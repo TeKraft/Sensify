@@ -1,0 +1,36 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-title>Sensify</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <div class="selectedPage" *ngIf="(tabSelector === 'start')">
+        <sensify-page-start [metadata]="metadata"></sensify-page-start>
+    </div>
+    <div class="selectedPage" *ngIf="(tabSelector === 'map')">
+        <sensify-page-map [metadata]="metadata"></sensify-page-map>
+    </div>
+    <div class="selectedPage" *ngIf="(tabSelector === 'about')">
+        <sensify-page-about [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-about>
+    </div>
+</ion-content>
+
+<ion-footer>
+    <!-- <ion-toolbar> -->
+    <ion-segment (click)="changeTab(tabSelector)" [(ngModel)]="tabSelector">
+        <ion-segment-button style="color:black" value="start">
+            Start
+        </ion-segment-button>
+        <ion-segment-button style="color:black" value="map">
+            Map
+        </ion-segment-button>
+        <ion-segment-button style="color:black" value="about">
+            About
+        </ion-segment-button>
+    </ion-segment>
+    <!-- </ion-toolbar> -->
+</ion-footer>

@@ -8,27 +8,39 @@ import { openSenseApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { ApiProvider } from '../providers/api/api';
 import { HttpClientModule } from '@angular/common/http';
+import { LocalNotifications } from '@ionic-native/local-notifications';
+import { NativeGeocoder } from '@ionic-native/native-geocoder';
+import { LeafletModule } from "@asymmetrik/ngx-leaflet";
+import { FavoriteProvider } from '../providers/favorite/favorite';
+import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
-  declarations: [
-    openSenseApp,
-    HomePage,
-  ],
-  imports: [
-    HttpClientModule,
-    BrowserModule,
-    IonicModule.forRoot(openSenseApp)
-  ],
-  bootstrap: [IonicApp],
-  entryComponents: [
-    openSenseApp,
-    HomePage
-  ],
-  providers: [
-    StatusBar,
-    SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
-    ApiProvider
-  ]
+    declarations: [
+        openSenseApp,
+        HomePage,
+    ],
+    imports: [
+        HttpClientModule,
+        BrowserModule,
+        IonicModule.forRoot(openSenseApp),
+        LeafletModule,
+        IonicStorageModule.forRoot()
+
+    ],
+    bootstrap: [IonicApp],
+    entryComponents: [
+        openSenseApp,
+        HomePage
+    ],
+    providers: [
+        StatusBar,
+        SplashScreen,
+        { provide: ErrorHandler, useClass: IonicErrorHandler },
+        ApiProvider,
+        FavoriteProvider,
+        LocalNotifications,
+        NativeGeocoder,
+    FavoriteProvider
+    ]
 })
-export class AppModule {}
+export class AppModule { }

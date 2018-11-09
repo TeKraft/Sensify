@@ -15,6 +15,46 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
+.start{
+    background: url(./../../../assets/imgs/TestBckgrd.png) no-repeat center center fixed;
+    background-size: cover;
+}
+
+.h{
+    color: color($colors,light);
+}
+
+.Overlay_Name{
+    padding-left: 15px;
+    text-align: left;
+    width: 100%;
+    height: 60px;
+    position: absolute;
+    z-index: 99;
+    color: color($colors,dark);
+}
+
+.Overlay_Temp{
+    padding-right: 15px;
+    text-align:right;
+    width: 100%;
+    height: 60px;
+    position: absolute;
+    z-index: 99;
+    color: color($colors,dark);
+}
+
+.Overlay_extra{
+    display:none;
+    padding-left: 15px;
+    padding-top: 120px;
+    text-align: left;
+    width: 100%;
+    height: 60px;
+    position: absolute;
+    z-index: 99;
+    color: color($colors,light);
+}
 
 .toolbar {
     .toolbar-title {

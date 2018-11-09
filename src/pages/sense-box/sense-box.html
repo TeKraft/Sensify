@@ -5,31 +5,39 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-  <ion-navbar>
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <ion-title>senseBox</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-title>senseBox</ion-title>
+    </ion-navbar>
 </ion-header>
-  
-  
+
+
 
 
 <ion-content padding>
 
-  <button (click)="getData()" ion-button color="secondary">
-    get data
-  </button>
+    <button (click)="getData()" ion-button color="secondary">
+        get data
+    </button>
 
-  <div *ngIf="boxData">
-    <h1>{{boxData.name}}</h1>
-    <ion-list>
-      <div ion-item *ngFor="let sensor of boxData.sensors">
-        <h3>{{sensor.title}}</h3>
-        <p>{{sensor.lastMeasurement.value}} &nbsp; {{sensor.unit}}</p>
-      </div>
-    </ion-list>
-  </div>
+    <button (click)="getSenseBoxes()" ion-button color="secondary">
+        get all SenseBoxes
+    </button>
+
+    <button (click)="getClosestSenseBox()" ion-button color="secondary">
+        get the nearest SenseBoxes
+    </button>
+
+    <div *ngIf="boxData">
+        <h1>{{boxData.model}}</h1>
+        <ion-list>
+            <div ion-item *ngFor="let sensor of boxData.sensors">
+                <h3>{{sensor.title}}</h3>
+                <p>{{sensor.lastMeasurement.value}} &nbsp; {{sensor.unit}}</p>
+            </div>
+        </ion-list>
+    </div>
 
 </ion-content>

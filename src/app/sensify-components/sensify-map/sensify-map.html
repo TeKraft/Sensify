@@ -1,0 +1,7 @@
+<div style="width:100%; height:100%;"
+    leaflet
+    [leafletOptions]="LeafletOptions"
+    (leafletMapReady)="onMapReady($event)"
+    [leafletLayersControl]="layersControl">
+    <!--<div *ngFor="let l of layers" [LeafletLayer]="l"></div>-->
+</div>
