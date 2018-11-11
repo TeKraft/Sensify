@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NavController, NavParams, AlertController, Platform } from 'ionic-angular';
-import { LocalNotifications } from '@ionic-native/local-notifications'
+import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { Metadata } from '../../../providers/model';
 
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
@@ -22,34 +21,11 @@ export class SensifyAboutPage {
     newValidationRange: any;
     newSenseboxID: any;
 
-    constructor(public mySensifyPage:SensifyPage,  public navCtrl: NavController, public alertCrtl: AlertController, public navParams: NavParams, private plt: Platform, private localNotifications: LocalNotifications) {
-        //if testing on device  (because notifications cant be tested on browser)
-        if (this.plt.is('cordova')) {
-            this.plt.ready().then(rdy => {
-                this.localNotifications.on('click').subscribe(res => {
-                    alert(res.data.mydata)
-                });
-            });
-        }
+    constructor(public mySensifyPage:SensifyPage,  public navCtrl: NavController, public alertCrtl: AlertController, public navParams: NavParams) {
     }
     
-
     ionViewDidLoad() {
         console.log('ionViewDidLoad SensifyAboutPage');
-    }
-
-    public testNotifications() {
-        if (this.plt.is('cordova')) {
-            this.localNotifications.schedule({
-                id: 1,
-                trigger: { at: new Date(new Date().getTime() + 1000) }, //1000 ms = 1sec
-                title: "Sensify News",
-                text: 'ALOHA I BIMS. EINS NOTIFICATIONS',
-                data: { mydata: "Hier könnte ihre Webung stehen <3 " }
-            })
-        } else {
-            alert("You can't test Notifications in the browser bro... Use an emulator!");
-        }
     }
 
     //SETTINGS

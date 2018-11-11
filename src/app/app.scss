@@ -16,8 +16,8 @@
 // automatically applied to the <body> element in the app.
 
 .start{
-    background: url(./../../../assets/imgs/TestBckgrd.png) no-repeat center center fixed;
-    background-size: cover;
+   // background: url(./../../../assets/imgs/TestBckgrd.png) no-repeat center center fixed;
+   // background-size: cover;
 }
 
 .h{
@@ -66,4 +66,8 @@
     .toolbar-background {
         background: map-get($colors, primary);
     }
+}
+
+.header-md::after {
+    height: 0%;
 }

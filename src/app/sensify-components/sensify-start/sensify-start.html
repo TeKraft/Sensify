@@ -1,19 +1,35 @@
 <ion-content class="start">
-    <ion-grid>
-        <ion-row>
-            <div *ngIf="currBox">
-                <h1 id="senseBoxTitle">{{currBox.name}}</h1>
-                <ion-list>
-                    <div *ngIf="currBox.sensors">
-                        <div ion-item *ngFor="let sensor of currBox.sensors">
-                            <h3>{{sensor.title}}</h3>
-                            <div *ngIf="sensor.lastMeasurement">
-                                <p>{{sensor.lastMeasurement.value}} &nbsp; {{sensor.unit}}</p>
-                            </div>
-                        </div>
-                    </div>
-                </ion-list>
-            </div>
-        </ion-row>
+    <ion-grid> 
+            <ion-row id="titleRow" justify-content-center>
+                <h1 *ngIf="currBox" id="senseBoxTitle">{{currBox.name}}</h1>
+            </ion-row>
+
+            <ion-row id="dateRow" justify-content-center>
+                <h5 *ngIf="date" id="date">{{date}}</h5>
+            </ion-row>
+
+
+            <ion-row  id="tempRow" justify-content-center>
+                <ion-col id="temperature" col-8>
+                    Temperature Information
+                </ion-col>
+                <ion-col id="sunIndicator">
+                    Sunrise/Sunset
+                </ion-col>
+            </ion-row>
+
+
+            <ion-row id="dataRow" justify-content-center>
+                <ion-col id="sensors">
+                    Sensor
+                </ion-col>
+                <ion-col id="values" col-3>
+                    Values
+                </ion-col>
+                <ion-col id="unit" col-1>
+                    Unit
+                </ion-col>
+            </ion-row>
+
     </ion-grid>
 </ion-content>

@@ -4,3 +4,49 @@ sensify-page-start {
 #senseBoxTitle{
     color: #4EAF47;
 }
+
+#titleRow{
+    background: yellow;
+    height: 10vh;
+}
+
+#dateRow{
+    background: purple;
+    height: 8vh;
+}
+
+#tempRow{
+    background: green;
+    height: 25vh;
+}
+
+#temperature{
+    background: darkcyan;
+}
+
+#sunIndicator{
+    background:darkolivegreen;
+}
+
+#dataRow{
+    background: red;
+    height: 40vh;
+}
+
+#sensors{
+    background:darkkhaki;
+    text-align: center;
+    align-content: center;
+}
+
+#values{
+    background:darkorange;
+    text-align: center;
+    align-content: center;
+}
+
+#unit{
+    background:plum;
+    text-align: center;
+    align-content: center;
+}

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NavController} from 'ionic-angular';
 import { tileLayer } from "leaflet";
 import * as L from "leaflet";
@@ -14,7 +14,8 @@ export class SensifyMapPage implements OnChanges {
     @Input()
     public metadata: Metadata;
 
-    public closestBoxesMarkers: any[] = [];
+    @Output()
+    public onMessageChange: EventEmitter<string> = new EventEmitter();;
 
     // Leaflet Config Values
     public map: L.Map;
@@ -65,22 +66,20 @@ export class SensifyMapPage implements OnChanges {
     }
 
     ngOnChanges(changes): void {
+        console.log(changes);
         if (changes.metadata && this.map) {
-            if (this.metadata.settings.location) {
-                this.addUserLocationToMap();
-            }
-            if (this.metadata.senseBoxes) {
-                this.addSenseboxMarkerToMap();
-            }
+            this.updateMap();
         }
     }
 
     onMapReady(map: L.Map) {
         this.map = map;
-        // this.map.removeControl();
-        // this.map.addControl(L.control.zoom({ position: 'topleft' }));
-        this.addUserLocationToMap();
-        if (this.metadata && this.metadata.senseBoxes) {
+        this.updateMap();
+    }
+
+    public updateMap() {
+        if (this.metadata.settings.location) {
+            this.addUserLocationToMap();
             this.addSenseboxMarkerToMap();
         }
     }
@@ -108,37 +107,51 @@ export class SensifyMapPage implements OnChanges {
  
     // Add senseBoxes to Map
     public addSenseboxMarkerToMap() {
-        // Check if markers were already set; delete them if yes -> update markers
-        if(this.senseboxMarkersLayer != undefined){
-            this.map.removeLayer(this.senseboxMarkersLayer);
-            this.senseboxMarkersLayer = undefined;
-        }
-
-        for (let i = 0; i < this.metadata.senseBoxes.length; i++) {
-            // Generate marker-description
-            let popupDescription = SensifyMapPage.getSenseboxPopupDescription(this.metadata.senseBoxes[i]);
-            // Generate marker
-            if(this.metadata.senseBoxes[i].location != this.metadata.closestSenseBox.location){
-                let marker = L.marker(this.metadata.senseBoxes[i].location, 
-                    { icon: this.greenIcon })
-                    .bindPopup(popupDescription);
-                // Add marker to map
-                this.closestBoxesMarkers.push(marker);
-            }else{//ClosestSenseBox Marker
-                let marker = L.marker(this.metadata.senseBoxes[i].location, 
-                    { icon: this.redIcon })
-                    .bindPopup(popupDescription);
-                // Add marker to map
-                this.closestBoxesMarkers.push(marker);
+        if (this.metadata.senseBoxes && this.metadata.closestSenseBox && this.metadata.senseBoxes.length > 0) {
+            let closestBoxesMarkers = [];
+            for (let i = 0; i < this.metadata.senseBoxes.length; i++) {
+                // Generate marker-description
+                let popupDescription = SensifyMapPage.getSenseboxPopupDescription(this.metadata.senseBoxes[i]);
+                // Generate marker
+                if (this.metadata.senseBoxes[i].location != this.metadata.closestSenseBox.location){
+                    let marker = L.marker(this.metadata.senseBoxes[i].location, 
+                        { icon: this.greenIcon })
+                        .bindPopup(popupDescription);
+                    // Add marker to map
+                    closestBoxesMarkers.push(marker);
+                } else {//ClosestSenseBox Marker
+                    let marker = L.marker(this.metadata.senseBoxes[i].location, 
+                        { icon: this.redIcon })
+                        .bindPopup(popupDescription);
+                    // Add marker to map
+                    closestBoxesMarkers.push(marker);
+                }
             }
-        }
-        //line from user to closest box
-        let lineCoords = [[this.metadata.settings.location, this.metadata.closestSenseBox.location]];
-        let polyline = L.polyline(lineCoords, {color:'red'});
-        this.closestBoxesMarkers.push(polyline);
-        this.senseboxMarkersLayer = L.layerGroup(this.closestBoxesMarkers);
-        this.layersControl.overlays['SenseBoxes'] = this.senseboxMarkersLayer;
-        this.layersControl.overlays['SenseBoxes'].addTo(this.map);
+    
+            // Check if markers were already set; delete them if yes -> update markers
+            if (this.senseboxMarkersLayer != undefined) {
+                this.map.removeLayer(this.senseboxMarkersLayer);
+                this.senseboxMarkersLayer = undefined;
+                this.layersControl.overlays['SenseBoxes'] = {};
+            }
+            //line from user to closest box
+            let lineCoords = [[this.metadata.settings.location, this.metadata.closestSenseBox.location]];
+            let polyline = L.polyline(lineCoords, {color:'red'});
+            closestBoxesMarkers.push(polyline);
+            this.senseboxMarkersLayer = L.layerGroup(closestBoxesMarkers);
+            this.layersControl.overlays['SenseBoxes'] = this.senseboxMarkersLayer;
+            this.layersControl.overlays['SenseBoxes'].addTo(this.map);
+        } else {
+            this.metadata.senseBoxes !== null ? console.log(this.metadata.senseBoxes.length) : console.log('senseboxes ==== null');
+            if (this.senseboxMarkersLayer !== undefined) {
+                this.map.removeLayer(this.senseboxMarkersLayer);
+            }
+            if (this.senseboxMarkersLayer === undefined || this.metadata.closestSenseBox === null || this.metadata.closestSenseBox === undefined) {
+                this.onMessageChange.emit('No SenseBoxes around.');
+            }
+            delete this.layersControl.overlays['SenseBoxes'];
+        }        
+        
     }
 
     static getSenseboxPopupDescription(sensebox: SenseBox): string{

@@ -18,6 +18,7 @@
     "@angular/core": "5.2.11",
     "@angular/forms": "5.2.11",
     "@angular/http": "5.2.11",
+    "@angular/material": "^7.0.3",
     "@angular/platform-browser": "5.2.11",
     "@angular/platform-browser-dynamic": "5.2.11",
     "@asymmetrik/ngx-leaflet": "^4.0.0",
@@ -30,17 +31,19 @@
     "@ionic/storage": "2.2.0",
     "cordova-android": "7.1.1",
     "cordova-browser": "5.0.4",
+    "cordova-ios": "4.5.5",
+    "cordova-plugin-add-swift-support": "^1.7.1",
     "cordova-plugin-badge": "^0.8.7",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-ionic-keyboard": "^2.1.3",
-    "cordova-plugin-ionic-webview": "^2.2.0",
-    "cordova-plugin-local-notification": "0.9.0-beta.2",
-    "cordova-plugin-nativegeocoder": "3.1.2",
+    "cordova-plugin-ionic-webview": "^2.2.1",
+    "cordova-plugin-local-notification": "^0.9.0-beta.2",
+    "cordova-plugin-nativegeocoder": "^3.1.2",
     "cordova-plugin-splashscreen": "^5.0.2",
     "cordova-plugin-statusbar": "^2.4.2",
     "cordova-plugin-whitelist": "^1.3.3",
-    "cordova-sqlite-storage": "2.5.1",
+    "cordova-sqlite-storage": "^2.5.1",
     "ionic-angular": "3.9.2",
     "ionicons": "3.0.0",
     "leaflet": "^1.3.4",
@@ -68,12 +71,15 @@
         "GEOLOCATION_USAGE_DESCRIPTION": "To locate you"
       },
       "cordova-plugin-local-notification": {},
-      "cordova-plugin-nativegeocoder": {},
+      "cordova-plugin-nativegeocoder": {
+        "LOCATION_WHEN_IN_USE_DESCRIPTION": "Use geocoder service"
+      },
       "cordova-sqlite-storage": {}
     },
     "platforms": [
       "android",
-      "browser"
+      "browser",
+      "ios"
     ]
   }
 }

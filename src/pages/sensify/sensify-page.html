@@ -8,15 +8,34 @@
 </ion-header>
 
 <ion-content>
-    <div class="selectedPage" *ngIf="(tabSelector === 'start')">
-        <sensify-page-start [metadata]="metadata"></sensify-page-start>
-    </div>
-    <div class="selectedPage" *ngIf="(tabSelector === 'map')">
-        <sensify-page-map [metadata]="metadata"></sensify-page-map>
-    </div>
-    <div class="selectedPage" *ngIf="(tabSelector === 'about')">
-        <sensify-page-about [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-about>
-    </div>
+        <!-- toolbar for loading -->
+        <ion-row id="loadingBar">
+            <ion-grid [hidden]="!loadingSpinner.show">
+                <ion-col id="colSpinner" col-1 >
+                    <ion-spinner id="spinner" name="dots" class="spinner-dark"></ion-spinner>
+                </ion-col>
+                <ion-col id="colMessage">
+                    {{loadingSpinner.message}}
+                </ion-col>
+            </ion-grid>
+            <ion-grid [hidden]="!globalMessage.show">
+                <ion-col id="colMessage">
+                    {{globalMessage.message}}
+                </ion-col>
+            </ion-grid>
+        </ion-row>
+        <!-- pages -->
+        <ion-row id="pageContent">
+            <div class="selectedPage" *ngIf="(tabSelector === 'start')">
+                <sensify-page-start [metadata]="metadata"></sensify-page-start>
+            </div>
+            <div class="selectedPage" *ngIf="(tabSelector === 'map')">
+                <sensify-page-map [metadata]="metadata" (onMessageChange)="showGlobalMessage($event)"></sensify-page-map>
+            </div>
+            <div class="selectedPage" *ngIf="(tabSelector === 'about')">
+                <sensify-page-about [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-about>
+            </div>
+        </ion-row>
 </ion-content>
 
 <ion-footer>

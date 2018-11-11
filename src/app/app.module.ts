@@ -11,7 +11,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeGeocoder } from '@ionic-native/native-geocoder';
 import { LeafletModule } from "@asymmetrik/ngx-leaflet";
-import { FavoriteProvider } from '../providers/favorite/favorite';
 import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
@@ -37,10 +36,8 @@ import { IonicStorageModule } from '@ionic/storage';
         SplashScreen,
         { provide: ErrorHandler, useClass: IonicErrorHandler },
         ApiProvider,
-        FavoriteProvider,
         LocalNotifications,
         NativeGeocoder,
-    FavoriteProvider
     ]
 })
 export class AppModule { }
