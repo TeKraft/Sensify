@@ -8,6 +8,8 @@ import { LocalNotifications } from '@ionic-native/local-notifications'
 import { SensifyStartPage } from './sensify-start/sensify-start';
 import { SensifyMapPage } from './sensify-map/sensify-map';
 import { SensifyAboutPage } from './sensify-about/sensify-about';
+import { SensifySettingsPage } from './sensify-settings/sensify-settings';
+import { SensifyNotificationsPage } from './sensify-notifications/sensify-notifications';
 
 
 @NgModule({
@@ -15,11 +17,15 @@ import { SensifyAboutPage } from './sensify-about/sensify-about';
     SensifyStartPage,
     SensifyMapPage,
     SensifyAboutPage,
+    SensifySettingsPage,
+    SensifyNotificationsPage
   ],
   imports: [
     IonicPageModule.forChild(SensifyStartPage),
     IonicPageModule.forChild(SensifyMapPage),
     IonicPageModule.forChild(SensifyAboutPage),
+    IonicPageModule.forChild(SensifySettingsPage),
+    IonicPageModule.forChild(SensifyNotificationsPage),
     LeafletModule,
     LeafletModule.forRoot()
   ],
@@ -31,6 +37,8 @@ import { SensifyAboutPage } from './sensify-about/sensify-about';
     SensifyStartPage,
     SensifyMapPage,
     SensifyAboutPage,
+    SensifySettingsPage,
+    SensifyNotificationsPage
   ]
 })
 export class SensifyComponentModule {}

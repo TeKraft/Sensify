@@ -1,52 +1,93 @@
 sensify-page-start {
-}
+    
+    .start{
+        background: no-repeat 0 0 fixed;
+        background-size: cover;
+        color: rgb(255, 255, 255);
+    }
 
-#senseBoxTitle{
-    color: #4EAF47;
-}
+    .titles{
+        margin-top: 20px;
+    }
 
-#titleRow{
-    background: yellow;
-    height: 10vh;
-}
+    .values{
+        margin-top: 0px;
+    }
 
-#dateRow{
-    background: purple;
-    height: 8vh;
-}
+    #senseBoxTitle{
+        font-size:40px;
+        color: rgb(255, 255, 255);
+    }
 
-#tempRow{
-    background: green;
-    height: 25vh;
-}
+    #date{
+        margin-top: 30px;
+        font-size:20px;
+        color: rgb(255, 255, 255);
+    }
+    #titleRow{
+        background: transparent;
+        height: 10vh;
+        
+    }
 
-#temperature{
-    background: darkcyan;
-}
+    #dateRow{
+        height: 8vh;
+    }
 
-#sunIndicator{
-    background:darkolivegreen;
-}
+    #tempRow{
+        height: 25vh;
+    }
 
-#dataRow{
-    background: red;
-    height: 40vh;
-}
+    #temperature{
+        position: relative;
+        left:30px;
+        font-size: 15px;
+    }
 
-#sensors{
-    background:darkkhaki;
-    text-align: center;
-    align-content: center;
-}
+    .temp{
+        position: relative;
+        font-size: 60px;
+    }
 
-#values{
-    background:darkorange;
-    text-align: center;
-    align-content: center;
-}
+    #sunIndicator{
+        text-align: center;
+        align-content: center;
+    }
 
-#unit{
-    background:plum;
-    text-align: center;
-    align-content: center;
+    #sunIcon{
+        margin-bottom: -10px;
+        height: 45px;
+    }
+
+    #dataRow{
+        height: 40vh;
+    }
+
+    #sensors{
+        background:rgba(0, 0, 0, 0.5);
+        font-size: 20px;
+        line-height: 2;
+        text-align: left;
+        align-content: center;
+    }
+
+    #values{
+        background:rgba(0, 0, 0, 0.5);
+        font-size: 20px;
+        line-height: 2;
+        text-align: center;
+        align-content: center;
+    }
+
+    #unit{
+        background:rgba(0, 0, 0, 0.5);
+        font-size: 20px;
+        line-height: 2;
+        text-align: center;
+        align-content: center;
+    }
+
+    li{
+        border-right: 1px solid #aaa;
+    }
 }

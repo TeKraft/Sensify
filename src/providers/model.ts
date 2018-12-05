@@ -3,6 +3,7 @@ export interface Sensor {
     unit: String;
     lastMeasurement: {
         value: String;
+        createdAt: String;
     };
     sensorType: String;
     id: String;
@@ -18,6 +19,7 @@ export interface SenseBox {
     updatedAt: String;
     sensors: Sensor[];
     _id: String;
+    updatedCategory: String;
 }
 
 export interface Settings {
@@ -25,9 +27,12 @@ export interface Settings {
     location?: L.LatLng;
     radius: number;
     mySenseBox?: String;
+    timestamp: Date;
     ranges: {
         temperature: number;
     };
+    zoomLevel: number;
+    mapView: L.LatLng;
 }
 
 export interface Metadata {
@@ -35,3 +40,4 @@ export interface Metadata {
     senseBoxes?: SenseBox[]; // Contains Closest SenseBoxes defined by radius and user location
     closestSenseBox?: SenseBox;
 }
+

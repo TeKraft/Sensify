@@ -1,9 +1,7 @@
-
 import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { HomePage } from '../pages/home/home';
 
 @Component({
     templateUrl: 'app.html'
@@ -12,13 +10,10 @@ export class openSenseApp {
 
     @ViewChild(Nav) nav: Nav;
 
-    public rootPage: any = HomePage;
+    public rootPage: any = "SensifyPage";
 
     pages: Array<{ title: string, component: any }> = [
-        { title: 'Home', component: HomePage },
-        { title: 'About', component: 'AboutPage' },
-        { title: 'senseBox', component: 'SenseBoxPage' },
-        { title: 'Sensify', component: 'SensifyPage' },
+        { title: 'Sensify', component: 'SensifyPage' }
     ];
 
     constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {

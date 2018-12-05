@@ -22,7 +22,13 @@ sensify-page {
     }
 
     #pageContent {
-        height: calc(100vh - 20px);
+        height: calc(100vh - 20px - 42px - 56px); // 100vh - loading - footer - header
+    }
+
+    ion-footer {
+        .footer-sensify-page {
+            height: 42px;
+        }
     }
 
     .selectedPage {

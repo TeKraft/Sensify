@@ -7,43 +7,25 @@
             <ion-item>
                 <strong>Version:</strong> 0.0.1
             </ion-item>
-            <ion-item>
-                <strong>Description:</strong> Light weight weather App bringing SenseBox data in your daily life
+            <ion-item >
+                <strong>Authors:</strong> <p text-wrap> Moritz Migge, Niklas Philippi, Raoul Kanschat, Saphir El-Kaiy, Torben Kraft, Viktor Gorte</p>
             </ion-item>
-            <ion-item>
-                <strong>Authors:</strong> Moritz Migge, Niklas Philippi, Raoul Kanschat, Saphir El-Kaiy, Torben Kraft,
-                Viktor
-                Gorte
+            <ion-item >
+                <strong>Description:</strong> <p text-wrap> Sensify is a light weight weather App bringing SenseBox data in your daily life:</p>
+                                              <ul id="functions">
+                                                  <li> <p text-wrap>- view data collected by the closest SenseBox</p></li>
+                                                  <li> <p text-wrap>- view all Senseboxes in your Area </p></li>
+                                                  <li> <p text-wrap>- chose your own SenseBox</p></li>
+                                                  <li> <p text-wrap>- chose your preferences</p></li>
+                                                  <li> <p text-wrap>- get notifications and stay cool</p></li>
+                                              </ul>    
             </ion-item>
-            <ion-item>
-                <!-- ToDo: Add Docu Hyperlink-->
-                <strong>Documentation and SourceCode</strong>
+            <ion-item>       
+                <button ion-button (click)="openUrl()">
+                        <strong>Documentation and SourceCode</strong>
+                </button>
             </ion-item>
         </ion-col>
     </ion-row>
 </ion-grid>
 
-<ion-grid>
-    <ion-row>
-        <ion-col width-100>
-            <ion-item>
-                <strong>Settings</strong>
-            </ion-item>
-            <ion-item>
-                <ion-label color="primary" floating>Radius (in km)</ion-label>
-                <!-- TODO: add placeholders ( e.g. in the ion-input: placeholder="{{settings.radius}}" ) -->
-                <ion-input type="number" min="0" [(ngModel)]="newRadius"></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label color="primary" floating>Temp Validation Range (in °C)</ion-label>
-                <ion-input type="number" min="0" [(ngModel)]="newValidationRange"></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label color="primary" floating>SenseBox ID</ion-label>
-                <ion-input [(ngModel)]="newSenseboxID"></ion-input>
-            </ion-item>
-        </ion-col>
-    </ion-row>
-    <button ion-button round outline (click)="changeSettings()">Confirm Changes</button>
-
-</ion-grid>

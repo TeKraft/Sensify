@@ -87,6 +87,7 @@
     </plugin>
     <plugin name="cordova-plugin-local-notification" spec="0.9.0-beta.2" />
     <plugin name="cordova-sqlite-storage" spec="2.5.1" />
+    <allow-navigation href="http://192.168.178.44:8100" sessionid="326b0ff7" />
     <engine name="android" spec="7.1.1" />
     <engine name="browser" spec="5.0.4" />
     <engine name="ios" spec="4.5.5" />

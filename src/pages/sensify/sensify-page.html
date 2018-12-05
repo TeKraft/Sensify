@@ -3,52 +3,75 @@
         <button ion-button menuToggle>
             <ion-icon name="menu"></ion-icon>
         </button>
+        <ion-buttons end>
+            <button ion-button (click)="openSelect()">
+                <ion-icon size="large" name="settings" style="zoom:1.5;"></ion-icon>
+            </button>
+        </ion-buttons>
         <ion-title>Sensify</ion-title>
     </ion-navbar>
 </ion-header>
 
+
+<!-- Does not need to be displayed on default-->
+<ion-select [(ngModel)]="tabSelector" interface="action-sheet" #mySelect>
+    <ion-option value="settings">Settings</ion-option>
+    <ion-option value="about">About</ion-option>
+    <!--<ion-option value="mute_inf">Exit App</ion-option>-->
+</ion-select>
+
+
 <ion-content>
-        <!-- toolbar for loading -->
-        <ion-row id="loadingBar">
-            <ion-grid [hidden]="!loadingSpinner.show">
-                <ion-col id="colSpinner" col-1 >
-                    <ion-spinner id="spinner" name="dots" class="spinner-dark"></ion-spinner>
-                </ion-col>
-                <ion-col id="colMessage">
-                    {{loadingSpinner.message}}
-                </ion-col>
-            </ion-grid>
-            <ion-grid [hidden]="!globalMessage.show">
-                <ion-col id="colMessage">
-                    {{globalMessage.message}}
-                </ion-col>
-            </ion-grid>
-        </ion-row>
-        <!-- pages -->
-        <ion-row id="pageContent">
-            <div class="selectedPage" *ngIf="(tabSelector === 'start')">
-                <sensify-page-start [metadata]="metadata"></sensify-page-start>
-            </div>
-            <div class="selectedPage" *ngIf="(tabSelector === 'map')">
-                <sensify-page-map [metadata]="metadata" (onMessageChange)="showGlobalMessage($event)"></sensify-page-map>
-            </div>
-            <div class="selectedPage" *ngIf="(tabSelector === 'about')">
-                <sensify-page-about [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-about>
-            </div>
-        </ion-row>
+    <!-- toolbar for loading -->
+    <ion-row id="loadingBar">
+        <ion-grid [hidden]="!loadingSpinner.show">
+            <ion-col id="colSpinner" col-1>
+                <ion-spinner id="spinner" name="dots" class="spinner-dark"></ion-spinner>
+            </ion-col>
+            <ion-col id="colMessage">
+                {{loadingSpinner.message}}
+            </ion-col>
+        </ion-grid>
+        <ion-grid [hidden]="loadingSpinner.show || !globalMessage.show">
+            <ion-col id="colMessage">
+                {{globalMessage.message}}
+            </ion-col>
+        </ion-grid>
+    </ion-row>
+    <!-- components -->
+    <ion-row id="pageContent">
+        <div class="selectedPage" *ngIf="(tabSelector === 'map')">
+            <sensify-page-map [metadata]="metadata" (onMessageChange)="showGlobalMessage($event)"></sensify-page-map>
+        </div>
+        <div class="selectedPage" *ngIf="(tabSelector === 'start')">
+            <sensify-page-start [metadata]="metadata"></sensify-page-start>
+        </div>
+        <div class="selectedPage" *ngIf="(tabSelector === 'notifications')">
+            <sensify-page-notifications></sensify-page-notifications>
+        </div>
+        <div class="selectedPage" *ngIf="(tabSelector === 'settings')">
+            <sensify-page-settings [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-settings>
+        </div>
+        <div class="selectedPage" *ngIf="(tabSelector === 'about')">
+            <sensify-page-about></sensify-page-about>
+        </div>
+    </ion-row>
 </ion-content>
 
-<ion-footer>
-    <!-- <ion-toolbar> -->
+<ion-footer class="footer-sensify-page">
+<!-- <ion-toolbar> -->
     <ion-segment (click)="changeTab(tabSelector)" [(ngModel)]="tabSelector">
-        <ion-segment-button style="color:black" value="start">
-            Start
-        </ion-segment-button>
+        <!--Map-->
         <ion-segment-button style="color:black" value="map">
-            Map
+            <ion-icon name="map"></ion-icon>
         </ion-segment-button>
-        <ion-segment-button style="color:black" value="about">
-            About
+        <!--Home-->
+        <ion-segment-button style="color:black" value="start">
+            <img src="../../assets/icon/favicon_sensify_black_white.png" width="30px">
+        </ion-segment-button>
+        <!--Notifications-->
+        <ion-segment-button style="color:black" value="notifications">
+            <ion-icon name="notifications"></ion-icon>
         </ion-segment-button>
     </ion-segment>
     <!-- </ion-toolbar> -->

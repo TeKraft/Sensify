@@ -1,15 +1,23 @@
 page-map {
-
+    .leaflet-control-zoom {
+        position: absolute;
+         left : -62px;
+         top: 65px;
+    }
+    
+    .leaflet-control-container { 
+        position: absolute; 
+        right: 5px 
+    }
 }
 
-.leaflet-control-zoom {
-    position: absolute;
-     left : -62px;
-     top: 65px;
+.line{
+    stroke: #5912a0;
+    opacity: 1;
 }
 
-.leaflet-control-container { 
-    position: absolute; 
-    right: 5px 
-} 
-
+.circle{
+    stroke: rgba(35, 131, 114, 0.68);
+    fill-opacity: .1;
+    fill: #c53debbb;
+}
