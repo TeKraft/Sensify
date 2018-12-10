@@ -4,9 +4,9 @@ import 'rxjs/add/operator/map';
 import { SenseBox, Metadata } from '../model';
 import * as L from "leaflet";
 
-interface CurrentDate{
-	today : String;
-	week : Date
+interface CurrentDate {
+	today: String;
+	week: Date
 }
 
 @Injectable()
@@ -17,7 +17,7 @@ export class ApiProvider {
 
 	public metadata: Metadata;
 
-	constructor(public http: HttpClient) {}
+	constructor(public http: HttpClient) { }
 
 	getData() {
 		return this.http.get(`${this.API_URL}/boxes/5b0d436fd40a290019ef444d`);
@@ -27,13 +27,10 @@ export class ApiProvider {
 		let senseboxes: SenseBox[] = [];
 		let boxes: SenseBox[] = await this.getSenseBoxesInBB(userLocation, radius);
 		let currDate = this.getCurrentDate();
-
 		for (const element of boxes) {
 			let box = await this.getSenseBoxByID(element._id);
-
 			if (box.updatedAt) {
 				let updatedAt = box.updatedAt.substring(0, 10);
-
 				let dateUpdate = new Date(box.updatedAt.toString());
 				if (currDate.today == updatedAt) {
 					box.updatedCategory = "today";
@@ -46,27 +43,28 @@ export class ApiProvider {
 				box.updatedCategory = "tooOld";
 			}
 			senseboxes.push(box);
-
 		}
 		return senseboxes;
 	}
 
 
-	getCurrentDate() : CurrentDate {
+	getCurrentDate(): CurrentDate {
 		//Current day in YYYY-MM-DD Format for easy comparison
-		let currDate : CurrentDate;
+		let currDate: CurrentDate;
 		let date = new Date();
 		let tmpDay = date.getUTCDate();
 		let currentDay;
-		if(tmpDay < 10){
-			currentDay = "0"+tmpDay;
-		}
+		if (tmpDay < 10) {
+			currentDay = "0" + tmpDay;
+		} else {
+      currentDay = tmpDay
+    }
 		let currentMonth = date.getUTCMonth() + 1;  //January is 0
 		let currentYear = date.getUTCFullYear();
 
 		currDate = {
-			today :  currentYear + "-" + currentMonth + "-" + currentDay,
-			week : new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7)
+			today: currentYear + "-" + currentMonth + "-" + currentDay,
+			week: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7)
 		};
 		return currDate;
 	}
@@ -145,24 +143,27 @@ export class ApiProvider {
 	}
 
 	getclosestSenseBox(boxes: SenseBox[], userLocation: L.LatLng): Promise<SenseBox> {
-		if (!userLocation) {
-			console.error('no userlcoation provided!\ngetClosestSenseBox() has no property userLocation.');
-		}
 		return new Promise((resolve, reject) => {
+			if (!userLocation) {
+				console.error('no userlcoation provided!\ngetClosestSenseBox() has no property userLocation.');
+				reject('no userlocation provided');
+			}
 			let index = 0;
 			let minDistance: number = Number.MAX_VALUE;
 			let i = 0;
 			let currDate = this.getCurrentDate();
-			if (boxes.length != 0) {
-				boxes.forEach(box => {
-					if (box.updatedAt) {
-						let updatedAt = box.updatedAt.substring(0, 10);
-						let distance = userLocation.distanceTo(box.location);
-						if (distance < minDistance && currDate.today == updatedAt) {
-							index = i;
-							minDistance = distance;
+			if (boxes.length > 0 || boxes[0] !== null) {
+				boxes.forEach((box, i) => {
+					if (box !== null) {
+						if (box.updatedAt) {
+							let updatedAt = box.updatedAt.substring(0, 10);
+							let distance = userLocation.distanceTo(box.location);
+							if (distance < minDistance && currDate.today == updatedAt) {
+								index = i;
+								minDistance = distance;
+							}
+							i++;
 						}
-						i++;
 					}
 				});
 				if (minDistance != Number.MAX_SAFE_INTEGER) {
@@ -181,7 +182,8 @@ export class ApiProvider {
 					resolve(boxes[index]);
 				}
 			} else {
-				reject(reject);
+				console.error('no boxes provided!\ngetClosestSenseBox() has no property boxes.');
+				reject('No boxes found');
 			}
 		});
 	};

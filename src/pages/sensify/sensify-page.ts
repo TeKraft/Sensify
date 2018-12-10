@@ -1,6 +1,6 @@
 import { ApiProvider } from '../../providers/api/api';
 import { Metadata, SenseBox } from '../../providers/model';
-import { Component, ViewChild} from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, Platform, Select } from 'ionic-angular';
 import { Geolocation, Geoposition } from "@ionic-native/geolocation";
 import * as L from "leaflet";
@@ -45,7 +45,7 @@ export class SensifyPage {
     currentPos: Geoposition;
     settingsData: any;
 
-    constructor(public navCtrl: NavController, public navParams: NavParams, private api: ApiProvider, private geolocation: Geolocation,private storage: Storage, private localNotifications: LocalNotifications, private plt: Platform) {
+    constructor(public navCtrl: NavController, public navParams: NavParams, private api: ApiProvider, private geolocation: Geolocation, private storage: Storage, private localNotifications: LocalNotifications, private plt: Platform) {
         // check for localStorage
         this.metadata = {
             settings: {
@@ -74,9 +74,9 @@ export class SensifyPage {
     ionViewDidLoad() {
         console.log('ionViewDidLoad SensifyPage');
         this.tabSelector = 'start';
-        
+
         //example notification 
-        this.setNotificationWithTimer(0.2,"Test","Hey! Open up your Sensify-App for a quick update :)","Works like a charm.");
+        this.setNotificationWithTimer(0.2, "Test", "Hey! Open up your Sensify-App for a quick update :)", "Works like a charm.");
     }
 
     public openSelect() {
@@ -92,7 +92,7 @@ export class SensifyPage {
         console.log('Start initSenseBoxes');
         try {
             var currentDate = new Date();
-            this.metadata.settings.timestamp = currentDate; 
+            this.metadata.settings.timestamp = currentDate;
             this.showGlobalMessage('No SenseBoxes around.');
             this.toggleSpinner(true, 'Loading user position.');
             await this.getUserPosition().then(userlocation => {
@@ -113,28 +113,30 @@ export class SensifyPage {
             this.updateMetadata();
             this.toggleSpinner(true, 'Loading closest SenseBox.');
 
-            //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
-            if(this.metadata.settings.mySenseBox){
-                await this.api.getSenseBoxByID(this.metadata.settings.mySenseBox).then((box : SenseBox) => {
-                    this.metadata.closestSenseBox = box;
-                    if(this.metadata.senseBoxes.indexOf(box) < 0){
-                        this.metadata.senseBoxes.push(box);
-                    }
-                  if(this.metadata.settings.location && this.metadata.closestSenseBox){
-                    this.distanceToClosest = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
-                  }
-                })
-            }else{
-                await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location)
-                    .then((closestBox : SenseBox) => {
-                        this.metadata.closestSenseBox = closestBox;
-                        if(this.metadata.settings.location && this.metadata.closestSenseBox){
+            if (this.metadata.senseBoxes != []) {
+                //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
+                if (this.metadata.settings.mySenseBox) {
+                    await this.api.getSenseBoxByID(this.metadata.settings.mySenseBox).then((box: SenseBox) => {
+                        this.metadata.closestSenseBox = box;
+                        if (this.metadata.senseBoxes.indexOf(box) < 0) {
+                            this.metadata.senseBoxes.push(box);
+                        }
+                        if (this.metadata.settings.location && this.metadata.closestSenseBox) {
                             this.distanceToClosest = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
                         }
-                    });
+                    })
+                } else {
+                    await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location)
+                        .then((closestBox: SenseBox) => {
+                            this.metadata.closestSenseBox = closestBox;
+                            if (this.metadata.settings.location && this.metadata.closestSenseBox) {
+                                this.distanceToClosest = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
+                            }
+                        });
+                }
+                this.toggleSpinner(false, 'Loading closest SenseBox.');
+                this.updateMetadata();
             }
-            this.toggleSpinner(false, 'Loading closest SenseBox.');
-            this.updateMetadata();
 
             // TEST: VALIDATE TEMPERATURE VALUE OF CLOSEST SENSEBOX          
             // console.log("SenseBox Sensor Value for Temperature Valid? : "+this.api.sensorIsValid("Temperatur", this.metadata.closestSenseBox, this.metadata.senseBoxes, this.metadata.settings.ranges.temperature));
@@ -166,7 +168,7 @@ export class SensifyPage {
             this.loadingSpinner.message = msg;
         }
 
-        if (!this.loadingSpinner.show && (!this.metadata.senseBoxes || (this.metadata.senseBoxes && this.metadata.senseBoxes.length <= 0)) ) {
+        if (!this.loadingSpinner.show && (!this.metadata.senseBoxes || (this.metadata.senseBoxes && this.metadata.senseBoxes.length <= 0))) {
             this.globalMessage.show = true;
         }
         return;
@@ -176,28 +178,51 @@ export class SensifyPage {
         await this.updateMetadata();
         await this.toggleSpinner(true, 'Updating SenseBoxes.');
         // Check whether radius gets bigger or smaller
-        if(this.radius <= this.metadata.settings.radius){
-            await this.getBoxesSmallerRadius()
-                .then(res => {
-                    this.metadata.senseBoxes = res;
-                })
+        if (this.metadata.senseBoxes != undefined && this.metadata.senseBoxes.length > 0) {
+            if (this.metadata.settings.radius > this.radius) {
+                // if new radius is greater than 
+                await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
+                    .then(res => {
+                        this.metadata.senseBoxes = res;
+                        if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
+                            this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
+                        }
+                    });
+            } else if ((this.metadata.settings.location.distanceTo(this.startLocation) / 1000) < (this.radius / 2)) {
+                // get boxes smaller radius inside origin circle & smaller
+                await this.getBoxesSmallerRadius()
+                    .then(res => {
+                        this.metadata.senseBoxes = res;
+                    })
+            } else {
+                // normal get senseBoxes
+                await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
+                    .then(res => {
+                        this.metadata.senseBoxes = res;
+                        if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
+                            this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
+                        }
+                    });
+            }
         } else {
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
                 .then(res => {
                     this.metadata.senseBoxes = res;
-                    if(this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0){
+                    if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
                         this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
                     }
                 });
         }
+        this.startLocation = this.metadata.settings.location;
         this.radius = this.metadata.settings.radius;
         await this.toggleSpinner(false, 'Updating SenseBoxes.');
         await this.updateMetadata();
         await this.toggleSpinner(true, 'Updating closest SenseBox.');
-        if(this.radius > this.metadata.settings.radius && !this.metadata.settings.mySenseBox){
+        // if (this.radius > this.metadata.settings.radius && !this.metadata.settings.mySenseBox) {
+        if (!this.metadata.settings.mySenseBox) {
             await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
                 this.metadata.closestSenseBox = closestBox;
-                if(this.metadata.settings.location && this.metadata.closestSenseBox){
+                if (this.metadata.settings.location && this.metadata.closestSenseBox) {
                     this.distanceToClosest = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
                 }
             });
@@ -205,7 +230,7 @@ export class SensifyPage {
         await this.toggleSpinner(false, 'Updating closest SenseBox.');
         await this.updateMetadata();
     }
-    
+
     private updateMetadata() {
         this.metadata = {
             settings: this.metadata.settings,
@@ -236,24 +261,24 @@ export class SensifyPage {
 
     // Get the Metadata from storage
     getMetadata(): Promise<Metadata> {
-      return this.storage.get('metadata')
-        .then((val) => {
-          return {
-            settings: {
-              gps: val ? val.settings.gps : true,
-              radius: val ? val.settings.radius : 5,
-              timestamp: val? val.settings.timestamp: " : ",
-              ranges: val ? val.settings.ranges : { temperature: 5 },
-              location: this.metadata.settings.location ? this.metadata.settings.location : ( val && val.settings.location ? val.settings.location : null ),
-              zoomLevel: val.settings.zoomLevel ? val.settings.zoomLevel : 13,
-              mapView: this.metadata.settings.mapView ? this.metadata.settings.mapView : null
-            },
-            senseBoxes: this.metadata.senseBoxes ? this.metadata.senseBoxes : ( val && val.senseBoxes ? val.senseBoxes : null ),
-            closestSenseBox: this.metadata.closestSenseBox ? this.metadata.closestSenseBox : ( val && val.closestSenseBox ? val.closestSenseBox : null )
-          };
-        }, (error) => {
-          return error;
-        });
+        return this.storage.get('metadata')
+            .then((val) => {
+                return {
+                    settings: {
+                        gps: val ? val.settings.gps : true,
+                        radius: val ? val.settings.radius : 5,
+                        timestamp: val ? val.settings.timestamp : " : ",
+                        ranges: val ? val.settings.ranges : { temperature: 5 },
+                        location: this.metadata.settings.location ? this.metadata.settings.location : (val && val.settings.location ? val.settings.location : null),
+                        zoomLevel: val.settings.zoomLevel ? val.settings.zoomLevel : 13,
+                        mapView: this.metadata.settings.mapView ? this.metadata.settings.mapView : null
+                    },
+                    senseBoxes: this.metadata.senseBoxes ? this.metadata.senseBoxes : (val && val.senseBoxes ? val.senseBoxes : null),
+                    closestSenseBox: this.metadata.closestSenseBox ? this.metadata.closestSenseBox : (val && val.closestSenseBox ? val.closestSenseBox : null)
+                };
+            }, (error) => {
+                return error;
+            });
     }
 
     /**
@@ -276,14 +301,14 @@ export class SensifyPage {
     }
 
     // If radius gets smaller, compute the new SenseBoxes
-    getBoxesSmallerRadius():Promise<SenseBox[]>{
+    getBoxesSmallerRadius(): Promise<SenseBox[]> {
         return new Promise(resolve => {
             let tempBoxes: SenseBox[] = [];
-            for(let i = 0; i < this.metadata.senseBoxes.length; i++) {
+            for (let i = 0; i < this.metadata.senseBoxes.length; i++) {
                 let distance: number = this.metadata.settings.location.distanceTo(this.metadata.senseBoxes[i].location) / 1000;
-                if (distance <= this.radius) {
+                if (distance <= this.metadata.settings.radius) { // radius) {
                     tempBoxes.push(this.metadata.senseBoxes[i]);
-                } else if(distance > this.radius && this.metadata.closestSenseBox._id == this.metadata.senseBoxes[i]._id){
+                } else if (distance > this.metadata.settings.radius && this.metadata.closestSenseBox._id == this.metadata.senseBoxes[i]._id) {
                     tempBoxes.push(this.metadata.senseBoxes[i]);
                 }
             }
@@ -291,38 +316,29 @@ export class SensifyPage {
         });
     }
 
-    /*
     // Watch the user position
     subscription = this.geolocation.watchPosition()
         .subscribe(pos => {
             console.log('watch position');
-            // let location = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
-            let location = new L.LatLng(7.5961, 51.9695);
-            // necessary to re-define this.settings to trigger ngOnChanges in sensify.map.ts
-            this.metadata.settings.location = location;
-            if (location.distanceTo(this.startLocation) / 1000 >= this.metadata.settings.radius / 2) {
-                this.startLocation = this.metadata.settings.location;
+            if (pos.coords) {
+                let location = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
+                // let location = new L.LatLng(7.5961, 51.9695);
+                // necessary to re-define this.settings to trigger ngOnChanges in sensify.map.ts
+                this.metadata.settings.location = location;
                 this.updateBoxes();
             }
-            if (this.metadata.senseBoxes && this.metadata.settings.location) {
-                this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
-                    this.metadata.closestSenseBox = closestBox;
-                    this.metadata = this.metadata;
-                });
-            }
         });
-        */
 
     //Set notification with time in minutes from now, Title, Text, data that will be visible on click
-    setNotificationWithTimer(time : number, title : String, text : String, data : String){
+    setNotificationWithTimer(time: number, title: String, text: String, data: String) {
         let timeInMS = time * 1000 * 60;    //time * 60 = time in seconds, time * 1000 = time in ms
         if (this.plt.is('cordova')) {
             this.localNotifications.schedule({
                 id: 1,
-                trigger: { at: new Date(new Date().getTime() + timeInMS) }, 
-                title: ""+title,
-                text: ""+text,
-                data: ""+data
+                trigger: { at: new Date(new Date().getTime() + timeInMS) },
+                title: "" + title,
+                text: "" + text,
+                data: "" + data
             });
         } else {
             console.log("Notifications are disabled: Not a real device or emulator");
