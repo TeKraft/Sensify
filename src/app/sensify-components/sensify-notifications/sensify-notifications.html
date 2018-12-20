@@ -1,6 +1,6 @@
+<h3>Notifications</h3>
 <ion-list>
-    <h3>Notifications</h3>
-    <ion-item>
+    <!-- <ion-item>
         <ion-col>
             22.10.2018 19:30
         </ion-col>
@@ -23,5 +23,21 @@
         <ion-col >
             ☀️It's getting HOT in here 🏖️🏖️
         </ion-col>
+    </ion-item> -->
+    <ion-item *ngFor='let notification of metadata.notifications'>
+        <ion-row>
+            <ion-col>
+                {{notification.trigger.at}}
+            </ion-col>
+            <ion-col>
+                {{notification.title}}
+            </ion-col>
+        </ion-row>
+        <ion-row>
+                {{notification.text}}
+        </ion-row>
+        <ion-row>
+            {{notification.data}}
+        </ion-row>
     </ion-item>
 </ion-list>

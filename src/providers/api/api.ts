@@ -83,7 +83,8 @@ export class ApiProvider {
 				updatedAt: closestBox.updatedAt,
 				sensors: closestBox.sensors,
 				_id: closestBox._id,
-				updatedCategory: null
+				updatedCategory: null,
+        isValid: null
 			};
 			return box;
 		}).toPromise().then((box: SenseBox) => {
@@ -158,7 +159,7 @@ export class ApiProvider {
 						if (box.updatedAt) {
 							let updatedAt = box.updatedAt.substring(0, 10);
 							let distance = userLocation.distanceTo(box.location);
-							if (distance < minDistance && currDate.today == updatedAt) {
+							if (distance < minDistance && currDate.today == updatedAt && box.isValid) {
 								index = i;
 								minDistance = distance;
 							}
@@ -169,7 +170,7 @@ export class ApiProvider {
 				if (minDistance != Number.MAX_SAFE_INTEGER) {
 					resolve(boxes[index]);
 				} else {
-					//When minDistance is still MAX_VALUE and boxes.length was not zero => No Box with values from today found, therefor closst Box is searched
+					//When minDistance is still MAX_VALUE and boxes.length was not zero => No Box with values from today found, therefor closest Box is searched
 					boxes.forEach(box => {
 						let distance = userLocation.distanceTo(box.location);
 						if (distance < minDistance) {
@@ -217,23 +218,28 @@ export class ApiProvider {
 	 * @param range 		{number}	Validation range.
 	 * @return {boolean} 				True, if value is inside range.
 	 */
-	sensorIsValid(sensorName: String, closestBox: SenseBox, senseBoxes: SenseBox[], range: number) {
-		//Check if closestBox even has the given sensor
-		if (this.senseBoxHasSensor(sensorName, closestBox)) {
-			//Get mean of all closest Boxes (same sensor and same day)
-			let mean = this.getMeanValue(sensorName, senseBoxes);
-			//validate and return 
-			return this.validateValue(sensorName, mean, closestBox, range)
-		}
-	}
+
+	sensorIsValid(sensorName: String, closestBox: SenseBox, senseBoxes: SenseBox[], range: number){
+      let valiValue = false;
+      //Check if closestBox even has the given sensor
+      if (this.senseBoxHasSensor(sensorName, closestBox)) {
+        //Get mean of all closest Boxes (same sensor and same day)
+        let mean = this.getMeanValue(sensorName, senseBoxes);
+        //validate and return
+        valiValue = this.validateValue(sensorName, mean, closestBox, range);
+      }
+      return(valiValue);
+  };
 
 	//Checks if closestSenseBox has the sensor that you want to validate
 	senseBoxHasSensor(sensorName: String, closestBox: SenseBox) {
 		let res = false;
-		closestBox.sensors.forEach(sensor => {
-			let title: String = sensor.title;
-			if (sensorName === title) res = true;
-		});
+		if(closestBox){
+      closestBox.sensors.forEach(sensor => {
+        let title: String = sensor.title;
+        if (sensorName === title) res = true;
+      });
+    }
 		return res;
 	}
 
@@ -251,23 +257,25 @@ export class ApiProvider {
 		//check all closest boxes
 		senseBoxes.forEach(box => {
 			//check all sensors
-			box.sensors.forEach(sensor => {
-				//if sensor title is equal to searched sensor
-				if (sensor.title == sensorName && sensor.lastMeasurement && sensor.lastMeasurement.createdAt) {
-					let measurements = sensor.lastMeasurement;
+      if(box){
+        box.sensors.forEach(sensor => {
+          //if sensor title is equal to searched sensor
+          if (sensor.title == sensorName && sensor.lastMeasurement && sensor.lastMeasurement.createdAt) {
+            let measurements = sensor.lastMeasurement;
 
-					//Get Year, Month, Day of lastMeasurements for checking
-					let creationDay = Number(measurements.createdAt.substring(8, 10));
-					let creationMonth = Number(measurements.createdAt.substring(5, 7));
-					let creationYear = Number(measurements.createdAt.substring(0, 4));
+            //Get Year, Month, Day of lastMeasurements for checking
+            let creationDay = Number(measurements.createdAt.substring(8, 10));
+            let creationMonth = Number(measurements.createdAt.substring(5, 7));
+            let creationYear = Number(measurements.createdAt.substring(0, 4));
 
-					//check if last measurement is from same day, same month, same year
-					if (creationDay == currentDay && creationMonth == currentMonth && creationYear == currentYear) {
-						sum += Number(measurements.value);
-						numberOfSensors++;
-					}
-				}
-			});
+            //check if last measurement is from same day, same month, same year
+            if (creationDay == currentDay && creationMonth == currentMonth && creationYear == currentYear) {
+              sum += Number(measurements.value);
+              numberOfSensors++;
+            }
+          }
+        });
+      }
 		});
 		//Division by zero handling
 		if (numberOfSensors === 0) {
@@ -285,6 +293,9 @@ export class ApiProvider {
 		//get closest box value for validation
 		closestBox.sensors.forEach(sensor => {
 			if (sensor.title === sensorName) {
+			  if(!sensor.lastMeasurement){
+			    return false;
+        }
 				boxValue = Number(sensor.lastMeasurement.value);
 			}
 		});

@@ -17,6 +17,9 @@ export class SensifyMapPage implements OnChanges {
     @Output()
     public onMessageChange: EventEmitter<string> = new EventEmitter();
 
+    @Output()
+    public onMetadataChange: EventEmitter<Metadata> = new EventEmitter();
+
     // Leaflet Config Values
     public map: L.Map;
     public locateButton = L.Control.extend({
@@ -122,6 +125,12 @@ export class SensifyMapPage implements OnChanges {
         this.layersControl.addTo(this.map);
         this.map.zoomControl.setPosition('topleft');
         this.locatorButton = new this.locateButton();
+        this.map.on('moveend', e => {
+            this.metadata.settings.zoomLevel = e.target.getZoom();
+            let tempView = e.target.getCenter();
+            this.metadata.settings.mapView = new L.LatLng(tempView.lat, tempView.lng);
+            this.onMetadataChange.emit(this.metadata);
+        });
         this.map.addControl(this.locatorButton);
         this.updateMap();
     }
@@ -134,8 +143,12 @@ export class SensifyMapPage implements OnChanges {
     }
 
     public addUserLocationToMap() {
-        // Center map on user location
-        this.map.panTo(this.metadata.settings.location);
+        // On first start, set view on user location; otherwise, set view on the saved position/zoom
+        if (this.metadata.settings.zoomLevel && this.metadata.settings.mapView) {
+            this.map.setView(this.metadata.settings.mapView, this.metadata.settings.zoomLevel);
+        } else {
+            this.map.setView(this.metadata.settings.location, this.metadata.settings.zoomLevel);
+        }
 
         // Remove user location layer from map
         if (this.userLocationMarkerLayer) {
@@ -171,13 +184,13 @@ export class SensifyMapPage implements OnChanges {
                     // Generate marker
                     let marker;
                     if (this.metadata.senseBoxes[i].location != this.metadata.closestSenseBox.location) {
-                        if (this.metadata.senseBoxes[i].updatedCategory == "today") {
+                        if (this.metadata.senseBoxes[i].updatedCategory == "today" && this.metadata.senseBoxes[i].isValid) {
                             marker = L.marker(this.metadata.senseBoxes[i].location,
                                 { icon: this.greenIcon })
                                 .bindPopup(popupDescription);
                             // Add marker to map
                             closestMarkersGreen.push(marker);
-                        } else if (this.metadata.senseBoxes[i].updatedCategory == "thisWeek") {
+                        } else if (this.metadata.senseBoxes[i].updatedCategory == "thisWeek" && this.metadata.senseBoxes[i].isValid) {
                             marker = L.marker(this.metadata.senseBoxes[i].location,
                                 { icon: this.yellowIcon })
                                 .bindPopup(popupDescription);

@@ -2,45 +2,70 @@
     <ion-grid class="grid"> 
 
 
-            <ion-row id="titleRow" justify-content-center>
-                <h1 *ngIf="currBox" id="senseBoxTitle">{{currBox.name}}</h1> <h5 *ngIf="date" id="date">({{date}})</h5>
-            </ion-row>
+        <ion-row id="titleRow" justify-content-center>
+            <h1 *ngIf="currBox" id="senseBoxTitle">{{currBox.name}}</h1> 
+            <h5 *ngIf="date" id="date">({{date}})</h5>
+        </ion-row>
 
-            <ion-row  id="tempRow" justify-content-center>
-                <ion-col id="temperature" col-8>
-                    <h5 class = "temp">{{temperature}}</h5>
-                </ion-col>
-                <ion-col id="sunIndicator" col-4>
-                    <img src="../../../assets/imgs/sunrise.png" alt="sunrise" id="sunIcon">
-                    <h5 *ngIf="date" id="sunrise">{{sunrise}}</h5>
-                    <img src="../../../assets/imgs/sunset.png" alt="sunset" id="sunIcon">
-                    <h5 *ngIf="date" id="sunrise">{{sunset}}</h5>
-                </ion-col>
-            </ion-row>
+        <ion-row  id="currentSensorRow">
 
+            <ion-col id="currentSensorCol" col-6>
 
-            <ion-row id="dataRow" class="titles" justify-content-center>
-                <ion-col id="sensors" col-6>
-                    <h3 >Sensors</h3>
-                    <ul class="values">
-                        <li *ngFor="let sensor of sensors">
-                          <div>{{sensor.title}}</div>
-                        </li>
-                    </ul>
+                <button ion-button block (click)="openMenu()" id="btn">
+                    <div *ngIf="curValue" id="curValue">{{curValue}}</div> 
+                    <div *ngIf="curUnit" id="curUnit">{{curUnit}}</div>
+                </button>
+        
+            </ion-col>
+
+            <ion-col id="sunIndicator" col-6>
+                <img src="../../../assets/imgs/sunrise.png" alt="sunrise" id="sunIcon">
+                <h5 *ngIf="date" id="sunrise">{{sunrise}}</h5>
+                <img src="../../../assets/imgs/sunset.png" alt="sunset" id="sunIcon">
+                <h5 *ngIf="date" id="sunrise">{{sunset}}</h5>
+            </ion-col>
+
+        </ion-row>
+
+        <ion-row id="headingsRow">
+
+                <ion-col id="heading" col-6 >
+                        <h3>Sensors</h3>        
                 </ion-col>
-                <ion-col id="values" col-3>
+
+                <ion-col id="heading" col-3>
                     <h3>Values</h3>
-                    <ul class="values">
-                        <li *ngFor="let sensor of sensors">
-                          <div *ngIf="sensor.lastMeasurement != null">{{sensor.lastMeasurement.value}}</div>
+                </ion-col>
+
+                <ion-col id="heading" col-3>
+                    <h3>Unit</h3>
+                </ion-col>
+
+        </ion-row>
+
+        
+        <ion-row id="dataRow">
+
+                <ion-col id="sensorCol" col-5>
+                    <ul id="sensors">
+                        <li *ngFor="let sensor of sensors" id="element">
+                            <div>{{sensor.title}}</div>
                         </li>
                     </ul>
                 </ion-col>
-                <ion-col id="unit" col-3>
-                    <h3>Unit</h3>
-                    <ul class="values">
-                        <li *ngFor="let sensor of sensors">
-                          <div>{{sensor.unit}}</div>
+
+                <ion-col id="valueCol" col-4>
+                    <ul id="values">
+                        <li *ngFor="let sensor of sensors" id="element">
+                            <div *ngIf="sensor.lastMeasurement != null">{{sensor.lastMeasurement.value}}</div>
+                        </li>
+                    </ul>
+                </ion-col>
+
+                <ion-col id="unitCol" col-3>
+                    <ul id="units">
+                        <li *ngFor="let sensor of sensors" id="element">
+                            <div>{{sensor.unit}}</div>
                         </li>
                     </ul>
                 </ion-col>

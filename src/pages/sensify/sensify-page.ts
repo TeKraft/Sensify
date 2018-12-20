@@ -5,7 +5,7 @@ import { IonicPage, NavController, NavParams, Platform, Select } from 'ionic-ang
 import { Geolocation, Geoposition } from "@ionic-native/geolocation";
 import * as L from "leaflet";
 import { Storage } from '@ionic/storage';
-import { LocalNotifications } from '@ionic-native/local-notifications';
+import { ILocalNotification, LocalNotifications } from '@ionic-native/local-notifications';
 
 interface Loading {
     show: boolean,
@@ -36,6 +36,9 @@ export class SensifyPage {
     };
 
     public distanceToClosest;
+    public timerNotificationCounter: number = 0;
+    public timerNotificationEnabled: boolean = false;
+    public notificationCounter: number = 0;
 
     tab: String;
     tabSelector: String;
@@ -55,7 +58,8 @@ export class SensifyPage {
                 ranges: { temperature: 5 },
                 zoomLevel: null,
                 mapView: null
-            }
+            },
+            notifications: []
         };
         this.radius = 5;
         this.storage.set("metadata", this.metadata);
@@ -108,6 +112,10 @@ export class SensifyPage {
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
                 .then(res => {
                     this.metadata.senseBoxes = res;
+                    this.validateBoxes(res)
+                        .then(response => {
+                            this.metadata.senseBoxes = response;
+                        })
                 });
             this.toggleSpinner(false, 'Loading SenseBoxes.');
             this.updateMetadata();
@@ -144,6 +152,99 @@ export class SensifyPage {
         catch (err) {
             console.error(err);
         }
+
+        // start notification creation and timebased updating
+        try {
+            this.timerNotification();
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    public async timerNotification() {
+        if (this.timerNotificationEnabled) {
+            await this.timeout(10000);
+            var currentDate = new Date();
+            this.metadata.settings.timestamp = currentDate;
+            this.toggleSpinner(true, 'Loading SenseBoxes. - automatic');
+            await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
+                .then(res => {
+                    this.metadata.senseBoxes = res;
+                    this.validateBoxes(res)
+                        .then(response => {
+                            this.metadata.senseBoxes = response;
+                        })
+                });
+            this.toggleSpinner(false, 'Loading SenseBoxes. - automatic');
+            this.updateMetadata();
+            this.toggleSpinner(true, 'Loading closest SenseBox. - automatic');
+
+            if (this.metadata.senseBoxes != []) {
+                //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
+                if (this.metadata.settings.mySenseBox) {
+                    await this.api.getSenseBoxByID(this.metadata.settings.mySenseBox).then((box: SenseBox) => {
+                        this.metadata.closestSenseBox = box;
+                        if (this.metadata.senseBoxes.indexOf(box) < 0) {
+                            this.metadata.senseBoxes.push(box);
+                        }
+                        if (this.metadata.settings.location && this.metadata.closestSenseBox) {
+                            this.distanceToClosest = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
+                        }
+                    })
+                } else {
+                    await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location)
+                        .then((closestBox: SenseBox) => {
+                            this.metadata.closestSenseBox = closestBox;
+                            if (this.metadata.settings.location && this.metadata.closestSenseBox) {
+                                this.distanceToClosest = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
+                            }
+                        });
+                }
+                this.toggleSpinner(false, 'Loading closest SenseBox. - automatic');
+                this.updateMetadata();
+            }
+            // validate for threshold
+            this.metadata.senseBoxes.forEach(sb => {
+                let tempSensor = sb.sensors.find(el => el.title === 'Temperatur');
+                if (tempSensor && tempSensor.lastMeasurement && tempSensor.lastMeasurement.value != undefined && Number(tempSensor.lastMeasurement.value) <= 1) {
+                    console.log(tempSensor);
+                    this.timerNotificationCounter += 1;
+                    this.setNotificationWithTimer(0.0, 'No.' + this.timerNotificationCounter, 'It will rain today at station ' + sb.name, 'Temperature is ' + tempSensor.lastMeasurement.value + '°C');
+                }
+            })
+            console.log('finished --> timerNotification()');
+            this.timerNotification();
+        }
+    }
+
+    /**
+     * Function that will return a timeout as promise
+     * @param ms {number} milliseconds settings a timeout (1000 == 1 sec; 60 000 == 1 min; 3 600 000 == 1 std)
+     */
+    public timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /**
+     * Function to switch timer notification and pulling ON and OFF and also call loop again after it has been disabled.
+     */
+    public changeTimerNotificationBoolean() {
+        this.timerNotificationEnabled = !this.timerNotificationEnabled;
+        if (this.timerNotificationEnabled) {
+            this.timerNotification();
+        }
+    }
+
+    public validateBoxes(senseboxes: SenseBox[]): Promise<SenseBox[]> {
+        return new Promise(resolve => {
+            for(let i  = 0; i < senseboxes.length; i++){
+                if(senseboxes[i]){
+                    senseboxes[i].isValid = this.api.sensorIsValid("Temperatur", senseboxes[i], senseboxes, this.metadata.settings.ranges.temperature);
+                }
+            }
+            resolve(senseboxes);
+        });
     }
 
     /**
@@ -187,6 +288,10 @@ export class SensifyPage {
                         if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
                             this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
                         }
+                        this.validateBoxes(res)
+                            .then(response => {
+                                this.metadata.senseBoxes = response;
+                            })
                     });
             } else if ((this.metadata.settings.location.distanceTo(this.startLocation) / 1000) < (this.radius / 2)) {
                 // get boxes smaller radius inside origin circle & smaller
@@ -202,6 +307,10 @@ export class SensifyPage {
                         if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
                             this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
                         }
+                        this.validateBoxes(res)
+                            .then(response => {
+                                this.metadata.senseBoxes = response;
+                            })
                     });
             }
         } else {
@@ -211,6 +320,10 @@ export class SensifyPage {
                     if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
                         this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
                     }
+                    this.validateBoxes(res)
+                        .then(response => {
+                            this.metadata.senseBoxes = response;
+                        })
                 });
         }
         this.startLocation = this.metadata.settings.location;
@@ -235,7 +348,8 @@ export class SensifyPage {
         this.metadata = {
             settings: this.metadata.settings,
             senseBoxes: this.metadata.senseBoxes,
-            closestSenseBox: this.metadata.closestSenseBox
+            closestSenseBox: this.metadata.closestSenseBox,
+            notifications: this.metadata.notifications
         };
         return;
     }
@@ -274,7 +388,8 @@ export class SensifyPage {
                         mapView: this.metadata.settings.mapView ? this.metadata.settings.mapView : null
                     },
                     senseBoxes: this.metadata.senseBoxes ? this.metadata.senseBoxes : (val && val.senseBoxes ? val.senseBoxes : null),
-                    closestSenseBox: this.metadata.closestSenseBox ? this.metadata.closestSenseBox : (val && val.closestSenseBox ? val.closestSenseBox : null)
+                    closestSenseBox: this.metadata.closestSenseBox ? this.metadata.closestSenseBox : (val && val.closestSenseBox ? val.closestSenseBox : null),
+                    notifications: this.metadata.notifications ? this.metadata.notifications : []
                 };
             }, (error) => {
                 return error;
@@ -330,16 +445,20 @@ export class SensifyPage {
         });
 
     //Set notification with time in minutes from now, Title, Text, data that will be visible on click
-    setNotificationWithTimer(time: number, title: String, text: String, data: String) {
+    setNotificationWithTimer(time: number, title: string, text: string, data: string) {
         let timeInMS = time * 1000 * 60;    //time * 60 = time in seconds, time * 1000 = time in ms
+        // let not: ILocalNotification;
+        let notification: ILocalNotification = {
+            id: this.notificationCounter,
+            trigger: { at: new Date(new Date().getTime() + timeInMS) },
+            title: title,
+            text: text,
+            data: data
+        };
+        this.metadata.notifications.push(notification);
+        this.notificationCounter += 1;
         if (this.plt.is('cordova')) {
-            this.localNotifications.schedule({
-                id: 1,
-                trigger: { at: new Date(new Date().getTime() + timeInMS) },
-                title: "" + title,
-                text: "" + text,
-                data: "" + data
-            });
+            this.localNotifications.schedule(notification);
         } else {
             console.log("Notifications are disabled: Not a real device or emulator");
         }

@@ -3,6 +3,7 @@ import { NavController, NavParams } from 'ionic-angular';
 import { Platform } from 'ionic-angular';
 import { SenseBox, Metadata, Sensor } from '../../../providers/model';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
+import { ActionSheetController } from 'ionic-angular';  
 
 @Component({
     selector: 'sensify-page-start',
@@ -17,16 +18,34 @@ export class SensifyStartPage implements OnChanges {
     public sunrise: String;
     public sunset: String;
     public sensors?: Sensor[];
-    public temperature: String;
-    public uv:String;
     public bgImage:String;
+    public temperature:String;
+    public curValue:String;
+    public curUnit:String;
+    public btns:any;
 
-    constructor(public mySensifyPage: SensifyPage, public platform: Platform, public navCtrl: NavController, public navParams: NavParams) {
+    constructor(public mySensifyPage: SensifyPage, public platform: Platform, public navCtrl: NavController, public navParams: NavParams,public actionSheetCtrl: ActionSheetController) {
         this.sensors = [];
-        this.temperature = "- °C"
-        this.uv = "";
+        this.btns = [];
+
+        this.temperature= " - ";
+
+        this.curValue = "...";
+        this.curUnit = "";
+
+
+        
+
         this.bgImage = "../../../assets/imgs/TestBckgrd.png";
         this.setCurrentDate();
+    }
+
+    openMenu() {
+        const actionSheet = this.actionSheetCtrl.create({
+            title: 'Select Sensor',
+            buttons: this.btns,
+        });
+        actionSheet.present();
     }
 
     ngOnChanges(changes) {
@@ -60,16 +79,34 @@ export class SensifyStartPage implements OnChanges {
     }
 
     public setSensors(){
+        this.sensors = [];
+        this.btns = [];
+
         for(var i: number = 0; i < this.currBox.sensors.length; i++){
-            if(this.currBox.sensors[i].title != "Temperatur" && this.currBox.sensors[i].title != "UV"  ){
-                if(this.currBox.sensors[i].lastMeasurement){
-                    this.sensors.push(this.currBox.sensors[i]);
+            let newBtn:any;
+            let sensor = this.currBox.sensors[i];
+
+            if(sensor.lastMeasurement){
+
+                newBtn = {
+                    text: sensor.title,
+                    handler: () => {
+                      this.curValue = sensor.lastMeasurement.value;
+                      this.curUnit = sensor.unit;
+                    }
                 }
-            } else if (this.currBox.sensors[i].lastMeasurement.value) {
-                var temp = this.currBox.sensors[i].lastMeasurement.value;
-                this.temperature = temp.substr(0, temp.indexOf("."));
-                this.temperature = this.temperature + " °C";
+
+                this.sensors.push(sensor);
+                
+                if(sensor.title == "Temperatur"){
+                    this.temperature = sensor.lastMeasurement.value;
+                    this.curValue = sensor.lastMeasurement.value;
+                    this.curUnit = sensor.unit;
+                }
             }
+
+            this.btns.push(newBtn);
+            
         }
     }
 

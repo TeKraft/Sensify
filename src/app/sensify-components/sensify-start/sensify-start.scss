@@ -1,53 +1,68 @@
 sensify-page-start {
-    
+
+    .grid{
+        height:100%;
+    }
+
+    //background Image
     .start{
         background: no-repeat 0 0 fixed;
         background-size: cover;
         color: rgb(255, 255, 255);
     }
 
-    .titles{
-        margin-top: 20px;
+    //First Row
+    #titleRow{
+        height:15%;
     }
 
-    .values{
-        margin-top: 0px;
-    }
-
+    // Titel
     #senseBoxTitle{
+        width: 70%;
         font-size:40px;
         color: rgb(255, 255, 255);
+        overflow:hidden;
+        text-align: center;
+        white-space: nowrap; 
+        text-overflow: ellipsis;
     }
 
+    // Date
     #date{
-        margin-top: 30px;
         font-size:20px;
         color: rgb(255, 255, 255);
-    }
-    #titleRow{
-        background: transparent;
-        height: 10vh;
-        
+        margin-top:30px;
     }
 
-    #dateRow{
-        height: 8vh;
+
+    //Second Row
+    #currentSensorRow{
+
     }
 
-    #tempRow{
-        height: 25vh;
+    #currentSensorCol{
+        text-align:left;
     }
 
-    #temperature{
-        position: relative;
-        left:30px;
-        font-size: 15px;
+    #btn{
+        height:80%;
+        width:100%;
+        background-color:transparent;
+        text-align: left;
+        color:white;
+        background:rgba(0, 0, 0, 0.2);
     }
 
-    .temp{
-        position: relative;
-        font-size: 60px;
+
+    #curValue{
+        font-size: 50px;
     }
+
+    #curUnit{
+        font-size: 50px;
+    }
+
+
 
     #sunIndicator{
         text-align: center;
@@ -59,35 +74,83 @@ sensify-page-start {
         height: 45px;
     }
 
-    #dataRow{
-        height: 40vh;
+    //Headings Row
+    #headingsRow{
+        background:rgba(0, 0, 0, 0.5);
+        height:8%;
+        //overflow: auto;
+        //white-space:nowrap;
+        margin-top:80px;
+        margin-bottom: 0px;
+        //border-bottom: 3px solid #aaa;
+        //border-bottom-width: 80%;
+        //border-bottom-left-radius: 10%;
+        //border-bottom-right-radius: 10%;
     }
 
-    #sensors{
-        background:rgba(0, 0, 0, 0.5);
+    #heading{
         font-size: 20px;
         line-height: 2;
         text-align: left;
+        left:30px;
         align-content: center;
+        overflow:hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis;
+    }
+
+
+    //Third Row
+    #dataRow{
+        background:rgba(0, 0, 0, 0.5);
+        height:52%;
+        overflow: auto;
+        white-space:nowrap;
+        margin-top: 0px;
+    }
+
+
+    #sensorCol{
+        font-size: 20px;
+        line-height: 2;
+        text-align: center;
+        align-content: center;
+        
+    }
+
+    #valueCol{
+        font-size: 20px;
+        line-height: 2;
+        text-align: left;
+        align-content: left;
+    }
+
+    #unitCol{
+        font-size: 20px;
+        line-height: 2;
+        text-align: center;
+        align-content: center;
+    }
+
+    #sensors{
+        padding-left: 10%;
+        border-right: 1px solid #aaa;
     }
 
     #values{
-        background:rgba(0, 0, 0, 0.5);
-        font-size: 20px;
-        line-height: 2;
-        text-align: center;
-        align-content: center;
+        padding-left: 10%;
+        list-style-type: none;
     }
 
-    #unit{
-        background:rgba(0, 0, 0, 0.5);
-        font-size: 20px;
-        line-height: 2;
-        text-align: center;
-        align-content: center;
+    #units{
+        padding-left: 10%;
+        list-style-type: none;
     }
 
-    li{
-        border-right: 1px solid #aaa;
+    #element{
+        overflow:hidden;
+        text-align: left;
+        white-space: nowrap; 
+        text-overflow: ellipsis;
     }
 }
