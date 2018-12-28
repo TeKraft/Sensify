@@ -1,26 +1,4 @@
 sensify-page {
-    #loadingBar {
-        height: 20px;
-        background: color($colors, primary);
-        
-        #spinner {
-            position: absolute;
-            top: -5%;
-            left: 15px;
-        }
-
-        #colSpinner {
-            position: absolute;
-            top: -1%;
-        }
-
-        #colMessage {
-            position: absolute;
-            top: -1%;
-            left: 15px + 50px;
-        }
-    }
-
     #pageContent {
         height: calc(100vh - 20px - 42px - 56px); // 100vh - loading - footer - header
     }

@@ -1,9 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-import { Platform } from 'ionic-angular';
+import { ActionSheetController, NavController, NavParams, Platform } from 'ionic-angular';
 import { SenseBox, Metadata, Sensor } from '../../../providers/model';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
-import { ActionSheetController } from 'ionic-angular';  
 
 @Component({
     selector: 'sensify-page-start',
@@ -18,23 +16,24 @@ export class SensifyStartPage implements OnChanges {
     public sunrise: String;
     public sunset: String;
     public sensors?: Sensor[];
-    public bgImage:String;
-    public temperature:String;
-    public curValue:String;
-    public curUnit:String;
-    public btns:any;
+    public bgImage: String;
+    public temperature: String;
+    public uv: String;
+    public curValue: String;
+    public curUnit: String;
+    public curName: String;
+    public btns: any;
 
-    constructor(public mySensifyPage: SensifyPage, public platform: Platform, public navCtrl: NavController, public navParams: NavParams,public actionSheetCtrl: ActionSheetController) {
+    constructor(public mySensifyPage: SensifyPage, public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController) {
         this.sensors = [];
         this.btns = [];
 
-        this.temperature= " - ";
+        this.temperature = " - ";
+        this.uv = "1000";
 
         this.curValue = "...";
         this.curUnit = "";
-
-
-        
+        this.curName = "";
 
         this.bgImage = "../../../assets/imgs/TestBckgrd.png";
         this.setCurrentDate();
@@ -72,41 +71,61 @@ export class SensifyStartPage implements OnChanges {
                 if (Number(this.temperature.slice(0, -3)) < 0) {
                     this.bgImage = "../../../assets/imgs/snowBackground.jpg";
                 } else {
-                    this.bgImage = "../../../assets/imgs/sunnyBackground.jpg";
+
+                    if (Number(this.uv) < 100) {
+                        this.bgImage = "../../../assets/imgs/cloudBackground.jpg";
+
+                    } else {
+                        this.bgImage = "../../../assets/imgs/sunnyBackground.jpg";
+                    }
                 }
             }
         }
     }
 
-    public setSensors(){
+    public setSensors() {
         this.sensors = [];
         this.btns = [];
 
-        for(var i: number = 0; i < this.currBox.sensors.length; i++){
-            let newBtn:any;
+        for (var i: number = 0; i < this.currBox.sensors.length; i++) {
+            let newBtn: any;
             let sensor = this.currBox.sensors[i];
 
-            if(sensor.lastMeasurement){
-
+            if (sensor.lastMeasurement) {
                 newBtn = {
                     text: sensor.title,
                     handler: () => {
-                      this.curValue = sensor.lastMeasurement.value;
-                      this.curUnit = sensor.unit;
+                        this.curValue = sensor.lastMeasurement.value;
+                        this.curUnit = sensor.unit;
+                        this.curName = sensor.title;
+
+                        this.metadata.settings.curSensor = sensor;
+
                     }
-                }
+                };
 
                 this.sensors.push(sensor);
-                
-                if(sensor.title == "Temperatur"){
-                    this.temperature = sensor.lastMeasurement.value;
-                    this.curValue = sensor.lastMeasurement.value;
-                    this.curUnit = sensor.unit;
+
+                if (this.metadata.settings.curSensor) {
+
+                    this.curValue = this.metadata.settings.curSensor.lastMeasurement.value;
+                    this.curUnit = this.metadata.settings.curSensor.unit;
+                    this.curName = this.metadata.settings.curSensor.title;
+
+                } else {
+                    if (sensor.title == "Temperatur") {
+                        this.temperature = sensor.lastMeasurement.value;
+                        this.curValue = sensor.lastMeasurement.value;
+                        this.curUnit = sensor.unit;
+                        this.curName = sensor.title;
+                    }
+                    if (sensor.title == "UV-Intensität") {
+                        this.uv = sensor.lastMeasurement.value;
+                    }
                 }
             }
 
             this.btns.push(newBtn);
-            
         }
     }
 
@@ -169,7 +188,6 @@ export class SensifyStartPage implements OnChanges {
         var currentDate = new Date()
         var day = currentDate.getDate()
         var month = currentDate.getMonth() + 1 //January is 0!
-        var year = currentDate.getFullYear()
         this.date = day + "." + month;// + "." + year;
     }
 }

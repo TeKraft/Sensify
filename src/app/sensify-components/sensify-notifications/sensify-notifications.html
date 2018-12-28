@@ -1,43 +1,27 @@
-<h3>Notifications</h3>
-<ion-list>
-    <!-- <ion-item>
-        <ion-col>
-            22.10.2018 19:30
+<ion-content class="start" [style.backgroundImage]="'url(' + bgImage + ')'">
+    <ion-row>
+        <ion-col width-100>
+            <ion-item class="header">
+                <strong>Notifications</strong>
+            </ion-item>
         </ion-col>
-        <ion-col >
-            🌧️🌧️   RAIN ☔  🌧️🌧️
-        </ion-col>
-    </ion-item>
-    <ion-item>
-        <ion-col>
-            19.10.2018 08:31
-        </ion-col>
-        <ion-col >
-            ❄️It's FREEEZING outside ❄️
-        </ion-col>
-    </ion-item>
-    <ion-item>
-        <ion-col>
-            16.08.2018 13:15
-        </ion-col>
-        <ion-col >
-            ☀️It's getting HOT in here 🏖️🏖️
-        </ion-col>
-    </ion-item> -->
-    <ion-item *ngFor='let notification of metadata.notifications'>
-        <ion-row>
-            <ion-col>
-                {{notification.trigger.at}}
-            </ion-col>
-            <ion-col>
-                {{notification.title}}
-            </ion-col>
-        </ion-row>
-        <ion-row>
-                {{notification.text}}
-        </ion-row>
-        <ion-row>
-            {{notification.data}}
-        </ion-row>
-    </ion-item>
-</ion-list>
+    </ion-row>
+    <ion-grid>
+        <ion-item *ngFor='let notification of metadata.notifications' class="start">
+            <ion-card class="card">
+                <ion-card-header style="color:white">
+                    {{notification.title}}
+                </ion-card-header>
+                <ion-card-content style="white-space: normal;">
+                    {{notification.text}}
+                </ion-card-content>
+                <ion-card-content style="white-space: normal;">
+                    {{notification.data}}
+                </ion-card-content>
+                <ion-card-content>
+                    {{notification.trigger.at | date : format : timezone}}
+                </ion-card-content>
+            </ion-card>
+        </ion-item>
+    </ion-grid>
+</ion-content>

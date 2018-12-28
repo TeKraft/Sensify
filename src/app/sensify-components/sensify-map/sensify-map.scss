@@ -1,23 +1,43 @@
 page-map {
     .leaflet-control-zoom {
         position: absolute;
-         left : -62px;
-         top: 65px;
+        left: -62px;
+        top: 65px;
     }
-    
-    .leaflet-control-container { 
-        position: absolute; 
-        right: 5px 
+
+    .leaflet-control-container {
+        position: absolute;
+        right: 5px
     }
 }
 
-.line{
+.line {
     stroke: #5912a0;
     opacity: 1;
 }
 
-.circle{
+.circle {
     stroke: rgba(35, 131, 114, 0.68);
     fill-opacity: .1;
     fill: #c53debbb;
+}
+
+/* css to customize Leaflet default styles  */
+.customRed .leaflet-popup-tip,
+.customRed .leaflet-popup-content-wrapper {
+    background: #bd2f2f;
+    color: color($colors, light);
+}
+
+/* css to customize Leaflet default styles  */
+.customGreen .leaflet-popup-tip,
+.customGreen .leaflet-popup-content-wrapper {
+    background: #34742f;
+    color: color($colors, light);
+}
+
+/* css to customize Leaflet default styles  */
+.customYellow .leaflet-popup-tip,
+.customYellow .leaflet-popup-content-wrapper {
+    background: #F1993C;
 }

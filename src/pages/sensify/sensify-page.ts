@@ -1,17 +1,11 @@
 import { ApiProvider } from '../../providers/api/api';
-import { Metadata, SenseBox } from '../../providers/model';
+import { Metadata, NotificationMessages, NotificationSensorTitles, NotificationThresholdValues, SenseBox } from '../../providers/model';
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, Select } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, Select, ToastController, Toast } from 'ionic-angular';
 import { Geolocation, Geoposition } from "@ionic-native/geolocation";
 import * as L from "leaflet";
 import { Storage } from '@ionic/storage';
 import { ILocalNotification, LocalNotifications } from '@ionic-native/local-notifications';
-
-interface Loading {
-    show: boolean,
-    message: string,
-    messages: string[]
-}
 
 @IonicPage()
 @Component({
@@ -25,20 +19,42 @@ export class SensifyPage {
     public metadata: Metadata;
     public startLocation: L.LatLng;
     public radius: number;
-    public globalMessage = {
-        show: false,
-        message: null
-    };
-    public loadingSpinner: Loading = {
-        show: false,
-        message: null,
-        messages: [],
-    };
+    toastMSG: Toast = null;
 
     public distanceToClosest;
     public timerNotificationCounter: number = 0;
     public timerNotificationEnabled: boolean = false;
     public notificationCounter: number = 0;
+
+    // to validate senseBox data for notifications
+    public notificationSensors = {
+        temperature: {
+            title: NotificationSensorTitles.temperature,
+            threshold: {
+                low: {
+                    value: NotificationThresholdValues.temperatureLow,
+                    msg: NotificationMessages.temperatureLow,
+                },
+                high: {
+                    value: NotificationThresholdValues.temperatureHigh,
+                    msg: NotificationMessages.temperatureHigh,
+                }
+            },
+        },
+        uvIntensity: {
+            title: NotificationSensorTitles.uvIntensity,
+            threshold: {
+                high: {
+                    value: NotificationThresholdValues.uvIntensityHigh,
+                    msg: NotificationMessages.uvIntensityHigh,
+                }
+            }
+        }
+        // brightness = 'Beleuchtungsstärke',
+        // airpressure = 'Luftdruck',
+        // humidity = 'rel. Luftfeuchte'
+        // , 'PM2.5', 'PM10', 'Niederschlagsmenge', 'Wolkenbedeckung', 'Windrichtung', 'Windgeschwindigkeit'
+    }
 
     tab: String;
     tabSelector: String;
@@ -48,7 +64,7 @@ export class SensifyPage {
     currentPos: Geoposition;
     settingsData: any;
 
-    constructor(public navCtrl: NavController, public navParams: NavParams, private api: ApiProvider, private geolocation: Geolocation, private storage: Storage, private localNotifications: LocalNotifications, private plt: Platform) {
+    constructor(public navCtrl: NavController, public navParams: NavParams, private api: ApiProvider, private geolocation: Geolocation, private storage: Storage, private localNotifications: LocalNotifications, private plt: Platform, private toastCtrl: ToastController) {
         // check for localStorage
         this.metadata = {
             settings: {
@@ -57,7 +73,9 @@ export class SensifyPage {
                 timestamp: null,
                 ranges: { temperature: 5 },
                 zoomLevel: null,
-                mapView: null
+                mapView: null,
+                curSensor: null,
+                mySenseBoxIDs: []
             },
             notifications: []
         };
@@ -91,24 +109,52 @@ export class SensifyPage {
         this.selectRef.close();
     }
 
+    presentToast(text: string): void {
+        let toastData = {
+            message: text,
+            duration: 500000,
+            position: 'top'
+        }
+
+        this.showToast(toastData);
+    }
+
+    presentClosableToast(text: string): void {
+        let toastData = {
+            message: text,
+            showCloseButton: true,
+            closeButtonText: 'X',
+            position: 'top'
+        };
+
+        this.showToast(toastData);
+    }
+
+    private showToast(data: any): void {
+        this.toastMSG ? this.toastMSG.dismiss() : false;
+        this.toastMSG = this.toastCtrl.create(data);
+        this.toastMSG.present();
+    }
 
     public async initSenseBoxes() {
         console.log('Start initSenseBoxes');
         try {
             var currentDate = new Date();
             this.metadata.settings.timestamp = currentDate;
-            this.showGlobalMessage('No SenseBoxes around.');
-            this.toggleSpinner(true, 'Loading user position.');
+            this.presentToast('Loading user position');
+
             await this.getUserPosition().then(userlocation => {
                 this.metadata.settings.location = userlocation;
                 this.startLocation = userlocation;
             });
-            this.toggleSpinner(false, 'Loading user position.');
+
+            this.presentToast('Loading user data');
             await this.getMetadata().then(meta => {
                 this.metadata = meta;
                 this.radius = meta.settings.radius;
             });
-            this.toggleSpinner(true, 'Loading SenseBoxes.');
+
+            this.presentToast('Loading SenseBoxes');
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
                 .then(res => {
                     this.metadata.senseBoxes = res;
@@ -117,10 +163,9 @@ export class SensifyPage {
                             this.metadata.senseBoxes = response;
                         })
                 });
-            this.toggleSpinner(false, 'Loading SenseBoxes.');
             this.updateMetadata();
-            this.toggleSpinner(true, 'Loading closest SenseBox.');
 
+            this.presentToast('Loading closest SenseBox');
             if (this.metadata.senseBoxes != []) {
                 //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
                 if (this.metadata.settings.mySenseBox) {
@@ -142,14 +187,16 @@ export class SensifyPage {
                             }
                         });
                 }
-                this.toggleSpinner(false, 'Loading closest SenseBox.');
                 this.updateMetadata();
             }
+            this.toastMSG.dismiss();
+            this.toastMSG = null;
 
             // TEST: VALIDATE TEMPERATURE VALUE OF CLOSEST SENSEBOX          
             // console.log("SenseBox Sensor Value for Temperature Valid? : "+this.api.sensorIsValid("Temperatur", this.metadata.closestSenseBox, this.metadata.senseBoxes, this.metadata.settings.ranges.temperature));
         }
         catch (err) {
+            this.presentClosableToast('Ups, something went wrong!');
             console.error(err);
         }
 
@@ -167,7 +214,7 @@ export class SensifyPage {
             await this.timeout(10000);
             var currentDate = new Date();
             this.metadata.settings.timestamp = currentDate;
-            this.toggleSpinner(true, 'Loading SenseBoxes. - automatic');
+            this.presentToast('Loading SenseBoxes. - automatic');
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
                 .then(res => {
                     this.metadata.senseBoxes = res;
@@ -176,9 +223,8 @@ export class SensifyPage {
                             this.metadata.senseBoxes = response;
                         })
                 });
-            this.toggleSpinner(false, 'Loading SenseBoxes. - automatic');
             this.updateMetadata();
-            this.toggleSpinner(true, 'Loading closest SenseBox. - automatic');
+            this.presentToast('Loading closest SenseBox. - automatic');
 
             if (this.metadata.senseBoxes != []) {
                 //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
@@ -201,20 +247,34 @@ export class SensifyPage {
                             }
                         });
                 }
-                this.toggleSpinner(false, 'Loading closest SenseBox. - automatic');
                 this.updateMetadata();
             }
             // validate for threshold
             this.metadata.senseBoxes.forEach(sb => {
-                let tempSensor = sb.sensors.find(el => el.title === 'Temperatur');
-                if (tempSensor && tempSensor.lastMeasurement && tempSensor.lastMeasurement.value != undefined && Number(tempSensor.lastMeasurement.value) <= 1) {
-                    console.log(tempSensor);
-                    this.timerNotificationCounter += 1;
-                    this.setNotificationWithTimer(0.0, 'No.' + this.timerNotificationCounter, 'It will rain today at station ' + sb.name, 'Temperature is ' + tempSensor.lastMeasurement.value + '°C');
+                // validate for each sensor with a threshold
+                for (let sensor in this.notificationSensors) {
+                    let sn = this.notificationSensors[sensor];
+                    let sensorId = sb.sensors.find(el => el.title === sn.title);
+                    // validate threshold for low values
+                    if (sn.threshold.low) {
+                        if (sensorId && sensorId.lastMeasurement && sensorId.lastMeasurement.value != undefined && Number(sensorId.lastMeasurement.value) <= sn.threshold.low.value) {
+                            this.timerNotificationCounter += 1;
+                            this.setNotificationWithTimer(0.0, 'No.' + this.timerNotificationCounter + ' @' + sb.name, sn.threshold.low.msg, sn.title + ' is ' + sensorId.lastMeasurement.value);
+                        }
+                    } else
+                        // validate threshold for low values
+                        if (sn.threshold.high) {
+                            if (sensorId && sensorId.lastMeasurement && sensorId.lastMeasurement.value != undefined && Number(sensorId.lastMeasurement.value) >= sn.threshold.high.value) {
+                                this.timerNotificationCounter += 1;
+                                this.setNotificationWithTimer(0.0, 'No.' + this.timerNotificationCounter + ' @' + sb.name, sn.threshold.high.msg, sn.title + ' is ' + sensorId.lastMeasurement.value);
+                            }
+                        }
                 }
             })
             console.log('finished --> timerNotification()');
             this.timerNotification();
+            this.toastMSG.dismiss();
+            this.toastMSG = null;
         }
     }
 
@@ -238,8 +298,8 @@ export class SensifyPage {
 
     public validateBoxes(senseboxes: SenseBox[]): Promise<SenseBox[]> {
         return new Promise(resolve => {
-            for(let i  = 0; i < senseboxes.length; i++){
-                if(senseboxes[i]){
+            for (let i = 0; i < senseboxes.length; i++) {
+                if (senseboxes[i] && senseboxes[i].updatedCategory == "today") {
                     senseboxes[i].isValid = this.api.sensorIsValid("Temperatur", senseboxes[i], senseboxes, this.metadata.settings.ranges.temperature);
                 }
             }
@@ -247,37 +307,10 @@ export class SensifyPage {
         });
     }
 
-    /**
-     * Function to display and verify message of loading spinner.
-     * @param show {boolean} Should be true, if spinner is visible.
-     * @param msg {string} Should be the displayed message.
-     */
-    public toggleSpinner(show: boolean, msg: string) {
-        this.globalMessage.show = false;
-        let idx = this.loadingSpinner.messages.findIndex(el => el === msg);
-        this.loadingSpinner.show = show;
-        if (idx >= 0) {
-            this.loadingSpinner.messages.splice(idx, 1);
-            if (this.loadingSpinner.messages.length > 0) {
-                this.loadingSpinner.show = true;
-                this.loadingSpinner.message = this.loadingSpinner.messages[this.loadingSpinner.messages.length - 1];
-            } else {
-                this.loadingSpinner.show = false;
-            }
-        } else if (show) {
-            this.loadingSpinner.messages.push(msg);
-            this.loadingSpinner.message = msg;
-        }
-
-        if (!this.loadingSpinner.show && (!this.metadata.senseBoxes || (this.metadata.senseBoxes && this.metadata.senseBoxes.length <= 0))) {
-            this.globalMessage.show = true;
-        }
-        return;
-    }
 
     public async updateBoxes() {
         await this.updateMetadata();
-        await this.toggleSpinner(true, 'Updating SenseBoxes.');
+        this.presentToast('Updating SenseBoxes');
         // Check whether radius gets bigger or smaller
         if (this.metadata.senseBoxes != undefined && this.metadata.senseBoxes.length > 0) {
             if (this.metadata.settings.radius > this.radius) {
@@ -328,9 +361,8 @@ export class SensifyPage {
         }
         this.startLocation = this.metadata.settings.location;
         this.radius = this.metadata.settings.radius;
-        await this.toggleSpinner(false, 'Updating SenseBoxes.');
         await this.updateMetadata();
-        await this.toggleSpinner(true, 'Updating closest SenseBox.');
+        this.presentToast('Updating closest SenseBox.');
         // if (this.radius > this.metadata.settings.radius && !this.metadata.settings.mySenseBox) {
         if (!this.metadata.settings.mySenseBox) {
             await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
@@ -340,7 +372,8 @@ export class SensifyPage {
                 }
             });
         }
-        await this.toggleSpinner(false, 'Updating closest SenseBox.');
+        this.toastMSG.dismiss();
+        this.toastMSG = null;
         await this.updateMetadata();
     }
 
@@ -364,13 +397,6 @@ export class SensifyPage {
         this.metadata.settings.timestamp = currentDate;
         this.updateBoxes();
         this.storage.set("metadata", this.metadata);
-    }
-
-    public showGlobalMessage(msg: string) {
-        this.globalMessage = {
-            show: true,
-            message: msg
-        }
     }
 
     // Get the Metadata from storage

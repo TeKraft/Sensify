@@ -13,12 +13,17 @@ sensify-page-start {
 
     //First Row
     #titleRow{
-        height:15%;
+        height:100px;
+        overflow:hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis;
+        min-height: 70px;
     }
 
     // Titel
     #senseBoxTitle{
         width: 70%;
+        height:100%;
         font-size:40px;
         color: rgb(255, 255, 255);
         overflow:hidden;
@@ -34,10 +39,13 @@ sensify-page-start {
         margin-top:30px;
     }
 
-
     //Second Row
     #currentSensorRow{
-
+        overflow:hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis;
+        height: 70%;
+        min-height: 200px;
     }
 
     #currentSensorCol{
@@ -45,24 +53,36 @@ sensify-page-start {
     }
 
     #btn{
-        height:80%;
+        height:50%;
         width:100%;
         background-color:transparent;
         text-align: left;
         color:white;
         background:rgba(0, 0, 0, 0.2);
+        text-transform: capitalize;
+        overflow:hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis;
+        
+        min-height: 120px;
     }
 
+    #curName{
+        font-size: 20px;
+        margin: 10px;
+    }
 
     #curValue{
-        font-size: 50px;
+        font-size: 40px;
+        display:inline;
+        font-size: 5.5vw;
+        margin: 10px;
     }
 
     #curUnit{
-        font-size: 50px;
+        font-size: 25px;
+        display:inline;
     }
-
-
 
     #sunIndicator{
         text-align: center;
@@ -77,28 +97,39 @@ sensify-page-start {
     //Headings Row
     #headingsRow{
         background:rgba(0, 0, 0, 0.5);
-        height:8%;
         //overflow: auto;
         //white-space:nowrap;
-        margin-top:80px;
+        margin-top:-20px;
         margin-bottom: 0px;
-        //border-bottom: 3px solid #aaa;
-        //border-bottom-width: 80%;
-        //border-bottom-left-radius: 10%;
-        //border-bottom-right-radius: 10%;
+        min-height: 50px;
+        
+        border-bottom: 3px solid #aaa;
+        border-bottom-width: 80%;
+        border-bottom-left-radius: 10%;
+        border-bottom-right-radius: 10%;
     }
 
-    #heading{
-        font-size: 20px;
-        line-height: 2;
+    #headingCol{
+        top:-10px;
         text-align: left;
-        left:30px;
         align-content: center;
         overflow:hidden;
         white-space: nowrap; 
         text-overflow: ellipsis;
     }
 
+    #headingSensor{
+        margin-left: 10px;
+    }
+
+
+    #headingValue{
+        margin-left: 12px;
+    }
+
+    #headingUnit{
+        margin-left: 9px;;
+    }
 
     //Third Row
     #dataRow{
@@ -107,25 +138,24 @@ sensify-page-start {
         overflow: auto;
         white-space:nowrap;
         margin-top: 0px;
+       
     }
 
-
     #sensorCol{
+        top:-10px;
         font-size: 20px;
         line-height: 2;
-        text-align: center;
-        align-content: center;
-        
+        margin-left: -30px;
     }
 
     #valueCol{
+        top:-10px;
         font-size: 20px;
         line-height: 2;
-        text-align: left;
-        align-content: left;
     }
 
     #unitCol{
+        top:-10px;
         font-size: 20px;
         line-height: 2;
         text-align: center;
@@ -133,7 +163,6 @@ sensify-page-start {
     }
 
     #sensors{
-        padding-left: 10%;
         border-right: 1px solid #aaa;
     }
 

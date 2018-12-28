@@ -5,7 +5,8 @@
         </button>
         <ion-buttons end>
             <button ion-button (click)="changeTimerNotificationBoolean()">
-                <ion-icon size="large" [name]="timerNotificationEnabled ? 'notifications' : 'notifications-off'" style="zoom:1.5;"></ion-icon>
+                <ion-icon size="large" [name]="timerNotificationEnabled ? 'notifications' : 'notifications-off'"
+                          style="zoom:1.5;"></ion-icon>
             </button>
             <button ion-button (click)="openSelect()">
                 <ion-icon size="large" name="settings" style="zoom:1.5;"></ion-icon>
@@ -25,26 +26,10 @@
 
 
 <ion-content>
-    <!-- toolbar for loading -->
-    <ion-row id="loadingBar">
-        <ion-grid [hidden]="!loadingSpinner.show">
-            <ion-col id="colSpinner" col-1>
-                <ion-spinner id="spinner" name="dots" class="spinner-dark"></ion-spinner>
-            </ion-col>
-            <ion-col id="colMessage">
-                {{loadingSpinner.message}}
-            </ion-col>
-        </ion-grid>
-        <ion-grid [hidden]="loadingSpinner.show || !globalMessage.show">
-            <ion-col id="colMessage">
-                {{globalMessage.message}}
-            </ion-col>
-        </ion-grid>
-    </ion-row>
     <!-- components -->
     <ion-row id="pageContent">
         <div class="selectedPage" *ngIf="(tabSelector === 'map')">
-            <sensify-page-map [metadata]="metadata" (onMessageChange)="showGlobalMessage($event)"></sensify-page-map>
+            <sensify-page-map [metadata]="metadata"></sensify-page-map>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'start')">
             <sensify-page-start [metadata]="metadata"></sensify-page-start>
@@ -53,7 +38,8 @@
             <sensify-page-notifications [metadata]="metadata"></sensify-page-notifications>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'settings')">
-            <sensify-page-settings [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-settings>
+            <sensify-page-settings [metadata]="metadata"
+                                   (onMetadataChange)="setMetadata($event)"></sensify-page-settings>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'about')">
             <sensify-page-about></sensify-page-about>
@@ -62,7 +48,7 @@
 </ion-content>
 
 <ion-footer class="footer-sensify-page">
-<!-- <ion-toolbar> -->
+    <!-- <ion-toolbar> -->
     <ion-segment (click)="changeTab(tabSelector)" [(ngModel)]="tabSelector">
         <!--Map-->
         <ion-segment-button style="color:black" value="map">

@@ -11,9 +11,16 @@
 
             <ion-col id="currentSensorCol" col-6>
 
-                <button ion-button block (click)="openMenu()" id="btn">
+                <button (click)="openMenu()" id="btn">
+                    
+                    <div *ngIf="curName" id="curName">{{curName}}</div> 
+
+                    <br>
+             
                     <div *ngIf="curValue" id="curValue">{{curValue}}</div> 
+                    
                     <div *ngIf="curUnit" id="curUnit">{{curUnit}}</div>
+                    
                 </button>
         
             </ion-col>
@@ -29,20 +36,19 @@
 
         <ion-row id="headingsRow">
 
-                <ion-col id="heading" col-6 >
-                        <h3>Sensors</h3>        
+                <ion-col id="headingCol" col-5 >
+                        <h3 id="headingSensor">Sensors</h3>        
                 </ion-col>
 
-                <ion-col id="heading" col-3>
-                    <h3>Values</h3>
+                <ion-col id="headingCol" col-4>
+                    <h3 id="headingValue">Values</h3>
                 </ion-col>
 
-                <ion-col id="heading" col-3>
-                    <h3>Unit</h3>
+                <ion-col id="headingCol" col-3>
+                    <h3 id="headingUnit">Unit</h3>
                 </ion-col>
 
         </ion-row>
-
         
         <ion-row id="dataRow">
 

@@ -9,8 +9,12 @@ export class SensifyNotificationsPage {
 
   @Input()
   public metadata: Metadata;
+  public bgImage:String;
 
-  constructor() {}
+
+  constructor() {
+    this.bgImage = "../../../assets/imgs/TestBckgrd.png";
+  }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad SensifyNotificationsPage');
