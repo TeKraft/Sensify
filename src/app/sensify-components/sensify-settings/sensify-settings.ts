@@ -185,15 +185,28 @@ export class SensifySettingsPage {
 
         if (this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
             this.metadata.settings.mySenseBoxIDs.forEach(id => {
+                let sb = this.metadata.senseBoxes.find(el => el._id === id);
+                let txt = id;
+                // set SenseBox name as selection text
+                if (sb) {
+                    txt = sb.name;
+                }
+                let selected = false;
+                if (this.metadata.closestSenseBox && this.metadata.closestSenseBox._id === id) {
+                    selected = true;
+                }
+                let actionSheetClass = selected ? 'selectedActionSheet' : 'unselectedActionSheet';
                 const senseBoxDeleteBtn: any = {
-                    text: id,
+                    text: txt,
+                    cssClass: actionSheetClass,
                     handler: () => {
                         this.deleteSenseBoxID(id);
                     }
                 }
                 this.senseBoxIDDelete.push(senseBoxDeleteBtn);
                 const senseBoxIDSelectBtn: any = {
-                    text: id,
+                    text: txt,
+                    cssClass: actionSheetClass,
                     handler: () => {
                         this.selectSenseBoxID(id);
                     }
