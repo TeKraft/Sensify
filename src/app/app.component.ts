@@ -6,7 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 @Component({
     templateUrl: 'app.html'
 })
-export class openSenseApp {
+export class Sensify {
 
     @ViewChild(Nav) nav: Nav;
 

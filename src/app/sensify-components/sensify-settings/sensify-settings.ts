@@ -1,9 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Metadata } from '../../../providers/model';
 import { ActionSheetController, AlertController, ActionSheetButton } from 'ionic-angular';
+import { Metadata } from '../../../providers/model';
 import { ApiProvider } from '../../../providers/api/api';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
-
+import { helpers } from "../../../pages/sensify/js/helpers";
 
 @Component({
     selector: 'sensify-page-settings',
@@ -29,10 +29,10 @@ export class SensifySettingsPage {
 
     constructor(
         public mySensifyPage: SensifyPage,
-        public alertCrtl: AlertController,
+        public alertCtrl: AlertController,
         public api: ApiProvider,
-        private alertCtrl: AlertController,
-        public actionSheetCtrl: ActionSheetController
+        public actionSheetCtrl: ActionSheetController,
+        private helpers: helpers
     ) { }
 
     ionViewDidLoad() {
@@ -92,7 +92,7 @@ export class SensifySettingsPage {
      * Function to remove all selected SenseBox IDs.
      */
     deleteSenseBoxIDs() {
-        this.mySensifyPage.presentToast('Waiting for Closest SenseBox');
+        this.helpers.presentToast('Waiting for Closest SenseBox');
         this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
             this.metadata.closestSenseBox = res;
             this.newSenseboxID = null;
@@ -101,8 +101,8 @@ export class SensifySettingsPage {
             this.senseBoxIDDelete = [];
             this.senseBoxIDSelect = [];
         });
-        this.mySensifyPage.toastMSG.dismiss();
-        this.mySensifyPage.toastMSG = null;
+        this.helpers.toastMSG.dismiss();
+        this.helpers.toastMSG = null;
         
         let alert = this.alertCtrl.create({
             title: 'IDs deleted',
@@ -117,7 +117,7 @@ export class SensifySettingsPage {
      * @param id {String} id of the SenseBox that should be removed
      */
     deleteSenseBoxID(id: String) {
-        this.mySensifyPage.presentToast('Waiting for Closest SenseBox');
+        this.helpers.presentToast('Waiting for Closest SenseBox');
         this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
             let idx = this.metadata.settings.mySenseBoxIDs.findIndex(el => el === id);
             // splice deleted id from sensebox array
@@ -153,8 +153,8 @@ export class SensifySettingsPage {
             });
             alert.present();
         })
-        this.mySensifyPage.toastMSG.dismiss();
-        this.mySensifyPage.toastMSG = null;
+        this.helpers.toastMSG.dismiss();
+        this.helpers.toastMSG = null;
     }
 
     /**

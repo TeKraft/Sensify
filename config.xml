@@ -1,8 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="io.ionic.starter" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>openSenseApp</name>
+    <name>Sensify</name>
     <description>Apps utilizing the openSenseMap and senseBox.</description>
-    <author email="kontakt@reedu.de" href="https://reedu.de/">re:edu</author>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />

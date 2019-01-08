@@ -4,7 +4,7 @@
   "start_url": "index.html",
   "display": "standalone",
   "icons": [{
-    "src": "assets/logos/sensify.png",
+    "src": "assets/logos/sensify_big.png",
     "sizes": "323x323",
     "type": "image/png"
   }],

@@ -70,7 +70,6 @@ export class SensifyStartPage implements OnChanges {
         var sunrise = this.sunrise.replace(":", ".");
         var sunset = this.sunset.replace(":", ".");
 
-
         if (this.temperature) {
             if (Number(sunrise) > Number(currTime) || Number(currTime) > Number(sunset)) {    //Nacht
                 this.bgImage = "../../../assets/imgs/nightBackground.jpg";
@@ -105,20 +104,16 @@ export class SensifyStartPage implements OnChanges {
                         this.curValue = sensor.lastMeasurement.value;
                         this.curUnit = sensor.unit;
                         this.curName = sensor.title;
-
                         this.metadata.settings.curSensor = sensor;
-
                     }
                 };
 
                 this.sensors.push(sensor);
 
                 if (this.metadata.settings.curSensor) {
-
                     this.curValue = this.metadata.settings.curSensor.lastMeasurement.value;
                     this.curUnit = this.metadata.settings.curSensor.unit;
                     this.curName = this.metadata.settings.curSensor.title;
-
                 } else {
                     if (sensor.title == "Temperatur") {
                         this.temperature = sensor.lastMeasurement.value;
@@ -131,7 +126,6 @@ export class SensifyStartPage implements OnChanges {
                     }
                 }
             }
-
             this.btns.push(newBtn);
         }
     }
