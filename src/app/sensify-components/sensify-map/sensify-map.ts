@@ -110,8 +110,16 @@ export class SensifyMapPage implements OnChanges {
 
         // Create marker with user location + description
         let userlocation = this.metadata.settings.location;
-        let popupDescription = "<b>Your position is:</b><br>Latitude: " + userlocation.lat.toFixed(4) + "<br>Longitude: " + userlocation.lng.toFixed(4);
-        this.userLocationMarker = this.createMarker('darkred', userlocation, popupDescription, null);
+        let popupDescription = "<b>Your position is:</b><br>Latitude: " 
+                                + userlocation.lat.toFixed(4) 
+                                + "<br>Longitude: " 
+                                + userlocation.lng.toFixed(4) 
+                                + "<br>Time at position: " 
+                                + this.metadata.settings.timestamp 
+                                + "<p><b>Closest SenseBox is:</b><br>'" 
+                                + this.metadata.closestSenseBox.name 
+                                + "'";
+        this.userLocationMarker = this.createMarker('darkred', userlocation, popupDescription, 'customBlue');
 
         // Add Layergroup to userLocationMarkerLayer
         this.removeLayerGroup(this.userLocationMarkerLayer)

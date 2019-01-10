@@ -36,6 +36,12 @@ page-map {
     background:white;
 }
 
+/* css to customize Leaflet default styles  */
+.customBlue .leaflet-popup-tip,
+.customBlue .leaflet-popup-content-wrapper {
+    background: #2f95bd;
+    color: color($colors, light);
+}
 
 /* css to customize Leaflet default styles  */
 .customRed .leaflet-popup-tip,
