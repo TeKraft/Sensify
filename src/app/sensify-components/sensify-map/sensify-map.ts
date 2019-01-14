@@ -154,12 +154,12 @@ export class SensifyMapPage implements OnChanges {
                                 break;
                             }
                             case 'thisWeek': {
-                                let marker = this.createMarker('orange', location, popupDescription, 'customOrange')
+                                marker = this.createMarker('orange', location, popupDescription, 'customOrange')
                                 closestMarkersYellow.push(marker);
                                 break;
                             }
                             case 'tooOld': {
-                                let marker = this.createMarker('red', location, popupDescription, 'customRed')
+                                marker = this.createMarker('red', location, popupDescription, 'customRed')
                                 closestMarkersRed.push(marker);
                                 break;
                             }
