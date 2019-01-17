@@ -78,33 +78,23 @@ export class SensifySettingsPage {
                     if (idx < 0) {
                         this.metadata.settings.mySenseBoxIDs.push(res._id);
                     }
-                    let alert = this.alertCtrl.create({
-                        title: 'ID saved successfully',
-                        subTitle: 'New ID saved successfully',
-                        buttons: ['OK']
-                    });
-                    alert.present();
+                    this.helpers.showAlert('ID saved successfully', 'New ID saved successfully');
                 } else {
                     console.error("SENSEBOX ID IS NOT VALID: Please check it again!")
                 }
                 this.resetInputForms();
             }).catch(error => {
-                let alert = this.alertCtrl.create({
-                    title: 'ID could not be saved.',
-                    subTitle: error.error.message,
-                    buttons: ['OK']
-                });
-                alert.present();
+                this.helpers.showAlert('ID could not be saved', error.error.message);
             })
         }
 
         if (this.newRadius || this.newVerificationRange) {
-            let alert = this.alertCtrl.create({
-                title: 'Saved successfully',
-                subTitle: 'Settings are saved successfully',
-                buttons: ['OK']
-            });
-            alert.present();
+            this.helpers.showAlert('Saved successfully', 'Settings are saved successfully');
+            this.resetInputForms();
+        }
+
+        if (this.newNotificationThresholdTemperatureMin || this.newNotificationThresholdTemperatureMax || this.newNotificationThresholduvIntensityMax) {
+            this.helpers.showAlert('Saved successfully', 'Thresholds saved successfully');
             this.resetInputForms();
         }
     }
@@ -116,6 +106,9 @@ export class SensifySettingsPage {
         //Reset Input forms after setting change
         this.newRadius = null;
         this.newVerificationRange = null;
+        this.newNotificationThresholdTemperatureMin = null;
+        this.newNotificationThresholdTemperatureMax = null;
+        this.newNotificationThresholduvIntensityMax = null;
         this.newSenseboxID = null;
         this.onMetadataChange.emit(this.metadata);
     }
@@ -135,13 +128,7 @@ export class SensifySettingsPage {
         });
         this.helpers.toastMSG.dismiss();
         this.helpers.toastMSG = null;
-
-        let alert = this.alertCtrl.create({
-            title: 'IDs deleted',
-            subTitle: 'The SenseBox IDs have been deleted.',
-            buttons: ['OK']
-        });
-        alert.present();
+        this.helpers.showAlert('IDs deleted', 'The SenseBox IDs have been deleted');
     }
 
     /**
@@ -178,12 +165,7 @@ export class SensifySettingsPage {
             }
 
             this.onMetadataChange.emit(this.metadata);
-            let alert = this.alertCtrl.create({
-                title: 'ID Removed',
-                subTitle: 'The SenseBox ID has been removed.',
-                buttons: ['OK']
-            });
-            alert.present();
+            this.helpers.showAlert('ID Removed', 'The SenseBox ID has been removed');
         })
         this.helpers.toastMSG.dismiss();
         this.helpers.toastMSG = null;
@@ -199,12 +181,7 @@ export class SensifySettingsPage {
         if (sensebox) {
             this.metadata.closestSenseBox = sensebox;
         }
-        let alert = this.alertCtrl.create({
-            title: 'ID set',
-            subTitle: 'The SenseBox ID has been set.',
-            buttons: ['OK']
-        });
-        alert.present();
+        this.helpers.showAlert('ID set', 'The SenseBox ID has been set');
         this.onMetadataChange.emit(this.metadata);
     }
 

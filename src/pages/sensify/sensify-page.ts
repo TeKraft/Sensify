@@ -262,7 +262,7 @@ export class SensifyPage {
                 }
             })
             this.timerNotification();
-            this.helpers.toastMSG.dismiss();
+            // this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
         }
     }
