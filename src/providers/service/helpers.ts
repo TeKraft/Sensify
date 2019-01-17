@@ -1,4 +1,4 @@
-import { ToastController, Toast } from 'ionic-angular';
+import { AlertController, ToastController, Toast } from 'ionic-angular';
 import { Injectable } from "@angular/core";
 
 @Injectable()
@@ -7,6 +7,7 @@ export class helpers {
     public toastMSG: Toast;
 
     constructor(
+        private alertCtrl: AlertController,
         private toastCtrl: ToastController) {
     }
 
@@ -35,5 +36,15 @@ export class helpers {
         this.toastMSG ? this.toastMSG.dismiss() : false;
         this.toastMSG = this.toastCtrl.create(data);
         this.toastMSG.present();
+    }
+
+    showAlert(legend: string, content: string) {
+        let alert = this.alertCtrl.create({
+            title: legend,
+            subTitle: content,
+            cssClass: 'alert',
+            buttons: ['Ok']
+        });
+        alert.present();
     }
 }

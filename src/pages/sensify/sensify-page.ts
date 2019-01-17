@@ -6,8 +6,8 @@ import { Geolocation, Geoposition } from "@ionic-native/geolocation";
 import * as L from "leaflet";
 import { Storage } from '@ionic/storage';
 import { ILocalNotification, LocalNotifications } from '@ionic-native/local-notifications';
-import { helpers } from "./js/helpers";
-import { validation } from "./js/validation"
+import { helpers } from '../../providers/service/helpers';
+import { verification } from '../../providers/service/verification';
 
 @IonicPage()
 @Component({
@@ -27,7 +27,7 @@ export class SensifyPage {
     public timerNotificationEnabled: boolean = false;
     public notificationCounter: number = 0;
 
-    // to validate senseBox data for notifications
+    // to verify senseBox data for notifications
     public notificationSensors = {
         temperature: {
             title: NotificationSensorTitles.temperature,
@@ -74,7 +74,7 @@ export class SensifyPage {
         private localNotifications: LocalNotifications,
         private plt: Platform,
         private helpers: helpers,
-        private validation: validation
+        private verification: verification
     ) {
         // check for localStorage
         this.metadata = {
@@ -83,6 +83,15 @@ export class SensifyPage {
                 radius: 5,
                 timestamp: null,
                 ranges: { temperature: 5 },
+                thresholds: {
+                    temperature: {
+                        min: NotificationThresholdValues.temperatureLow,
+                        max: NotificationThresholdValues.temperatureHigh
+                    },
+                    uvIntensity: {
+                        max: NotificationThresholdValues.uvIntensityHigh
+                    }
+                },
                 zoomLevel: null,
                 mapView: null,
                 curSensor: null,
@@ -106,6 +115,8 @@ export class SensifyPage {
 
     ionViewDidLoad() {
         console.log('ionViewDidLoad SensifyPage');
+        console.log(this.metadata.settings.thresholds.temperature.min);
+        console.log(this.metadata.settings.thresholds);
         this.tabSelector = 'start';
 
         //example notification 
@@ -138,7 +149,7 @@ export class SensifyPage {
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
                 .then(res => {
                     this.metadata.senseBoxes = res;
-                    this.validateBoxes(res)
+                    this.verifyBoxes(res)
                         .then(response => {
                             this.metadata.senseBoxes = response;
                         })
@@ -172,7 +183,7 @@ export class SensifyPage {
             this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
 
-            // TEST: VALIDATE TEMPERATURE VALUE OF CLOSEST SENSEBOX          
+            // TEST: verify TEMPERATURE VALUE OF CLOSEST SENSEBOX          
             // console.log("SenseBox Sensor Value for Temperature Valid? : "+this.api.sensorIsValid("Temperatur", this.metadata.closestSenseBox, this.metadata.senseBoxes, this.metadata.settings.ranges.temperature));
         }
         catch (err) {
@@ -194,17 +205,15 @@ export class SensifyPage {
             await this.timeout(10000);
             var currentDate = new Date();
             this.metadata.settings.timestamp = currentDate;
-            this.helpers.presentToast('Loading SenseBoxes. - automatic');
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
                 .then(res => {
                     this.metadata.senseBoxes = res;
-                    this.validateBoxes(res)
+                    this.verifyBoxes(res)
                         .then(response => {
                             this.metadata.senseBoxes = response;
                         })
                 });
             this.updateMetadata();
-            this.helpers.presentToast('Loading closest SenseBox. - automatic');
 
             if (this.metadata.senseBoxes != []) {
                 //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
@@ -229,20 +238,21 @@ export class SensifyPage {
                 }
                 this.updateMetadata();
             }
-            // validate for threshold
+            // verify for threshold
             this.metadata.senseBoxes.forEach(sb => {
-                // validate for each sensor with a threshold
+                this.updateNotificationThresholds();
+                // verify for each sensor with a threshold
                 for (let sensor in this.notificationSensors) {
                     let sn = this.notificationSensors[sensor];
                     let sensorId = sb.sensors.find(el => el.title === sn.title);
-                    // validate threshold for low values
+                    // verify threshold for low values
                     if (sn.threshold.low) {
                         if (sensorId && sensorId.lastMeasurement && sensorId.lastMeasurement.value != undefined && Number(sensorId.lastMeasurement.value) <= sn.threshold.low.value) {
                             this.timerNotificationCounter += 1;
                             this.setNotificationWithTimer(0.0, 'No.' + this.timerNotificationCounter + ' @' + sb.name, sn.threshold.low.msg, sn.title + ' is ' + sensorId.lastMeasurement.value);
                         }
                     } else
-                        // validate threshold for low values
+                        // verify threshold for low values
                         if (sn.threshold.high) {
                             if (sensorId && sensorId.lastMeasurement && sensorId.lastMeasurement.value != undefined && Number(sensorId.lastMeasurement.value) >= sn.threshold.high.value) {
                                 this.timerNotificationCounter += 1;
@@ -251,12 +261,29 @@ export class SensifyPage {
                         }
                 }
             })
-            console.log('finished --> timerNotification()');
             this.timerNotification();
             this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
         }
     }
+
+    /**
+     * Function to update thresholds for notifications and adapt to threshold, the user chose.
+     */
+    private updateNotificationThresholds() {
+        if (this.metadata.settings.thresholds) {
+            if (this.metadata.settings.thresholds.temperature.min !== this.notificationSensors.temperature.threshold.low.value) {
+                this.notificationSensors.temperature.threshold.low.value = this.metadata.settings.thresholds.temperature.min;
+            }
+            if (this.metadata.settings.thresholds.temperature.max !== this.notificationSensors.temperature.threshold.high.value) {
+                this.notificationSensors.temperature.threshold.high.value = this.metadata.settings.thresholds.temperature.max;
+            }
+            if (this.metadata.settings.thresholds.uvIntensity.max !== this.notificationSensors.uvIntensity.threshold.high.value) {
+                this.notificationSensors.uvIntensity.threshold.high.value = this.metadata.settings.thresholds.uvIntensity.max;
+            }
+        }
+    }
+
 
     /**
      * Function that will return a timeout as promise
@@ -276,11 +303,11 @@ export class SensifyPage {
         }
     }
 
-    public validateBoxes(senseboxes: SenseBox[]): Promise<SenseBox[]> {
+    public verifyBoxes(senseboxes: SenseBox[]): Promise<SenseBox[]> {
         return new Promise(resolve => {
             for (let i = 0; i < senseboxes.length; i++) {
                 if (senseboxes[i] && senseboxes[i].updatedCategory == "today") {
-                    senseboxes[i].isValid = this.validation.sensorIsValid("Temperatur", senseboxes[i], senseboxes, this.metadata.settings.ranges.temperature);
+                    senseboxes[i].isValid = this.verification.sensorIsValid("Temperatur", senseboxes[i], senseboxes, this.metadata.settings.ranges.temperature);
                 }
             }
             resolve(senseboxes);
@@ -301,7 +328,7 @@ export class SensifyPage {
                         if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
                             this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
                         }
-                        this.validateBoxes(res)
+                        this.verifyBoxes(res)
                             .then(response => {
                                 this.metadata.senseBoxes = response;
                             })
@@ -320,7 +347,7 @@ export class SensifyPage {
                         if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
                             this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
                         }
-                        this.validateBoxes(res)
+                        this.verifyBoxes(res)
                             .then(response => {
                                 this.metadata.senseBoxes = response;
                             })
@@ -333,7 +360,7 @@ export class SensifyPage {
                     if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
                         this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
                     }
-                    this.validateBoxes(res)
+                    this.verifyBoxes(res)
                         .then(response => {
                             this.metadata.senseBoxes = response;
                         })
@@ -344,6 +371,7 @@ export class SensifyPage {
         await this.updateMetadata();
         this.helpers.presentToast('Updating closest SenseBox.');
         // if (this.radius > this.metadata.settings.radius && !this.metadata.settings.mySenseBox) {
+        // only executed when no personal sensebox set
         if (!this.metadata.settings.mySenseBox) {
             await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
                 this.metadata.closestSenseBox = closestBox;
@@ -357,6 +385,9 @@ export class SensifyPage {
         await this.updateMetadata();
     }
 
+    /**
+     * Function to change reference on metadata to trigger "onChanges"
+     */
     private updateMetadata() {
         this.metadata = {
             settings: this.metadata.settings,
@@ -389,6 +420,10 @@ export class SensifyPage {
                         radius: val ? val.settings.radius : 5,
                         timestamp: val ? val.settings.timestamp : " : ",
                         ranges: val ? val.settings.ranges : { temperature: 5 },
+                        thresholds: val ? val.settings.thresholds : {
+                            temperature: { min: NotificationThresholdValues.temperatureLow, max: NotificationThresholdValues.temperatureHigh },
+                            uvIntensity: { max: NotificationThresholdValues.uvIntensityHigh }
+                        },
                         location: this.metadata.settings.location ? this.metadata.settings.location : (val && val.settings.location ? val.settings.location : null),
                         zoomLevel: val.settings.zoomLevel ? val.settings.zoomLevel : 13,
                         mapView: this.metadata.settings.mapView ? this.metadata.settings.mapView : null

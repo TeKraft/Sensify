@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { SenseBox } from '../../../providers/model';
+import { SenseBox } from '../model';
 
 @Injectable()
-export class validation {
+export class verification {
 
     constructor() {
     }
@@ -43,7 +43,7 @@ export class validation {
         });
         //Division by zero handling
         if (numberOfSensors === 0) {
-            console.error("VALIDATION ERROR: Could not validate. No Sensors or no measurements from today found.");
+            console.error("VALIDATION ERROR: Could not verify. No Sensors or no measurements from today found.");
             return 0;
         } else {
             mean = sum / numberOfSensors;
@@ -51,7 +51,7 @@ export class validation {
         }
     }
 
-    //Checks if closestSenseBox has the sensor that you want to validate
+    //Checks if closestSenseBox has the sensor that you want to verify
     senseBoxHasSensor(sensorName: String, closestBox: SenseBox) {
         let res = false;
         if (closestBox) {
@@ -69,7 +69,7 @@ export class validation {
      * @param sensorName    {String}    Name of the Sensor, for instance: "Temperatur".
      * @param closestBox    {SenseBox}    SenseBox the user is connected to.
      * @param senseBoxes    {SenseBox[]}Array of all SenseBoxes inside certain radius    .
-     * @param range        {number}    Validation range.
+     * @param range        {number}    Verification range.
      * @return {boolean}                True, if value is inside range.
      */
     sensorIsValid(sensorName: String, closestBox: SenseBox, senseBoxes: SenseBox[], range: number) {
@@ -78,16 +78,16 @@ export class validation {
         if (this.senseBoxHasSensor(sensorName, closestBox)) {
             //Get mean of all closest Boxes (same sensor and same day)
             let mean = this.getMeanValue(sensorName, senseBoxes);
-            //validate and return
-            valiValue = this.validateValue(sensorName, mean, closestBox, range);
+            //verify and return
+            valiValue = this.verifyValue(sensorName, mean, closestBox, range);
         }
         return (valiValue);
     };
 
-    //Checks if sensor value form sensebox is inside the range of mean values of all closest boxes (+/- validation range)
-    validateValue(sensorName: String, mean: number, closestBox: SenseBox, range: number) {
+    //Checks if sensor value form sensebox is inside the range of mean values of all closest boxes (+/- verification range)
+    verifyValue(sensorName: String, mean: number, closestBox: SenseBox, range: number) {
         let boxValue: number;
-        //get closest box value for validation
+        //get closest box value for verification
         closestBox.sensors.forEach(sensor => {
             if (sensor.title === sensorName) {
                 if (!sensor.lastMeasurement) {

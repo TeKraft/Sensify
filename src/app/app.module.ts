@@ -13,8 +13,8 @@ import { LeafletModule } from "@asymmetrik/ngx-leaflet";
 
 import { Sensify } from './app.component';
 import { ApiProvider } from '../providers/api/api';
-import { helpers } from '../pages/sensify/js/helpers';
-import { validation } from '../pages/sensify/js/validation';
+import { helpers } from '../providers/service/helpers';
+import { verification } from '../providers/service/verification';
 
 @NgModule({
     declarations: [
@@ -39,7 +39,7 @@ import { validation } from '../pages/sensify/js/validation';
         LocalNotifications,
         NativeGeocoder,
         helpers,
-        validation
+        verification
     ]
 })
 export class AppModule { }

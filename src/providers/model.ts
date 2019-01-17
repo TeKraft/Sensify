@@ -35,9 +35,20 @@ export interface Settings {
     ranges: {
         temperature: number;
     };
+    thresholds: Thresholds;
     zoomLevel: number;
     mapView: L.LatLng;
     curSensor: Sensor;
+}
+
+export interface Thresholds {
+    temperature: {
+        min: number;
+        max: number;
+    };
+    uvIntensity: {
+        max: number;
+    }
 }
 
 export interface Metadata {

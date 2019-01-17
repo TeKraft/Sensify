@@ -3,7 +3,7 @@ import { ActionSheetController, AlertController, ActionSheetButton } from 'ionic
 import { Metadata } from '../../../providers/model';
 import { ApiProvider } from '../../../providers/api/api';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
-import { helpers } from "../../../pages/sensify/js/helpers";
+import { helpers } from "../../../providers/service/helpers";
 
 @Component({
     selector: 'sensify-page-settings',
@@ -20,8 +20,11 @@ export class SensifySettingsPage {
     @Output()
     public onMessageChange: EventEmitter<string> = new EventEmitter();
 
-    newRadius: any;
-    newValidationRange: any;
+    newRadius: number;
+    newVerificationRange: number;
+    newNotificationThresholdTemperatureMin: number;
+    newNotificationThresholdTemperatureMax: number;
+    newNotificationThresholduvIntensityMax: number;
     newSenseboxID: any;
 
     public senseBoxIDDelete: (string | ActionSheetButton)[] = [];
@@ -48,44 +51,73 @@ export class SensifySettingsPage {
         if (this.newRadius) {
             this.metadata.settings.radius = this.newRadius;
         }
-        if (this.newValidationRange) {
-            this.metadata.settings.ranges.temperature = this.newValidationRange;
+        if (this.newVerificationRange) {
+            this.metadata.settings.ranges.temperature = this.newVerificationRange;
         }
+        if (this.newNotificationThresholdTemperatureMin) {
+            this.metadata.settings.thresholds.temperature.min = this.newNotificationThresholdTemperatureMin;
+        }
+        if (this.newNotificationThresholdTemperatureMax) {
+            this.metadata.settings.thresholds.temperature.max = this.newNotificationThresholdTemperatureMax;
+        }
+        if (this.newNotificationThresholduvIntensityMax) {
+            this.metadata.settings.thresholds.uvIntensity.max = this.newNotificationThresholduvIntensityMax;
+        }
+
         if (this.newSenseboxID) {
             this.api.getSenseBoxByID(this.newSenseboxID).then(res => {
                 if (res) {
                     this.metadata.closestSenseBox = res;
                     this.metadata.settings.mySenseBox = res._id;
-                    let idx = this.metadata.settings.mySenseBoxIDs.findIndex(el => el === res._id);
+                    let idx = -1;
+                    if (this.metadata.settings.mySenseBoxIDs) {
+                        idx = this.metadata.settings.mySenseBoxIDs.findIndex(el => el === res._id);
+                    } else {
+                        this.metadata.settings.mySenseBoxIDs = [];
+                    }
                     if (idx < 0) {
                         this.metadata.settings.mySenseBoxIDs.push(res._id);
                     }
-
+                    let alert = this.alertCtrl.create({
+                        title: 'ID saved successfully',
+                        subTitle: 'New ID saved successfully',
+                        buttons: ['OK']
+                    });
+                    alert.present();
                 } else {
                     console.error("SENSEBOX ID IS NOT VALID: Please check it again!")
                 }
+                this.resetInputForms();
+            }).catch(error => {
+                let alert = this.alertCtrl.create({
+                    title: 'ID could not be saved.',
+                    subTitle: error.error.message,
+                    buttons: ['OK']
+                });
+                alert.present();
             })
         }
-        if (this.newRadius || this.newValidationRange || this.newSenseboxID) {
+
+        if (this.newRadius || this.newVerificationRange) {
             let alert = this.alertCtrl.create({
                 title: 'Saved successfully',
                 subTitle: 'Settings are saved successfully',
                 buttons: ['OK']
             });
             alert.present();
-        } else {
-            let alert = this.alertCtrl.create({
-                title: 'Nothing changed',
-                subTitle: 'There were no settings changed',
-                buttons: ['OK']
-            });
-            alert.present();
+            this.resetInputForms();
         }
+    }
+
+    /**
+     * Function to reset input forms after setting changes
+     */
+    resetInputForms() {
         //Reset Input forms after setting change
         this.newRadius = null;
-        this.newValidationRange = null;
+        this.newVerificationRange = null;
         this.newSenseboxID = null;
-        this.onMetadataChange.emit(this.metadata);    
+        this.onMetadataChange.emit(this.metadata);
     }
 
     /**
@@ -103,7 +135,7 @@ export class SensifySettingsPage {
         });
         this.helpers.toastMSG.dismiss();
         this.helpers.toastMSG = null;
-        
+
         let alert = this.alertCtrl.create({
             title: 'IDs deleted',
             subTitle: 'The SenseBox IDs have been deleted.',

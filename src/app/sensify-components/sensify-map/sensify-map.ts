@@ -1,9 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { NavController, AlertController } from 'ionic-angular';
+import { NavController } from 'ionic-angular';
 import * as L from "leaflet";
 import "leaflet.awesome-markers";
 import { Metadata, SenseBox } from "../../../providers/model";
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
+import { helpers } from "./../../../providers/service/helpers";
 
 @Component({
     selector: 'sensify-page-map',
@@ -35,7 +36,7 @@ export class SensifyMapPage implements OnChanges {
     constructor(
         public navCtrl: NavController,
         private elementRef: ElementRef,
-        private alertCtrl: AlertController,
+        private helpers: helpers,
         public mySensifyPage: SensifyPage
     ) {
         this.ionViewDidLoad();
@@ -60,7 +61,7 @@ export class SensifyMapPage implements OnChanges {
     };
 
     onMapReady(map: L.Map) {
-        this.map = map;      
+        this.map = map;
         this.map.on('moveend', e => {
             this.metadata.settings.zoomLevel = e.target.getZoom();
             let tempView = e.target.getCenter();
@@ -68,11 +69,11 @@ export class SensifyMapPage implements OnChanges {
             this.onMetadataChange.emit(this.metadata);
         });
 
-        this.layersControl =  L.control.layers(null, {}, { position: 'topleft' }).addTo(this.map);
+        this.layersControl = L.control.layers(null, {}, { position: 'topleft' }).addTo(this.map);
         // Custom buttons
         this.locatorButton = new this.locateButton();
         this.LegendButton = new this.legendButton();
-        
+
         this.map.addControl(this.LegendButton);
         this.map.addControl(this.locatorButton);
 
@@ -81,7 +82,7 @@ export class SensifyMapPage implements OnChanges {
         this.locatorButton.setPosition('topleft');
 
         // Add layers to map
-        if(this.metadata.settings.location){
+        if (this.metadata.settings.location) {
             this.addUserLocationToLayer();
             this.addSenseboxMarkerToMap();
         }
@@ -110,15 +111,15 @@ export class SensifyMapPage implements OnChanges {
 
         // Create marker with user location + description
         let userlocation = this.metadata.settings.location;
-        let popupDescription = "<b>Your position is:</b><br>Latitude: " 
-                                + userlocation.lat.toFixed(4) 
-                                + "<br>Longitude: " 
-                                + userlocation.lng.toFixed(4) 
-                                + "<br>Time at position: " 
-                                + this.metadata.settings.timestamp 
-                                + "<p><b>Closest SenseBox is:</b><br>'" 
-                                + this.metadata.closestSenseBox.name 
-                                + "'";
+        let popupDescription = "<b>Your position is:</b><br>Latitude: "
+            + userlocation.lat.toFixed(4)
+            + "<br>Longitude: "
+            + userlocation.lng.toFixed(4)
+            + "<br>Time at position: "
+            + this.metadata.settings.timestamp
+            + "<p><b>Closest SenseBox is:</b><br>'"
+            + this.metadata.closestSenseBox.name
+            + "'";
         this.userLocationMarker = this.createMarker('darkred', userlocation, popupDescription, 'customBlue');
 
         // Add Layergroup to userLocationMarkerLayer
@@ -164,11 +165,28 @@ export class SensifyMapPage implements OnChanges {
                                 break;
                             }
                             default: {
-                                this.showAlert('Error', 'Ups, something went wrong here.');
+                                this.helpers.showAlert('Error', 'Ups, something went wrong here.');
                                 break;
                             }
                         }
                     } else {
+                        marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen')
+                        closestMarkersBlue.push(marker);
+                        // Calculate and style distance distance to ClosestSenseBox
+                        let distanceToBox = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
+                        if (distanceToBox > 999) {
+                            distanceToBox = distanceToBox / 1000;
+                            this.distanceToClosestString = this.round(distanceToBox, 2) + " km";
+                        } else {
+                            this.distanceToClosestString = this.round(distanceToBox, 2) + " m";
+                        }
+                    }
+
+                    // check if closestSenseBox exists in senseBoxes array (if closestSB is inside radius)
+                    let idxOutside = this.metadata.senseBoxes.findIndex(el => el._id === this.metadata.closestSenseBox._id);
+
+                    // should be executed only once
+                    if (i === this.metadata.senseBoxes.length - 1 && idxOutside < 0) {
                         marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen')
                         closestMarkersBlue.push(marker);
                         // Calculate and style distance distance to ClosestSenseBox
@@ -195,7 +213,7 @@ export class SensifyMapPage implements OnChanges {
                                 this.metadata.settings.mySenseBoxIDs.push(this.metadata.settings.mySenseBox);
                             }
                             this.updateMap();
-                            this.showAlert('Success', 'New home SenseBox was set');
+                            this.helpers.showAlert('Success', 'New home SenseBox was set');
                         })
                     })
                 }
@@ -211,9 +229,9 @@ export class SensifyMapPage implements OnChanges {
 
             // Create and add layerGroups to map (for markers)
             this.senseboxMarkersLayerGreen = this.createLayerGroupsForMarkers(closestMarkersGreen, this.senseboxMarkersLayerGreen, true);
-            this.senseboxMarkersLayerYellow = this.createLayerGroupsForMarkers(closestMarkersYellow, this.senseboxMarkersLayerYellow, false);            
+            this.senseboxMarkersLayerYellow = this.createLayerGroupsForMarkers(closestMarkersYellow, this.senseboxMarkersLayerYellow, false);
             this.senseboxMarkersLayerRed = this.createLayerGroupsForMarkers(closestMarkersRed, this.senseboxMarkersLayerRed, false);
-            this.senseboxMarkersLayerBlue = this.createLayerGroupsForMarkers(closestMarkersBlue, this.senseboxMarkersLayerBlue,  true);
+            this.senseboxMarkersLayerBlue = this.createLayerGroupsForMarkers(closestMarkersBlue, this.senseboxMarkersLayerBlue, true);
             this.layersControl.addOverlay(this.senseboxMarkersLayerGreen, 'Green SenseBoxes');
             this.layersControl.addOverlay(this.senseboxMarkersLayerYellow, 'Yellow SenseBoxes');
             this.layersControl.addOverlay(this.senseboxMarkersLayerRed, 'Red SenseBoxes');
@@ -237,7 +255,7 @@ export class SensifyMapPage implements OnChanges {
                 this.senseboxMarkersLayerBlue === undefined ||
                 this.metadata.closestSenseBox === null ||
                 this.metadata.closestSenseBox === undefined) {
-                this.showAlert('Error', 'No SenseBoxes were found.');
+                this.helpers.showAlert('Error', 'No SenseBoxes were found.');
             }
         }
     }
@@ -272,8 +290,8 @@ export class SensifyMapPage implements OnChanges {
             container.onclick = () => {
                 let containerContent = "<ion-grid><ion-row><ion-col col-20><p><img style='height:30px' src='../../assets/markers/greenMarkerIcon.png'></ion-col><ion-col col-80>Data is valid & up-to-date (<24h)</p></ion-col></ion-row><ion-row><ion-col col-20><p><img style='height:30px' src='../../assets/markers/greenMarkerNotValidIcon.png'></ion-col><ion-col col-80>Data is NOT valid, but up-to-date (<24h)</p></ion-col></ion-row><ion-row><ion-col col-20><p><img style='height:30px' src='../../assets/markers/orangeMarkerIcon.png'></ion-col><ion-col col-80>Data is one week old</p></ion-col></ion-row><ion-row><ion-col col-20><p><img style='height:30px' src='../../assets/markers/redMarkerIcon.png'></ion-col><ion-col col-80>Data is older than one week</p></ion-col></ion-row><ion-row><ion-col col-20><p><img style='height:30px' src='../../assets/markers/blueMarkerIcon.png'></ion-col><ion-col col-80>Closest Sensebox</p></ion-col></ion-row><ion-row><ion-col col-20><p><img style='height:30px' src='../../assets/markers/positionMarkerIcon.png'></ion-col><ion-col col-80>User-Location</p></ion-col></ion-row></ion-grid>";
                 /*let containerContent = "<ion-grid> <ion-row> <p><img style='height:30px' src='../../assets/markers/greenMarkerIcon.png'>Data is valid & up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/greenMarkerNotValidIcon.png'>Data is NOT valid, but up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/orangeMarkerIcon.png'>Data is one week old</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/redMarkerIcon.png'>Data is older than one week</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/blueMarkerIcon.png'>Closest Sensebox</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/positionMarkerIcon.png'>User-Location</p> </ion-row> </ion-grid>";*/
-                /*let containerContent = "<ion-grid> <ion-row> <p><img src='../../assets/markers/greenMarkerIcon.png'>Data is valid & up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img src='../../assets/markers/greenMarkerNotValidIcon.png'>Data is NOT valid, but up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img src='../../assets/markers/orangeMarkerIcon.png'>Data is one week old</p> </ion-row> <ion-row> <p><img src='../../assets/markers/redMarkerIcon.png'>Data is at most one week old</p> </ion-row> <ion-row> <p><img src='../../assets/markers/blueMarkerIcon.png'>Closest Sensebox</p> </ion-row> <ion-row> <p><img src='../../assets/markers/positionMarkerIcon.png'>User-Location</p> </ion-row> </ion-grid>";*/                
-                this.showAlert('Legend', containerContent);
+                /*let containerContent = "<ion-grid> <ion-row> <p><img src='../../assets/markers/greenMarkerIcon.png'>Data is valid & up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img src='../../assets/markers/greenMarkerNotValidIcon.png'>Data is NOT valid, but up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img src='../../assets/markers/orangeMarkerIcon.png'>Data is one week old</p> </ion-row> <ion-row> <p><img src='../../assets/markers/redMarkerIcon.png'>Data is at most one week old</p> </ion-row> <ion-row> <p><img src='../../assets/markers/blueMarkerIcon.png'>Closest Sensebox</p> </ion-row> <ion-row> <p><img src='../../assets/markers/positionMarkerIcon.png'>User-Location</p> </ion-row> </ion-grid>";*/
+                this.helpers.showAlert('Legend', containerContent);
             };
             return container;
         }
@@ -320,7 +338,7 @@ export class SensifyMapPage implements OnChanges {
                 layer = new L.LayerGroup(markerArray);
             }
         }
-        return layer; 
+        return layer;
     }
 
     private removeLayerGroup(layer: L.LayerGroup) {
@@ -349,15 +367,5 @@ export class SensifyMapPage implements OnChanges {
     private round(value, precision) {
         var multiplier = Math.pow(10, precision || 0);
         return Math.round(value * multiplier) / multiplier;
-    }
-
-    showAlert(legend: string, content: string) {
-        let alert = this.alertCtrl.create({
-            title: legend,
-            subTitle: content,
-            cssClass: 'alert',
-            buttons: ['Ok']
-        });
-        alert.present();
     }
 }

@@ -10,10 +10,26 @@
                 <ion-input type="number" min="0" [(ngModel)]="newRadius" placeholder="{{metadata.settings.radius}}"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-label color="primary" stacked>Temp Validation Range (in °C)</ion-label>
-                <ion-input type="number" min="0" [(ngModel)]="newValidationRange" placeholder={{metadata.settings.ranges.temperature}}></ion-input>
+                <ion-label color="primary" stacked>Temp Verification Range (in °C)</ion-label>
+                <ion-input type="number" min="0" [(ngModel)]="newVerificationRange" placeholder={{metadata.settings.ranges.temperature}}></ion-input>
             </ion-item>
-            
+            <ion-item>
+                <ion-label color="primary" stacked>Min Temp Notification Threshold</ion-label>
+                <ion-input type="number" min="-70" [(ngModel)]="newNotificationThresholdTemperatureMin" placeholder={{metadata.settings.thresholds.temperature.min}}></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label color="primary" stacked>Max Temp Notification Threshold</ion-label>
+                <ion-input type="number" min="-70" [(ngModel)]="newNotificationThresholdTemperatureMax" placeholder={{metadata.settings.thresholds.temperature.max}}></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label color="primary" stacked>Max UV Intensity Notification Threshold</ion-label>
+                <ion-input type="number" min="-70" [(ngModel)]="newNotificationThresholduvIntensityMax" placeholder={{metadata.settings.thresholds.uvIntensity.max}}></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label color="primary" stacked>SenseBox ID</ion-label>
+                <ion-input [(ngModel)]="newSenseboxID" placeholder="{{metadata.settings.mySenseBox}}"></ion-input>
+            </ion-item>
+
         </ion-col>
     </ion-row>
     <button ion-button round outline (click)="changeSettings()">Confirm Changes</button>
@@ -27,10 +43,6 @@
                 <button ion-button (click)="openSenseBoxIDDelete()">
                     <ion-icon size="large" name="trash" style="zoom:1.5;"></ion-icon>
                 </button>
-            </ion-item>
-            <ion-item>
-                <ion-label color="primary" stacked>SenseBox ID</ion-label>
-                <ion-input [(ngModel)]="newSenseboxID" placeholder="{{metadata.settings.mySenseBox}}"></ion-input>
             </ion-item>
         </ion-col>
     </ion-row>
