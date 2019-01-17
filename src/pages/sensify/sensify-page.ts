@@ -76,32 +76,49 @@ export class SensifyPage {
         private helpers: helpers,
         private verification: verification
     ) {
-        // check for localStorage
-        this.metadata = {
-            settings: {
-                gps: true,
-                radius: 5,
-                timestamp: null,
-                ranges: { temperature: 5 },
-                thresholds: {
-                    temperature: {
-                        min: NotificationThresholdValues.temperatureLow,
-                        max: NotificationThresholdValues.temperatureHigh
+
+        this.storage.get('metadata')
+        .then((val) => {
+            
+            if (val) {
+                
+                
+                this.metadata = val;
+                this.radius = val.settings.radius;
+                this.initSenseBoxes();
+            } else {
+
+                this.metadata = {
+                    settings: {
+                        gps: true,
+                        radius: 5,
+                        timestamp: null,
+                        ranges: { temperature: 5 },
+                        thresholds: {
+                            temperature: {
+                                min: NotificationThresholdValues.temperatureLow,
+                                max: NotificationThresholdValues.temperatureHigh
+                            },
+                            uvIntensity: {
+                                max: NotificationThresholdValues.uvIntensityHigh
+                            }
+                        },
+                        zoomLevel: null,
+                        mapView: null,
+                        curSensor: null,
+                        mySenseBoxIDs: []
                     },
-                    uvIntensity: {
-                        max: NotificationThresholdValues.uvIntensityHigh
-                    }
-                },
-                zoomLevel: null,
-                mapView: null,
-                curSensor: null,
-                mySenseBoxIDs: []
-            },
-            notifications: []
-        };
-        this.radius = 5;
-        this.storage.set("metadata", this.metadata);
-        this.initSenseBoxes();
+                    notifications: []
+                };
+                this.radius = 5;
+                this.storage.set("metadata", this.metadata);
+                this.initSenseBoxes();
+            }}, (error) => {
+ 
+                return error;
+            });
+
+      
 
         //On Notification click display data property of notification
         if (this.plt.is('cordova')) {
@@ -115,17 +132,17 @@ export class SensifyPage {
 
     ionViewDidLoad() {
         console.log('ionViewDidLoad SensifyPage');
-        console.log(this.metadata.settings.thresholds.temperature.min);
-        console.log(this.metadata.settings.thresholds);
         this.tabSelector = 'start';
 
         //example notification 
-        this.setNotificationWithTimer(0.2, "Test", "Hey! Open up your Sensify-App for a quick update :)", "Works like a charm.");
+        //this.setNotificationWithTimer(0.2, "Test", "Hey! Open up your Sensify-App for a quick update :)", "Works like a charm.");
     }
 
     public openSelect() {
         this.selectRef.open();
     }
+
+    
 
     public async initSenseBoxes() {
         console.log('Start initSenseBoxes');
@@ -139,11 +156,8 @@ export class SensifyPage {
                 this.startLocation = userlocation;
             });
 
+
             this.helpers.presentToast('Loading user data');
-            await this.getMetadata().then(meta => {
-                this.metadata = meta;
-                this.radius = meta.settings.radius;
-            });
 
             this.helpers.presentToast('Loading SenseBoxes');
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
@@ -155,11 +169,11 @@ export class SensifyPage {
                         })
                 });
             this.updateMetadata();
-
             this.helpers.presentToast('Loading closest SenseBox');
             if (this.metadata.senseBoxes != []) {
                 //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
                 if (this.metadata.settings.mySenseBox) {
+
                     await this.api.getSenseBoxByID(this.metadata.settings.mySenseBox).then((box: SenseBox) => {
                         this.metadata.closestSenseBox = box;
                         if (this.metadata.senseBoxes.indexOf(box) < 0) {
@@ -182,6 +196,19 @@ export class SensifyPage {
             }
             this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
+
+                // Watch the user position
+                this.geolocation.watchPosition()
+                .subscribe(pos => {
+                    console.log('Watching GPS position');
+                    if (pos.coords && this.metadata) {
+                        let location = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
+                        // let location = new L.LatLng(7.5961, 51.9695);
+                        // necessary to re-define this.settings to trigger ngOnChanges in sensify.map.ts
+                        this.metadata.settings.location = location;
+                        this.updateBoxes();
+                    }
+                });
 
             // TEST: verify TEMPERATURE VALUE OF CLOSEST SENSEBOX          
             // console.log("SenseBox Sensor Value for Temperature Valid? : "+this.api.sensorIsValid("Temperatur", this.metadata.closestSenseBox, this.metadata.senseBoxes, this.metadata.settings.ranges.temperature));
@@ -410,33 +437,6 @@ export class SensifyPage {
         this.storage.set("metadata", this.metadata);
     }
 
-    // Get the Metadata from storage
-    getMetadata(): Promise<Metadata> {
-        return this.storage.get('metadata')
-            .then((val) => {
-                return {
-                    settings: {
-                        gps: val ? val.settings.gps : true,
-                        radius: val ? val.settings.radius : 5,
-                        timestamp: val ? val.settings.timestamp : " : ",
-                        ranges: val ? val.settings.ranges : { temperature: 5 },
-                        thresholds: val ? val.settings.thresholds : {
-                            temperature: { min: NotificationThresholdValues.temperatureLow, max: NotificationThresholdValues.temperatureHigh },
-                            uvIntensity: { max: NotificationThresholdValues.uvIntensityHigh }
-                        },
-                        location: this.metadata.settings.location ? this.metadata.settings.location : (val && val.settings.location ? val.settings.location : null),
-                        zoomLevel: val.settings.zoomLevel ? val.settings.zoomLevel : 13,
-                        mapView: this.metadata.settings.mapView ? this.metadata.settings.mapView : null
-                    },
-                    senseBoxes: this.metadata.senseBoxes ? this.metadata.senseBoxes : (val && val.senseBoxes ? val.senseBoxes : null),
-                    closestSenseBox: this.metadata.closestSenseBox ? this.metadata.closestSenseBox : (val && val.closestSenseBox ? val.closestSenseBox : null),
-                    notifications: this.metadata.notifications ? this.metadata.notifications : []
-                };
-            }, (error) => {
-                return error;
-            });
-    }
-
     /**
      * ##############################
      * Positioning
@@ -472,18 +472,7 @@ export class SensifyPage {
         });
     }
 
-    // Watch the user position
-    subscription = this.geolocation.watchPosition()
-        .subscribe(pos => {
-            console.log('Watching GPS position');
-            if (pos.coords) {
-                let location = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
-                // let location = new L.LatLng(7.5961, 51.9695);
-                // necessary to re-define this.settings to trigger ngOnChanges in sensify.map.ts
-                this.metadata.settings.location = location;
-                this.updateBoxes();
-            }
-        });
+
 
     //Set notification with time in minutes from now, Title, Text, data that will be visible on click
     setNotificationWithTimer(time: number, title: string, text: string, data: string) {

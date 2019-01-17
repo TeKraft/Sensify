@@ -55,7 +55,7 @@ export class SensifyStartPage implements OnChanges {
     }
 
     ngOnChanges(changes) {
-        if (changes.metadata.currentValue.closestSenseBox) {
+        if (changes && changes.metadata.currentValue && changes.metadata.currentValue.closestSenseBox) {
             this.currBox = this.metadata.closestSenseBox;
             this.init();
             this.setSensors();
@@ -78,7 +78,7 @@ export class SensifyStartPage implements OnChanges {
                     this.bgImage = "../../../assets/imgs/snowBackground.jpg";
                 } else {
 
-                    if (Number(this.uv) < 100) {
+                    if (Number(this.uv) < 700) {
                         this.bgImage = "../../../assets/imgs/cloudBackground.jpg";
 
                     } else {
