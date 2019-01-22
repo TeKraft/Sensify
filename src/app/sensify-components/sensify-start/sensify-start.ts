@@ -40,7 +40,7 @@ export class SensifyStartPage implements OnChanges {
 
         this.curValue = "...";
         this.curUnit = "";
-        this.curName = "";
+        this.curName;
 
         this.bgImage = "../../../assets/imgs/background.png";
         this.setCurrentDate();
@@ -56,6 +56,10 @@ export class SensifyStartPage implements OnChanges {
 
     ngOnChanges(changes) {
         if (changes && changes.metadata.currentValue && changes.metadata.currentValue.closestSenseBox) {
+            if (this.metadata.settings.curSensor) {
+                // this.curName is undefined in setSensors(). It needs to be set, when changes occur.
+                this.curName = this.metadata.settings.curSensor.title;
+            }
             this.currBox = this.metadata.closestSenseBox;
             this.init();
             this.setSensors();
@@ -92,6 +96,8 @@ export class SensifyStartPage implements OnChanges {
     public setSensors() {
         this.sensors = [];
         this.btns = [];
+        // check if the current title (sensebox sensor title) exists in the selected sensebox.
+        let idx = this.currBox.sensors.findIndex(el => el.title === this.curName);
 
         for (var i: number = 0; i < this.currBox.sensors.length; i++) {
             let newBtn: any;
@@ -107,24 +113,40 @@ export class SensifyStartPage implements OnChanges {
                         this.metadata.settings.curSensor = sensor;
                     }
                 };
-
                 this.sensors.push(sensor);
 
-                if (this.metadata.settings.curSensor) {
-                    this.curValue = this.metadata.settings.curSensor.lastMeasurement.value;
-                    this.curUnit = this.metadata.settings.curSensor.unit;
-                    this.curName = this.metadata.settings.curSensor.title;
+                // always set temperature and uv intensity as globals
+                if (sensor.title == "Temperatur") {
+                    this.temperature = sensor.lastMeasurement.value;
+                }
+                if (sensor.title == "UV-Intensität") {
+                    this.uv = sensor.lastMeasurement.value;
+                }
+
+                // if the selected sensebox has the current selected sensor it is used. otherwise "Temperatur" will be set.
+                if (idx >= 0) {
+                    if (sensor.title === this.curName) {
+                        this.metadata.settings.curSensor = sensor;
+                    }
+                    if (this.metadata.settings.curSensor) {
+                        this.curValue = this.metadata.settings.curSensor.lastMeasurement.value;
+                        this.curUnit = this.metadata.settings.curSensor.unit;
+                        this.curName = this.metadata.settings.curSensor.title;
+                    } else {
+                        if (sensor.title == "Temperatur") {
+                            this.curValue = sensor.lastMeasurement.value;
+                            this.curUnit = sensor.unit;
+                            this.curName = sensor.title;
+                        }
+                    }
                 } else {
                     if (sensor.title == "Temperatur") {
-                        this.temperature = sensor.lastMeasurement.value;
                         this.curValue = sensor.lastMeasurement.value;
                         this.curUnit = sensor.unit;
                         this.curName = sensor.title;
                     }
-                    if (sensor.title == "UV-Intensität") {
-                        this.uv = sensor.lastMeasurement.value;
-                    }
                 }
+
             }
             this.btns.push(newBtn);
         }
