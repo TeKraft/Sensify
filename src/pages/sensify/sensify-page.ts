@@ -76,18 +76,14 @@ export class SensifyPage {
         private helpers: helpers,
         private verification: verification
     ) {
-
+        //this.helpers.presentToast('Loading user data');
         this.storage.get('metadata')
         .then((val) => {
-            
-            if (val) {
-                
-                
+            if (val) {               
                 this.metadata = val;
                 this.radius = val.settings.radius;
                 this.initSenseBoxes();
             } else {
-
                 this.metadata = {
                     settings: {
                         gps: true,
@@ -117,8 +113,6 @@ export class SensifyPage {
  
                 return error;
             });
-
-      
 
         //On Notification click display data property of notification
         if (this.plt.is('cordova')) {
@@ -150,16 +144,13 @@ export class SensifyPage {
             var currentDate = new Date();
             this.metadata.settings.timestamp = currentDate;
 
-            this.helpers.presentToast('Loading user position');
+            this.helpers.presentClosableToast('Loading user data');
             await this.getUserPosition().then(userlocation => {
                 this.metadata.settings.location = userlocation;
                 this.startLocation = userlocation;
             });
 
-
-            this.helpers.presentToast('Loading user data');
-
-            this.helpers.presentToast('Loading SenseBoxes');
+            //this.helpers.presentToast('Loading SenseBoxes');
             await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
                 .then(res => {
                     this.metadata.senseBoxes = res;
@@ -169,7 +160,7 @@ export class SensifyPage {
                         })
                 });
             this.updateMetadata();
-            this.helpers.presentToast('Loading closest SenseBox');
+            //this.helpers.presentToast('Loading closest SenseBox');
             if (this.metadata.senseBoxes != []) {
                 //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
                 if (this.metadata.settings.mySenseBox) {
@@ -344,7 +335,7 @@ export class SensifyPage {
 
     public async updateBoxes() {
         await this.updateMetadata();
-        this.helpers.presentToast('Updating SenseBoxes');
+        this.helpers.presentClosableToast('Updating SenseBoxes');
         // Check whether radius gets bigger or smaller
         if (this.metadata.senseBoxes != undefined && this.metadata.senseBoxes.length > 0) {
             if (this.metadata.settings.radius > this.radius) {
@@ -396,7 +387,7 @@ export class SensifyPage {
         this.startLocation = this.metadata.settings.location;
         this.radius = this.metadata.settings.radius;
         await this.updateMetadata();
-        this.helpers.presentToast('Updating closest SenseBox.');
+        //this.helpers.presentToast('Updating closest SenseBox.');
         // if (this.radius > this.metadata.settings.radius && !this.metadata.settings.mySenseBox) {
         // only executed when no personal sensebox set
         if (!this.metadata.settings.mySenseBox) {

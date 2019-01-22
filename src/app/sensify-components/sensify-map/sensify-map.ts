@@ -129,7 +129,6 @@ export class SensifyMapPage implements OnChanges {
 
     // Add senseBoxes to Map
     public addSenseboxMarkerToMap() {
-        console.log('im here<')
         if (this.metadata.senseBoxes && this.metadata.closestSenseBox && this.metadata.senseBoxes.length > 0) {
             let closestMarkersRed: L.Marker[] = [];
             let closestMarkersYellow: L.Marker[] = [];
@@ -220,8 +219,6 @@ export class SensifyMapPage implements OnChanges {
             } // End Create Markers
 
             // Check if markers were already set; If yes: Remove Layer
-            console.log(this.senseboxMarkersLayerGreen)
-
             this.removeLayerGroup(this.senseboxMarkersLayerGreen);
             this.removeLayerGroup(this.senseboxMarkersLayerYellow);
             this.removeLayerGroup(this.senseboxMarkersLayerRed);
