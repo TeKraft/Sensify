@@ -103,7 +103,7 @@ export class SensifyPage {
                                 max: NotificationThresholdValues.uvIntensityHigh
                             }
                         },
-                        zoomLevel: null,
+                        zoomLevel: 13,
                         mapView: null,
                         curSensor: null,
                         mySenseBoxIDs: []
