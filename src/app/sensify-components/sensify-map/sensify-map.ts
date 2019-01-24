@@ -231,10 +231,11 @@ export class SensifyMapPage implements OnChanges {
             this.senseboxMarkersLayerYellow = this.createLayerGroupsForMarkers(closestMarkersYellow, this.senseboxMarkersLayerYellow, false);
             this.senseboxMarkersLayerRed = this.createLayerGroupsForMarkers(closestMarkersRed, this.senseboxMarkersLayerRed, false);
             this.senseboxMarkersLayerBlue = this.createLayerGroupsForMarkers(closestMarkersBlue, this.senseboxMarkersLayerBlue, true);
-            this.layersControl.addOverlay(this.senseboxMarkersLayerGreen, 'Green SenseBoxes');
-            this.layersControl.addOverlay(this.senseboxMarkersLayerYellow, 'Yellow SenseBoxes');
-            this.layersControl.addOverlay(this.senseboxMarkersLayerRed, 'Red SenseBoxes');
-            this.layersControl.addOverlay(this.senseboxMarkersLayerBlue, 'Nearest/My SenseBoxes');
+
+            if(this.senseboxMarkersLayerGreen) this.layersControl.addOverlay(this.senseboxMarkersLayerGreen, 'Green SenseBoxes');
+            if(this.senseboxMarkersLayerYellow) this.layersControl.addOverlay(this.senseboxMarkersLayerYellow, 'Yellow SenseBoxes');
+            if(this.senseboxMarkersLayerRed) this.layersControl.addOverlay(this.senseboxMarkersLayerRed, 'Red SenseBoxes');
+            if(this.senseboxMarkersLayerBlue) this.layersControl.addOverlay(this.senseboxMarkersLayerBlue, 'Nearest/My SenseBoxes');
 
             // Connect user with closest SenseBox
             this.connectUserWithBox();
