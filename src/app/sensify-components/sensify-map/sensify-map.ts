@@ -115,8 +115,10 @@ export class SensifyMapPage implements OnChanges {
             + userlocation.lat.toFixed(4)
             + "<br>Longitude: "
             + userlocation.lng.toFixed(4)
-            + "<br>Time at position: "
-            + this.metadata.settings.timestamp
+            + "<br>Timestamp at position: "
+            + this.metadata.settings.timestamp.getHours()
+            + ":"
+            + this.metadata.settings.timestamp.getMinutes()
             + "<p><b>Closest SenseBox is:</b><br>'"
             + this.metadata.closestSenseBox.name
             + "'";
