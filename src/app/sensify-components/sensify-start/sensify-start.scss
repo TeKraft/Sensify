@@ -26,10 +26,9 @@ sensify-page-start {
         height:100%;
         font-size:40px;
         color: rgb(255, 255, 255);
-        overflow:hidden;
+        overflow:auto;
         text-align: center;
         white-space: nowrap; 
-        text-overflow: ellipsis;
     }
 
     // Date
@@ -41,7 +40,7 @@ sensify-page-start {
 
     //Second Row
     #currentSensorRow{
-        overflow:hidden;
+        overflow:auto;
         white-space: nowrap; 
         text-overflow: ellipsis;
         height: 70%;
@@ -60,7 +59,7 @@ sensify-page-start {
         color:white;
         background:rgba(0, 0, 0, 0.2);
         text-transform: capitalize;
-        overflow:hidden;
+        overflow:auto;
         white-space: nowrap; 
         text-overflow: ellipsis;
         
@@ -94,11 +93,18 @@ sensify-page-start {
         height: 45px;
     }
 
+
+
+
+
+
+
+
+
+
     //Headings Row
     #headingsRow{
         background:rgba(0, 0, 0, 0.5);
-        //overflow: auto;
-        //white-space:nowrap;
         margin-top:-20px;
         margin-bottom: 0px;
         min-height: 50px;
@@ -112,72 +118,69 @@ sensify-page-start {
     #headingCol{
         top:-10px;
         text-align: left;
-        align-content: center;
-        overflow:hidden;
-        white-space: nowrap; 
-        text-overflow: ellipsis;
+        overflow:auto;
     }
 
     #headingSensor{
-        margin-left: 10px;
+        margin-left: 10px;        
+        white-space: nowrap; 
     }
 
-
     #headingValue{
-        margin-left: 12px;
+        margin-left: 10px;
+        white-space: nowrap; 
     }
 
     #headingUnit{
-        margin-left: 9px;;
+        margin-left: 10px;
+        white-space: nowrap; 
     }
+
 
     //Third Row
     #dataRow{
         background:rgba(0, 0, 0, 0.5);
         height:52%;
         overflow: auto;
-        white-space:nowrap;
         margin-top: 0px;
-       
     }
 
     #sensorCol{
         top:-10px;
         font-size: 20px;
         line-height: 2;
-        margin-left: -30px;
+        text-align: left;
     }
 
     #valueCol{
         top:-10px;
         font-size: 20px;
         line-height: 2;
+        margin-left:-30px;
     }
 
     #unitCol{
         top:-10px;
         font-size: 20px;
         line-height: 2;
-        text-align: center;
-        align-content: center;
+        text-align: left;
     }
+
+
+
+
+
+
+
 
     #sensors{
         border-right: 1px solid #aaa;
+        margin-left:-30px;
     }
 
-    #values{
-        padding-left: 10%;
-        list-style-type: none;
-    }
-
-    #units{
-        padding-left: 10%;
-        list-style-type: none;
-    }
 
     #element{
-        overflow:hidden;
+        overflow:auto;
         text-align: left;
         white-space: nowrap; 
         text-overflow: ellipsis;

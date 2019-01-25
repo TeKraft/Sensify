@@ -31,51 +31,47 @@
                 <img src="../../../assets/imgs/sunset.png" alt="sunset" id="sunIcon">
                 <h5 *ngIf="date" id="sunrise">{{sunset}}</h5>
             </ion-col>
-
         </ion-row>
 
         <ion-row id="headingsRow">
 
-                <ion-col id="headingCol" col-5 >
-                        <h3 id="headingSensor">Sensors</h3>        
-                </ion-col>
+            <ion-col id="headingCol" col-5>
+                    <h3 id="headingSensor">Sensors</h3>        
+            </ion-col>
 
-                <ion-col id="headingCol" col-4>
-                    <h3 id="headingValue">Values</h3>
-                </ion-col>
+            <ion-col id="headingCol" col-4>
+                <h3 id="headingValue">Values</h3>
+            </ion-col>
 
-                <ion-col id="headingCol" col-3>
-                    <h3 id="headingUnit">Unit</h3>
-                </ion-col>
+            <ion-col id="headingCol" col-3>
+                <h3 id="headingUnit">Unit</h3>
+            </ion-col>
 
         </ion-row>
         
         <ion-row id="dataRow">
-
-                <ion-col id="sensorCol" col-5>
-                    <ul id="sensors">
-                        <li *ngFor="let sensor of sensors" id="element">
-                            <div>{{sensor.title}}</div>
-                        </li>
-                    </ul>
-                </ion-col>
-
-                <ion-col id="valueCol" col-4>
-                    <ul id="values">
-                        <li *ngFor="let sensor of sensors" id="element">
-                            <div *ngIf="sensor.lastMeasurement != null">{{sensor.lastMeasurement.value}}</div>
-                        </li>
-                    </ul>
-                </ion-col>
-
-                <ion-col id="unitCol" col-3>
-                    <ul id="units">
-                        <li *ngFor="let sensor of sensors" id="element">
-                            <div>{{sensor.unit}}</div>
-                        </li>
-                    </ul>
-                </ion-col>
-            </ion-row>
+            <ion-col id="sensorCol" col-5>
+                <ul id="sensors">
+                    <li *ngFor="let sensor of sensors" id="element">
+                        <div>{{sensor.title}}</div>
+                    </li>
+                </ul>
+            </ion-col>
+            <ion-col id="valueCol" col-4>
+                <ul id="values">
+                    <li *ngFor="let sensor of sensors" id="element">
+                        <div *ngIf="sensor.lastMeasurement != null">{{sensor.lastMeasurement.value}}</div>
+                    </li>
+                </ul>
+            </ion-col>
+            <ion-col id="unitCol" col-3>
+                <ul id="units">
+                    <li *ngFor="let sensor of sensors" id="element">
+                        <div>{{sensor.unit}}</div>
+                    </li>
+                </ul>
+            </ion-col>
+        </ion-row>
 
     </ion-grid>
 </ion-content>
