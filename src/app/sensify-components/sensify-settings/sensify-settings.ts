@@ -21,6 +21,7 @@ export class SensifySettingsPage {
     public onMessageChange: EventEmitter<string> = new EventEmitter();
 
     newRadius: number;
+    newGpsDistance: number;
     newVerificationRange: number;
     newNotificationThresholdTemperatureMin: number;
     newNotificationThresholdTemperatureMax: number;
@@ -46,6 +47,9 @@ export class SensifySettingsPage {
     public changeSettings() {
         if (this.newRadius) {
             this.metadata.settings.radius = this.newRadius;
+        }
+        if(this.newGpsDistance){
+            this.metadata.settings.gpsDistance = this.newGpsDistance;
         }
         if (this.newVerificationRange) {
             this.metadata.settings.ranges.temperature = this.newVerificationRange;
@@ -82,7 +86,7 @@ export class SensifySettingsPage {
             })
         }
 
-        if (this.newRadius || this.newVerificationRange) {
+        if (this.newRadius || this.newVerificationRange || this.newGpsDistance) {
             this.helpers.showAlert('Saved successfully', 'Settings are saved successfully');
             this.resetInputForms();
         }
@@ -99,6 +103,7 @@ export class SensifySettingsPage {
     resetInputForms() {
         //Reset Input forms after setting change
         this.newRadius = null;
+        this.newGpsDistance = null;
         this.newVerificationRange = null;
         this.newNotificationThresholdTemperatureMin = null;
         this.newNotificationThresholdTemperatureMax = null;

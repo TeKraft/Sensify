@@ -29,6 +29,7 @@ export interface Settings {
     gps: boolean;
     location?: L.LatLng;
     radius: number;
+    gpsDistance: number;
     mySenseBox?: String;
     mySenseBoxIDs?: String[];
     timestamp: Date;
