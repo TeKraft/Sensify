@@ -146,7 +146,7 @@ export class SensifyMapPage implements OnChanges {
                         let location = this.metadata.senseBoxes[i].location;
                         switch (this.metadata.senseBoxes[i].updatedCategory) {
                             case 'today': {
-                                if (currentSensebox.isValid) {
+                                if (currentSensebox.isVerified) {
                                     marker = this.createMarker('green', location, popupDescription, 'customGreen');
                                     closestMarkersGreen.push(marker);
                                 } else {

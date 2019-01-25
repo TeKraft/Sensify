@@ -22,7 +22,7 @@ export interface SenseBox {
     sensors: Sensor[];
     _id: String;
     updatedCategory: String;
-    isValid: Boolean;
+    isVerified: Boolean;
 }
 
 export interface Settings {

@@ -127,7 +127,7 @@ export class verification {
      * @param range       Verification range.
      * @return True, if value is inside range.
      */
-    sensorIsValid(sensorName:String, closestBox:SenseBox, senseBoxes:SenseBox[], range:number) {
+    sensorIsVerified(sensorName:String, closestBox:SenseBox, senseBoxes:SenseBox[], range:number) {
         let valiValue = false;
         //Check if closestBox even has the given sensor
         if (this.senseBoxHasSensor(sensorName, closestBox)) {

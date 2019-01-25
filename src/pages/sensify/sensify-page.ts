@@ -257,7 +257,7 @@ export class SensifyPage {
             }
             // verify for threshold
             this.metadata.senseBoxes.forEach(sb => {
-                if(sb.isValid == false) return;  //ONLY USE VERIFIED BOXES
+                if(sb.isVerified == false) return;  //ONLY USE VERIFIED BOXES
                 this.updateNotificationThresholds();
                 // verify for each sensor with a threshold
                 for (let sensor in this.notificationSensors) {
@@ -325,9 +325,9 @@ export class SensifyPage {
         return new Promise(resolve => {
             for (let i = 0; i < senseboxes.length; i++) {
                 if (senseboxes[i] && senseboxes[i].updatedCategory == "today") {
-                    senseboxes[i].isValid = this.verification.sensorIsValid("Temperatur", senseboxes[i], senseboxes, this.metadata.settings.ranges.temperature);
+                    senseboxes[i].isVerified = this.verification.sensorIsVerified("Temperatur", senseboxes[i], senseboxes, this.metadata.settings.ranges.temperature);
                 }else{
-                    senseboxes[i].isValid = false;
+                    senseboxes[i].isVerified = false;
                 }
             }
             resolve(senseboxes);

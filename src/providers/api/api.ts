@@ -88,7 +88,7 @@ export class ApiProvider {
                 sensors: closestBox.sensors,
                 _id: closestBox._id,
                 updatedCategory: null,
-                isValid: null
+                isVerified: null
             };
             return box;
         }).toPromise().then((box: SenseBox) => {
@@ -163,7 +163,7 @@ export class ApiProvider {
                         if (box.updatedAt) {
                             let updatedAt = box.updatedAt.substring(0, 10);
                             let distance = userLocation.distanceTo(box.location);
-                            if (distance < minDistance && todayDate == updatedAt && box.isValid) {
+                            if (distance < minDistance && todayDate == updatedAt && box.isVerified) {
                                 index = i;
                                 minDistance = distance;
                             }
