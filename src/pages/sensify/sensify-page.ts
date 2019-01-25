@@ -60,7 +60,6 @@ export class SensifyPage {
     tab: String;
     tabSelector: String;
     start: boolean;
-    map: boolean;
     about: boolean;
     currentPos: Geoposition;
     settingsData: any;
@@ -258,6 +257,7 @@ export class SensifyPage {
             }
             // verify for threshold
             this.metadata.senseBoxes.forEach(sb => {
+                if(sb.isValid == false) return;  //ONLY USE VERIFIED BOXES
                 this.updateNotificationThresholds();
                 // verify for each sensor with a threshold
                 for (let sensor in this.notificationSensors) {
@@ -326,6 +326,8 @@ export class SensifyPage {
             for (let i = 0; i < senseboxes.length; i++) {
                 if (senseboxes[i] && senseboxes[i].updatedCategory == "today") {
                     senseboxes[i].isValid = this.verification.sensorIsValid("Temperatur", senseboxes[i], senseboxes, this.metadata.settings.ranges.temperature);
+                }else{
+                    senseboxes[i].isValid = false;
                 }
             }
             resolve(senseboxes);
