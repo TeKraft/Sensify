@@ -161,12 +161,12 @@ export class SensifyMapPage implements OnChanges {
                                 break;
                             }
                             case 'thisWeek': {
-                                marker = this.createMarker('orange', location, popupDescription, 'customOrange')
+                                marker = this.createMarker('orange', location, popupDescription, 'customOrange');
                                 closestMarkersYellow.push(marker);
                                 break;
                             }
                             case 'tooOld': {
-                                marker = this.createMarker('red', location, popupDescription, 'customRed')
+                                marker = this.createMarker('red', location, popupDescription, 'customRed');
                                 closestMarkersRed.push(marker);
                                 break;
                             }
@@ -176,7 +176,7 @@ export class SensifyMapPage implements OnChanges {
                             }
                         }
                     } else {
-                        marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen')
+                        marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen');
                         closestMarkersBlue.push(marker);
                         // Calculate and style distance distance to ClosestSenseBox
                         let distanceToBox = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);

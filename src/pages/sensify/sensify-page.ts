@@ -352,9 +352,9 @@ export class SensifyPage {
         await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
         .then(res => {
             this.metadata.senseBoxes = res;
-            if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
-                this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
-            }
+            // if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
+            //     this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
+            // }
             this.verifyBoxes(res)
                 .then(response => {
                     this.metadata.senseBoxes = response;
@@ -384,7 +384,6 @@ export class SensifyPage {
 
             // only executed when no personal sensebox was set
             if (!this.metadata.settings.mySenseBox) {
-                this.metadata
                 await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
                     this.metadata.closestSenseBox = closestBox;
                     this.distanceToClosest = this.metadata.settings.location.distanceTo(closestBox.location);
