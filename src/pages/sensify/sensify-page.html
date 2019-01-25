@@ -29,7 +29,7 @@
     <!-- components -->
     <ion-row id="pageContent">
         <div class="selectedPage" *ngIf="(tabSelector === 'map')">
-            <sensify-page-map [metadata]="metadata"></sensify-page-map>
+            <sensify-page-map [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-map>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'start')">
             <sensify-page-start [metadata]="metadata"></sensify-page-start>

@@ -102,7 +102,8 @@ export class SensifyPage {
                         zoomLevel: 13,
                         mapView: null,
                         curSensor: null,
-                        mySenseBoxIDs: []
+                        mySenseBoxIDs: [],
+                        setPositionManual: false
                     },
                     notifications: []
                 };
@@ -364,7 +365,7 @@ export class SensifyPage {
 
     public async updateBoxes() {
         try {
-            await this.updateMetadata();
+            // await this.updateMetadata();
             if (!(this.radius < this.metadata.settings.radius) && ((this.metadata.settings.location.distanceTo(this.startLocation) / 1000) < (this.radius / 2) )) {
                 // Smaller Radius
                 await this.getBoxesSmallerRadius()
@@ -382,6 +383,7 @@ export class SensifyPage {
 
             // only executed when no personal sensebox was set
             if (!this.metadata.settings.mySenseBox) {
+                this.metadata
                 await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
                     this.metadata.closestSenseBox = closestBox;
                     this.distanceToClosest = this.metadata.settings.location.distanceTo(closestBox.location);

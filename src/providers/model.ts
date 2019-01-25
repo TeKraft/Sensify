@@ -39,6 +39,7 @@ export interface Settings {
     zoomLevel: number;
     mapView: L.LatLng;
     curSensor: Sensor;
+    setPositionManual: Boolean;
 }
 
 export interface Thresholds {

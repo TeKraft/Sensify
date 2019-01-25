@@ -4,6 +4,7 @@ import * as L from "leaflet";
 import "leaflet.awesome-markers";
 import { Metadata, SenseBox } from "../../../providers/model";
 import { helpers } from "./../../../providers/service/helpers";
+import { map } from 'rxjs/operator/map';
 
 @Component({
     selector: 'sensify-page-map',
@@ -24,6 +25,7 @@ export class SensifyMapPage implements OnChanges {
     public radiusCircle: L.CircleMarker;
     public locatorButton: L.Control;
     public LegendButton: L.Control;
+    public DrawButton: L.Control;
     public userLocationMarker: L.Marker;
     public userLocationMarkerLayer: L.LayerGroup;
     public senseboxMarkersLayerGreen: L.LayerGroup;
@@ -58,20 +60,31 @@ export class SensifyMapPage implements OnChanges {
             this.metadata.settings.zoomLevel = e.target.getZoom();
             let tempView = e.target.getCenter();
             this.metadata.settings.mapView = new L.LatLng(tempView.lat, tempView.lng);
-            this.onMetadataChange.emit(this.metadata);
+            // this.onMetadataChange.emit(this.metadata);
         });
 
         this.layersControl = L.control.layers(null, {}, { position: 'topleft' }).addTo(this.map);
-        // Custom buttons
+        // Custom Controls
         this.locatorButton = new this.locateButton();
         this.LegendButton = new this.legendButton();
+        this.DrawButton = new this.drawButton();
 
         this.map.addControl(this.LegendButton);
         this.map.addControl(this.locatorButton);
+        this.map.addControl(this.DrawButton);
 
         this.map.zoomControl.setPosition('topleft');
         this.LegendButton.setPosition('topleft');
         this.locatorButton.setPosition('topleft');
+        this.DrawButton.setPosition('topleft');
+
+        this.map.on('click', (e: any) => {
+            if (this.metadata.settings.setPositionManual) {
+                this.metadata.settings.location = e.latlng;
+                this.updateMap();
+            }
+            // var marker = new L.marker(e.latlng).addTo(map);
+        });
 
         // Add layers to map
         if (this.metadata.settings.location) {
@@ -117,7 +130,7 @@ export class SensifyMapPage implements OnChanges {
         this.userLocationMarker = this.createMarker('darkred', userlocation, popupDescription, 'customBlue');
 
         // Add Layergroup to userLocationMarkerLayer
-        this.removeLayerGroup(this.userLocationMarkerLayer);
+        this.userLocationMarkerLayer = this.removeLayerGroup(this.userLocationMarkerLayer);
         this.userLocationMarkerLayer = L.layerGroup([this.userLocationMarker]).addTo(this.map);
     }
 
@@ -213,10 +226,10 @@ export class SensifyMapPage implements OnChanges {
             } // End Create Markers
 
             // Check if markers were already set; If yes: Remove Layer
-            this.removeLayerGroup(this.senseboxMarkersLayerGreen);
-            this.removeLayerGroup(this.senseboxMarkersLayerYellow);
-            this.removeLayerGroup(this.senseboxMarkersLayerRed);
-            this.removeLayerGroup(this.senseboxMarkersLayerBlue);
+            this.senseboxMarkersLayerGreen = this.removeLayerGroup(this.senseboxMarkersLayerGreen);
+            this.senseboxMarkersLayerYellow = this.removeLayerGroup(this.senseboxMarkersLayerYellow);
+            this.senseboxMarkersLayerRed = this.removeLayerGroup(this.senseboxMarkersLayerRed);
+            this.senseboxMarkersLayerBlue = this.removeLayerGroup(this.senseboxMarkersLayerBlue);
 
             // Create and add layerGroups to map (for markers)
             this.senseboxMarkersLayerGreen = this.createLayerGroupsForMarkers(closestMarkersGreen, this.senseboxMarkersLayerGreen, true);
@@ -224,10 +237,10 @@ export class SensifyMapPage implements OnChanges {
             this.senseboxMarkersLayerRed = this.createLayerGroupsForMarkers(closestMarkersRed, this.senseboxMarkersLayerRed, false);
             this.senseboxMarkersLayerBlue = this.createLayerGroupsForMarkers(closestMarkersBlue, this.senseboxMarkersLayerBlue, true);
 
-            if(this.senseboxMarkersLayerGreen) this.layersControl.addOverlay(this.senseboxMarkersLayerGreen, 'Green SenseBoxes');
-            if(this.senseboxMarkersLayerYellow) this.layersControl.addOverlay(this.senseboxMarkersLayerYellow, 'Yellow SenseBoxes');
-            if(this.senseboxMarkersLayerRed) this.layersControl.addOverlay(this.senseboxMarkersLayerRed, 'Red SenseBoxes');
-            if(this.senseboxMarkersLayerBlue) this.layersControl.addOverlay(this.senseboxMarkersLayerBlue, 'Nearest/My SenseBoxes');
+            if (this.senseboxMarkersLayerGreen) this.layersControl.addOverlay(this.senseboxMarkersLayerGreen, 'Green SenseBoxes');
+            if (this.senseboxMarkersLayerYellow) this.layersControl.addOverlay(this.senseboxMarkersLayerYellow, 'Yellow SenseBoxes');
+            if (this.senseboxMarkersLayerRed) this.layersControl.addOverlay(this.senseboxMarkersLayerRed, 'Red SenseBoxes');
+            if (this.senseboxMarkersLayerBlue) this.layersControl.addOverlay(this.senseboxMarkersLayerBlue, 'Nearest/My SenseBoxes');
 
             // Connect user with closest SenseBox
             this.connectUserWithBox();
@@ -236,10 +249,10 @@ export class SensifyMapPage implements OnChanges {
             this.drawRadiusCircle();
 
         } else { // Metadata was not set yet => No SenseBoxes found
-            this.removeLayerGroup(this.senseboxMarkersLayerGreen);
-            this.removeLayerGroup(this.senseboxMarkersLayerYellow);
-            this.removeLayerGroup(this.senseboxMarkersLayerRed);
-            this.removeLayerGroup(this.senseboxMarkersLayerBlue);
+            this.senseboxMarkersLayerGreen = this.removeLayerGroup(this.senseboxMarkersLayerGreen);
+            this.senseboxMarkersLayerYellow = this.removeLayerGroup(this.senseboxMarkersLayerYellow);
+            this.senseboxMarkersLayerRed = this.removeLayerGroup(this.senseboxMarkersLayerRed);
+            this.senseboxMarkersLayerBlue = this.removeLayerGroup(this.senseboxMarkersLayerBlue);
 
             if (this.senseboxMarkersLayerGreen === undefined &&
                 this.senseboxMarkersLayerYellow === undefined &&
@@ -284,6 +297,28 @@ export class SensifyMapPage implements OnChanges {
                 /*let containerContent = "<ion-grid> <ion-row> <p><img style='height:30px' src='../../assets/markers/greenMarkerIcon.png'>Data is valid & up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/greenMarkerNotValidIcon.png'>Data is NOT valid, but up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/orangeMarkerIcon.png'>Data is one week old</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/redMarkerIcon.png'>Data is older than one week</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/blueMarkerIcon.png'>Closest Sensebox</p> </ion-row> <ion-row> <p><img style='height:30px' src='../../assets/markers/positionMarkerIcon.png'>User-Location</p> </ion-row> </ion-grid>";*/
                 /*let containerContent = "<ion-grid> <ion-row> <p><img src='../../assets/markers/greenMarkerIcon.png'>Data is valid & up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img src='../../assets/markers/greenMarkerNotValidIcon.png'>Data is NOT valid, but up-to-date (&lt24h)</p> </ion-row> <ion-row> <p><img src='../../assets/markers/orangeMarkerIcon.png'>Data is one week old</p> </ion-row> <ion-row> <p><img src='../../assets/markers/redMarkerIcon.png'>Data is at most one week old</p> </ion-row> <ion-row> <p><img src='../../assets/markers/blueMarkerIcon.png'>Closest Sensebox</p> </ion-row> <ion-row> <p><img src='../../assets/markers/positionMarkerIcon.png'>User-Location</p> </ion-row> </ion-grid>";*/
                 this.helpers.showAlert('Legend', containerContent);
+            };
+            return container;
+        }
+    });
+
+    public drawButton = L.Control.extend({
+        options: {
+            position: 'topleft'
+        },
+        onAdd: (map) => {
+            var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+            container.className = 'buttons';
+            container.style.backgroundImage = 'url(../../assets/buttons/setPositionManually.png)';
+
+            container.onclick = () => {
+                if (this.metadata.settings.setPositionManual) { // deactivate
+                    container.style.backgroundImage = 'url(../../assets/buttons/setPositionManually.png)';
+                    this.onMetadataChange.emit(this.metadata);
+                } else { // set active
+                    container.style.backgroundImage = 'url(../../assets/buttons/setPositionManuallyActive.png)';
+                }
+                this.metadata.settings.setPositionManual = !this.metadata.settings.setPositionManual;
             };
             return container;
         }
@@ -337,8 +372,8 @@ export class SensifyMapPage implements OnChanges {
         if (layer !== undefined) {
             this.map.removeLayer(layer);
             this.layersControl.removeLayer(layer);
-            layer = undefined;
         }
+        return undefined;
     }
 
     private getSenseboxPopupDescription(sensebox: SenseBox): string {
