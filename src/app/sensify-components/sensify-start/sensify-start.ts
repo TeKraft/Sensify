@@ -204,10 +204,6 @@ export class SensifyStartPage implements OnChanges {
             });
     }
 
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad SensifyStartPage');
-    }
-
     setCurrentDate() {
         var currentDate = new Date()
         var day = currentDate.getDate()

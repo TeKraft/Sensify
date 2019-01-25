@@ -3,7 +3,6 @@ import { NavController } from 'ionic-angular';
 import * as L from "leaflet";
 import "leaflet.awesome-markers";
 import { Metadata, SenseBox } from "../../../providers/model";
-import { SensifyPage } from '../../../pages/sensify/sensify-page';
 import { helpers } from "./../../../providers/service/helpers";
 
 @Component({
@@ -36,14 +35,8 @@ export class SensifyMapPage implements OnChanges {
     constructor(
         public navCtrl: NavController,
         private elementRef: ElementRef,
-        private helpers: helpers
-    ) {
-        this.ionViewDidLoad();
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad MapPage');
-    }
+        private helpers: helpers,
+    ) {}
 
     ngOnChanges(changes): void {
         if (changes.metadata && this.map) {

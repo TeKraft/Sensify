@@ -21,7 +21,6 @@
     "@angular/platform-browser": "5.2.11",
     "@angular/platform-browser-dynamic": "5.2.11",
     "@asymmetrik/ngx-leaflet": "^4.0.0",
-    "@ionic-native/background-geolocation": "^5.0.0",
     "@ionic-native/core": "~4.15.0",
     "@ionic-native/geolocation": "^4.19.0",
     "@ionic-native/local-notifications": "^4.19.0",
@@ -51,8 +50,7 @@
     "leaflet.awesome-markers": "2.0.5",
     "rxjs": "5.5.11",
     "sw-toolbox": "3.6.0",
-    "zone.js": "0.8.26",
-    "cordova-plugin-mauron85-background-geolocation": "~2.3.6"
+    "zone.js": "0.8.26"
   },
   "devDependencies": {
     "@ionic/app-scripts": "^3.2.1",
@@ -77,17 +75,7 @@
       "cordova-plugin-nativegeocoder": {
         "LOCATION_WHEN_IN_USE_DESCRIPTION": "Use geocoder service"
       },
-      "cordova-sqlite-storage": {},
-      "cordova-plugin-mauron85-background-geolocation": {
-        "GOOGLE_PLAY_SERVICES_VERSION": "11+",
-        "ANDROID_SUPPORT_LIBRARY_VERSION": "23+",
-        "ICON": "@mipmap/icon",
-        "SMALL_ICON": "@mipmap/icon",
-        "ACCOUNT_NAME": "@string/app_name",
-        "ACCOUNT_LABEL": "@string/app_name",
-        "ACCOUNT_TYPE": "$PACKAGE_NAME.account",
-        "CONTENT_AUTHORITY": "$PACKAGE_NAME"
-      }
+      "cordova-sqlite-storage": {}
     },
     "platforms": [
       "android",

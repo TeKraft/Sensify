@@ -38,10 +38,6 @@ export class SensifySettingsPage {
         private helpers: helpers
     ) { }
 
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad SensifySettingsPage');
-    }
-
     ngOnChanges(changes) {
         this.updateSenseBoxIDs();
     }
@@ -79,12 +75,10 @@ export class SensifySettingsPage {
                         this.metadata.settings.mySenseBoxIDs.push(res._id);
                     }
                     this.helpers.showAlert('ID saved successfully', 'New ID saved successfully');
-                } else {
-                    console.error("SENSEBOX ID IS NOT VALID: Please check it again!")
                 }
                 this.resetInputForms();
-            }).catch(error => {
-                this.helpers.showAlert('ID could not be saved', error.error.message);
+            }).catch(err => {
+                this.helpers.showAlert('ID not saved', '<br><b>The ID you have is not valid. Please try again</b><br><br>' + err.error.message);
             })
         }
 
@@ -117,7 +111,6 @@ export class SensifySettingsPage {
      * Function to remove all selected SenseBox IDs.
      */
     deleteSenseBoxIDs() {
-        //this.helpers.presentToast('Waiting for Closest SenseBox');
         this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
             this.metadata.closestSenseBox = res;
             this.newSenseboxID = null;
@@ -126,9 +119,8 @@ export class SensifySettingsPage {
             this.senseBoxIDDelete = [];
             this.senseBoxIDSelect = [];
         });
-        this.helpers.toastMSG.dismiss();
-        this.helpers.toastMSG = null;
-        this.helpers.showAlert('IDs deleted', 'The SenseBox IDs have been deleted');
+
+        this.helpers.showAlert('All IDs deleted successfully', 'The SenseBox IDs have been deleted');
     }
 
     /**
@@ -136,8 +128,8 @@ export class SensifySettingsPage {
      * @param id {String} id of the SenseBox that should be removed
      */
     deleteSenseBoxID(id: String) {
-        this.helpers.presentClosableToast('Deleting Sensebox');
         this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
+            this.helpers.presentClosableToast('Deleting Sensebox');
             let idx = this.metadata.settings.mySenseBoxIDs.findIndex(el => el === id);
             // splice deleted id from sensebox array
             if (idx >= 0) {
@@ -163,12 +155,12 @@ export class SensifySettingsPage {
                     delete this.metadata.settings.mySenseBox;
                 }
             }
-
             this.onMetadataChange.emit(this.metadata);
-            this.helpers.showAlert('ID Removed', 'The SenseBox ID has been removed');
+            this.helpers.showAlert('ID removed successfully', 'The SenseBox ID has been removed');
+
+            this.helpers.toastMSG.dismiss();
+            this.helpers.toastMSG = null;
         })
-        this.helpers.toastMSG.dismiss();
-        this.helpers.toastMSG = null;
     }
 
     /**

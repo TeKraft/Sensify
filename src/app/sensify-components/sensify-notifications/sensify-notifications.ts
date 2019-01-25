@@ -15,8 +15,4 @@ export class SensifyNotificationsPage {
   constructor() {
     this.bgImage = "../../../assets/imgs/background.png";
   }
-
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad SensifyNotificationsPage');
-  }
 }
