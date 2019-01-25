@@ -8,7 +8,7 @@ export interface Sensor {
         createdAt: String;
     };
     sensorType: String;
-    id: String;
+    _id: String;
 }
 
 export interface SenseBox {

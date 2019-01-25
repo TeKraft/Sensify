@@ -10,6 +10,7 @@ import { SensifyMapPage } from './sensify-map/sensify-map';
 import { SensifyAboutPage } from './sensify-about/sensify-about';
 import { SensifySettingsPage } from './sensify-settings/sensify-settings';
 import { SensifyNotificationsPage } from './sensify-notifications/sensify-notifications';
+//import { ApiProvider } from '../../providers/api/api';
 
 
 @NgModule({
@@ -27,11 +28,13 @@ import { SensifyNotificationsPage } from './sensify-notifications/sensify-notifi
     IonicPageModule.forChild(SensifySettingsPage),
     IonicPageModule.forChild(SensifyNotificationsPage),
     LeafletModule,
-    LeafletModule.forRoot()
+    LeafletModule.forRoot(),
+  //  ApiProvider
   ],
   providers: [
     Geolocation,
-    LocalNotifications
+    LocalNotifications,
+  //  ApiProvider
   ],
   exports: [
     SensifyStartPage,

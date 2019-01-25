@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
-import { SenseBox, Metadata } from '../model';
+import { SenseBox, Metadata, Sensor } from '../model';
 import * as L from "leaflet";
 
 interface CurrentDate {
@@ -192,4 +192,15 @@ export class ApiProvider {
             }
         });
     };
+
+    getSensorMeasurement(boxID: String, sensorID:String, fromDate:String): Promise<SenseBox> {
+        return this.http.get(`${this.API_URL}/boxes/` + boxID +  "/data/" + sensorID + "?from-date=" + fromDate + "&format=json").map(res => {
+            let result: any = res;
+            return res;
+        }).toPromise().then((res: any) => {
+            return res;
+        })
+    };
+
+    
 }

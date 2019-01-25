@@ -1,7 +1,9 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, ViewChild} from '@angular/core';
 import { ActionSheetController, NavController, NavParams, Platform } from 'ionic-angular';
 import { SenseBox, Metadata, Sensor } from '../../../providers/model';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
+import { Chart } from 'chart.js';
+import { ApiProvider } from '../../../providers/api/api';
 
 @Component({
     selector: 'sensify-page-start',
@@ -25,7 +27,13 @@ export class SensifyStartPage implements OnChanges {
     public curName: String;
     public btns: any;
 
+    @ViewChild('canvas') canvas;
+    chart: any;
+
+
+
     constructor(
+        public api: ApiProvider,
         public mySensifyPage: SensifyPage,
         public platform: Platform,
         public navCtrl: NavController,
@@ -209,5 +217,99 @@ export class SensifyStartPage implements OnChanges {
         var day = currentDate.getDate()
         var month = currentDate.getMonth() + 1 //January is 0!
         this.date = day + "." + month;// + "." + year;
+    }
+
+    
+    visualizeCharts(){
+
+
+        console.log(this.currBox);
+
+        //console.log(this.metadata.settings.curSensor.id);
+
+
+
+
+
+//  boxID: String, sensorID:String, fromDate:String, toDate:String
+
+    let boxID = this.currBox._id;
+    let sensorID:String;
+
+    if(this.metadata.settings.curSensor){
+        sensorID = this.metadata.settings.curSensor._id;
+    }else{
+        for (var i: number = 0; i < this.currBox.sensors.length; i++){
+            if(this.currBox.sensors[i].title == "Temperatur"){          
+                sensorID = this.currBox.sensors[i]._id;
+            }else{
+                sensorID = this.currBox.sensors[0]._id;
+            }
+        }
+    }
+
+
+
+
+    let currDate = this.api.getCurrentDate();
+    let todayDate = currDate.today;
+    if(todayDate.substring(6, 7) == "-"){
+        todayDate = todayDate.substring(0, 5) + "0" + todayDate.substring(5);
+    }
+    console.log(currDate);
+
+
+    //2011-08-11T01:23:45.678Z
+
+    let fromDate = "";
+    this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
+
+    });
+
+        document.getElementById("sensorInformation").style.display = "none";
+
+        document.getElementById("chart").style.display = "inline";
+
+
+        this.chart = new Chart(this.canvas.nativeElement, {
+
+            type: 'line',
+            data: {
+                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+
+        });
+
+
     }
 }

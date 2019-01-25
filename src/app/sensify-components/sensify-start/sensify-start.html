@@ -30,8 +30,18 @@
                 <h5 *ngIf="date" id="sunrise">{{sunrise}}</h5>
                 <img src="../../../assets/imgs/sunset.png" alt="sunset" id="sunIcon">
                 <h5 *ngIf="date" id="sunrise">{{sunset}}</h5>
+
+                
+                <button (click)="visualizeCharts()" id="chartBTN"> TEST
+
+                    </button>
+                    
             </ion-col>
         </ion-row>
+
+        
+        <div id="sensorInformation">
+
 
         <ion-row id="headingsRow">
 
@@ -72,6 +82,13 @@
                 </ul>
             </ion-col>
         </ion-row>
+
+    </div>
+        
+        <div id= "chart" style = "display:none;">
+                <canvas id="canvas" #canvas></canvas>
+        </div>
+    
 
     </ion-grid>
 </ion-content>
