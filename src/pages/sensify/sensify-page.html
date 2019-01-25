@@ -45,6 +45,9 @@
             <sensify-page-about></sensify-page-about>
         </div>
     </ion-row>
+    <div style="width:0px; height:0px; z-index: 5; position: absolute; visibility: hidden" leaflet [leafletOptions]="LeafletOptions"
+         (leafletMapReady)="onMapReady($event)">
+    </div>
 </ion-content>
 
 <ion-footer class="footer-sensify-page">

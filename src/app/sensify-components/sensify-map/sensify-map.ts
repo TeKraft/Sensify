@@ -36,8 +36,7 @@ export class SensifyMapPage implements OnChanges {
     constructor(
         public navCtrl: NavController,
         private elementRef: ElementRef,
-        private helpers: helpers,
-        public mySensifyPage: SensifyPage
+        private helpers: helpers
     ) {
         this.ionViewDidLoad();
     }
@@ -120,12 +119,12 @@ export class SensifyMapPage implements OnChanges {
             + ":"
             + this.metadata.settings.timestamp.getMinutes()
             + "<p><b>Closest SenseBox is:</b><br>'"
-            + this.metadata.closestSenseBox.name
+            + (this.metadata.closestSenseBox ? this.metadata.closestSenseBox.name : "Not set");
             + "'";
         this.userLocationMarker = this.createMarker('darkred', userlocation, popupDescription, 'customBlue');
 
         // Add Layergroup to userLocationMarkerLayer
-        this.removeLayerGroup(this.userLocationMarkerLayer)
+        this.removeLayerGroup(this.userLocationMarkerLayer);
         this.userLocationMarkerLayer = L.layerGroup([this.userLocationMarker]).addTo(this.map);
     }
 
@@ -188,7 +187,7 @@ export class SensifyMapPage implements OnChanges {
 
                     // should be executed only once
                     if (i === this.metadata.senseBoxes.length - 1 && idxOutside < 0) {
-                        marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen')
+                        marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen');
                         closestMarkersBlue.push(marker);
                         // Calculate and style distance distance to ClosestSenseBox
                         let distanceToBox = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);

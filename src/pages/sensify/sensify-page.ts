@@ -26,6 +26,7 @@ export class SensifyPage {
     public timerNotificationCounter: number = 0;
     public timerNotificationEnabled: boolean = false;
     public notificationCounter: number = 0;
+    public map: L.Map;
 
     // to verify senseBox data for notifications
     public notificationSensors = {
@@ -55,7 +56,7 @@ export class SensifyPage {
         // airpressure = 'Luftdruck',
         // humidity = 'rel. Luftfeuchte'
         // , 'PM2.5', 'PM10', 'Niederschlagsmenge', 'Wolkenbedeckung', 'Windrichtung', 'Windgeschwindigkeit'
-    }
+    };
 
     tab: String;
     tabSelector: String;
@@ -131,11 +132,21 @@ export class SensifyPage {
         //this.setNotificationWithTimer(0.2, "Test", "Hey! Open up your Sensify-App for a quick update :)", "Works like a charm.");
     }
 
+    public LeafletOptions = {
+        layers: [
+            L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        ],
+        zoom: 13,
+        center: [0, 0]
+    };
+
+    onMapReady(map: L.Map) {
+        this.map = map;
+    }
+
     public openSelect() {
         this.selectRef.open();
     }
-
-    
 
     public async initSenseBoxes() {
         console.log('Start initSenseBoxes');
@@ -145,6 +156,7 @@ export class SensifyPage {
 
             this.helpers.presentClosableToast('Loading user data');
             await this.getUserPosition().then(userlocation => {
+                this.helpers.showAlert("location", userlocation.lng.toString());
                 this.metadata.settings.location = userlocation;
                 this.startLocation = userlocation;
             });
@@ -187,18 +199,19 @@ export class SensifyPage {
             this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
 
-                // Watch the user position
-                this.geolocation.watchPosition()
-                .subscribe(pos => {
-                    console.log('Watching GPS position');
-                    if (pos.coords && this.metadata) {
-                        let location = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
-                        // let location = new L.LatLng(7.5961, 51.9695);
-                        // necessary to re-define this.settings to trigger ngOnChanges in sensify.map.ts
+            // Watch the user position
+            this.map.locate({watch: true, enableHighAccuracy: true}).on("locationfound", (e: any) => {
+                if(e.latlng){
+                    let location = new L.LatLng(e.latlng.lat, e.latlng.lng);
+                    let distance = location.distanceTo(this.metadata.settings.location);
+                    if(distance >= 20) {
                         this.metadata.settings.location = location;
                         this.updateBoxes();
                     }
-                });
+                }
+            }).on("locationerror", error => {
+                console.error(error);
+            });
 
             // TEST: verify TEMPERATURE VALUE OF CLOSEST SENSEBOX          
             // console.log("SenseBox Sensor Value for Temperature Valid? : "+this.api.sensorIsValid("Temperatur", this.metadata.closestSenseBox, this.metadata.senseBoxes, this.metadata.settings.ranges.temperature));
@@ -418,7 +431,7 @@ export class SensifyPage {
     // Get the current location
     getUserPosition(): Promise<L.LatLng> {
         // TODO: check if this.settings.gps === true
-        return this.geolocation.getCurrentPosition()
+            return this.geolocation.getCurrentPosition()
             .then((pos: Geoposition) => {
                 // this.metadata.settings.location = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
                 return new L.LatLng(pos.coords.latitude, pos.coords.longitude);
