@@ -77,8 +77,11 @@ export class SensifyStartPage implements OnChanges {
         if (this.temperature) {
             if (Number(sunrise) > Number(currTime) || Number(currTime) > Number(sunset)) {    //Nacht
                 this.bgImage = "../../../assets/imgs/nightBackground.jpg";
+                if(Number(this.temperature.slice(0, -3)) <= 0){
+                    this.bgImage = "../../../assets/imgs/nightCold_Background.jpg";
+                }
             } else {                                          //Tag
-                if (Number(this.temperature.slice(0, -3)) < 0) {
+                if (Number(this.temperature.slice(0, -3)) <= 0) {
                     this.bgImage = "../../../assets/imgs/snowBackground.jpg";
                 } else {
 
