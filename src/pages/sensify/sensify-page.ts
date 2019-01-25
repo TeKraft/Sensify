@@ -88,6 +88,7 @@ export class SensifyPage {
                     settings: {
                         gps: true,
                         radius: 5,
+                        gpsDistance: 20,
                         timestamp: null,
                         ranges: { temperature: 5 },
                         thresholds: {
@@ -113,7 +114,7 @@ export class SensifyPage {
             this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
         }, (error) => {
-                console.log(error);
+                console.error(error);
                 return error;
             });
 
@@ -203,7 +204,7 @@ export class SensifyPage {
                 if(e.latlng){
                     let location = new L.LatLng(e.latlng.lat, e.latlng.lng);
                     let distance = location.distanceTo(this.metadata.settings.location);
-                    if(distance >= 20) {
+                    if(distance >= this.metadata.settings.gpsDistance) {
                         this.metadata.settings.location = location;
                         this.updateBoxes();
                     }
@@ -290,7 +291,7 @@ export class SensifyPage {
                             }
                         }
                 }
-            })
+            });
             this.timerNotification();
             this.helpers.toastMSG = null;
         }

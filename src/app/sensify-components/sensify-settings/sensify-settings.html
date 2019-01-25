@@ -10,6 +10,10 @@
                 <ion-input type="number" min="0" [(ngModel)]="newRadius" placeholder="{{metadata.settings.radius}}"></ion-input>
             </ion-item>
             <ion-item>
+                <ion-label color="primary" stacked>Refresh distance for gps (in m)</ion-label>
+                <ion-input type="number" min="0" [(ngModel)]="newGpsDistance" placeholder="{{metadata.settings.gpsDistance}}"></ion-input>
+            </ion-item>
+            <ion-item>
                 <ion-label color="primary" stacked>Temp Verification Range (in °C)</ion-label>
                 <ion-input type="number" min="0" [(ngModel)]="newVerificationRange" placeholder={{metadata.settings.ranges.temperature}}></ion-input>
             </ion-item>
