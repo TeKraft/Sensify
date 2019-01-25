@@ -158,7 +158,7 @@ export class SensifyPage {
                             this.metadata.senseBoxes = response;
                         })
                 });
-            this.updateMetadata();
+            await this.updateMetadata();
             //this.helpers.presentToast('Loading closest SenseBox');
             if (this.metadata.senseBoxes != []) {
                 //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
@@ -182,7 +182,7 @@ export class SensifyPage {
                             }
                         });
                 }
-                this.updateMetadata();
+                await this.updateMetadata();
             }
             this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
@@ -230,7 +230,7 @@ export class SensifyPage {
                             this.metadata.senseBoxes = response;
                         })
                 });
-            this.updateMetadata();
+            await this.updateMetadata();
 
             if (this.metadata.senseBoxes != []) {
                 //if personal sensebox is saved, use it instead of searching for closestSenseBox. If not, search closestSenseBox like usually
@@ -253,7 +253,7 @@ export class SensifyPage {
                             }
                         });
                 }
-                this.updateMetadata();
+                await this.updateMetadata();
             }
             // verify for threshold
             this.metadata.senseBoxes.forEach(sb => {
@@ -335,74 +335,53 @@ export class SensifyPage {
     }
 
 
-    public async updateBoxes() {
-        await this.updateMetadata();
+    public async updateSenseBoxesNow(){
         this.helpers.presentClosableToast('Updating SenseBoxes');
-        // Check whether radius gets bigger or smaller
-        if (this.metadata.senseBoxes != undefined && this.metadata.senseBoxes.length > 0) {
-            if (this.metadata.settings.radius > this.radius) {
-                // if new radius is greater than 
-                await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
-                    .then(res => {
-                        this.metadata.senseBoxes = res;
-                        if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
-                            this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
-                        }
-                        this.verifyBoxes(res)
-                            .then(response => {
-                                this.metadata.senseBoxes = response;
-                            })
-                    });
-            } else if ((this.metadata.settings.location.distanceTo(this.startLocation) / 1000) < (this.radius / 2)) {
-                // get boxes smaller radius inside origin circle & smaller
-                await this.getBoxesSmallerRadius()
-                    .then(res => {
-                        this.metadata.senseBoxes = res;
-                    })
-            } else {
-                // normal get senseBoxes
-                await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
-                    .then(res => {
-                        this.metadata.senseBoxes = res;
-                        if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
-                            this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
-                        }
-                        this.verifyBoxes(res)
-                            .then(response => {
-                                this.metadata.senseBoxes = response;
-                            })
-                    });
+        await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
+        .then(res => {
+            this.metadata.senseBoxes = res;
+            if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
+                this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
             }
-        } else {
-            await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
-                .then(res => {
-                    this.metadata.senseBoxes = res;
-                    if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
-                        this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
-                    }
-                    this.verifyBoxes(res)
-                        .then(response => {
-                            this.metadata.senseBoxes = response;
-                        })
-                });
-        }
-        this.startLocation = this.metadata.settings.location;
-        this.radius = this.metadata.settings.radius;
-        await this.updateMetadata();
-        //this.helpers.presentToast('Updating closest SenseBox.');
-        // if (this.radius > this.metadata.settings.radius && !this.metadata.settings.mySenseBox) {
-        // only executed when no personal sensebox set
-        if (!this.metadata.settings.mySenseBox) {
-            await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
-                this.metadata.closestSenseBox = closestBox;
-                if (this.metadata.settings.location && this.metadata.closestSenseBox) {
-                    this.distanceToClosest = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
-                }
-            });
-        }
+            this.verifyBoxes(res)
+                .then(response => {
+                    this.metadata.senseBoxes = response;
+                })
+        });
         this.helpers.toastMSG.dismiss();
         this.helpers.toastMSG = null;
-        await this.updateMetadata();
+    }
+
+    public async updateBoxes() {
+        try {
+            await this.updateMetadata();
+            if (!(this.radius < this.metadata.settings.radius) && ((this.metadata.settings.location.distanceTo(this.startLocation) / 1000) < (this.radius / 2) )) {
+                // Smaller Radius
+                await this.getBoxesSmallerRadius()
+                .then(res => {
+                    this.metadata.senseBoxes = res;
+                })              
+            } else {
+                // Bigger Radius OR simple update
+                await this.updateSenseBoxesNow();
+            }
+            this.startLocation = this.metadata.settings.location;
+            this.radius = this.metadata.settings.radius;
+            await this.updateMetadata();
+
+            // only executed when no personal sensebox was set
+            if (!this.metadata.settings.mySenseBox) {
+                await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
+                    this.metadata.closestSenseBox = closestBox;
+                    this.distanceToClosest = this.metadata.settings.location.distanceTo(closestBox.location);
+                });
+            }
+            await this.updateMetadata();
+        }
+        catch (err) {
+            this.helpers.presentClosableToast('Ups, something went wrong!');
+            console.error(err);
+        }
     }
 
     /**

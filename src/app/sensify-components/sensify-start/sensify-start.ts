@@ -54,7 +54,7 @@ export class SensifyStartPage implements OnChanges {
         actionSheet.present();
     }
 
-    ngOnChanges(changes) {
+    ngOnChanges(changes) : void {
         if (changes && changes.metadata.currentValue && changes.metadata.currentValue.closestSenseBox) {
             if (this.metadata.settings.curSensor) {
                 // this.curName is undefined in setSensors(). It needs to be set, when changes occur.
