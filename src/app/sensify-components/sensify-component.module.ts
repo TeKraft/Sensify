@@ -10,6 +10,7 @@ import { SensifyMapPage } from './sensify-map/sensify-map';
 import { SensifyAboutPage } from './sensify-about/sensify-about';
 import { SensifySettingsPage } from './sensify-settings/sensify-settings';
 import { SensifyNotificationsPage } from './sensify-notifications/sensify-notifications';
+import { SensifyWelcomePage } from './sensify-welcome/sensify-welcome';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { SensifyNotificationsPage } from './sensify-notifications/sensify-notifi
     SensifyMapPage,
     SensifyAboutPage,
     SensifySettingsPage,
-    SensifyNotificationsPage
+    SensifyNotificationsPage,
+    SensifyWelcomePage
   ],
   imports: [
     IonicPageModule.forChild(SensifyStartPage),
@@ -26,6 +28,7 @@ import { SensifyNotificationsPage } from './sensify-notifications/sensify-notifi
     IonicPageModule.forChild(SensifyAboutPage),
     IonicPageModule.forChild(SensifySettingsPage),
     IonicPageModule.forChild(SensifyNotificationsPage),
+    IonicPageModule.forChild(SensifyWelcomePage),
     LeafletModule,
     LeafletModule.forRoot()
   ],
@@ -38,7 +41,8 @@ import { SensifyNotificationsPage } from './sensify-notifications/sensify-notifi
     SensifyMapPage,
     SensifyAboutPage,
     SensifySettingsPage,
-    SensifyNotificationsPage
+    SensifyNotificationsPage,
+    SensifyWelcomePage  
   ]
 })
 export class SensifyComponentModule {}

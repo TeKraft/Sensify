@@ -76,7 +76,7 @@ export class SensifyPage {
         private helpers: helpers,
         private verification: verification
     ) {
-        this.helpers.presentToast('Loading user data');
+        this.helpers.presentClosableToast('Loading user data');
         this.storage.get('metadata')
         .then((val) => {
             if (val) {               
@@ -104,12 +104,17 @@ export class SensifyPage {
                         mapView: null,
                         curSensor: null,
                         mySenseBoxIDs: [],
-                        setPositionManual: false
+                        setPositionManual: false,
+                        firstStart: true
                     },
                     notifications: []
                 };
                 this.radius = 5;
                 this.storage.set("metadata", this.metadata);
+                if(this.metadata.settings.firstStart){
+                    this.tabSelector = 'welcome';
+                    this.metadata.settings.firstStart = false;
+                }
                 this.initSenseBoxes();
             }
             this.helpers.toastMSG.dismiss();
@@ -130,7 +135,7 @@ export class SensifyPage {
     }
 
     ionViewDidLoad() {
-        this.tabSelector = 'start'
+        this.tabSelector = 'start';
     }
 
     public LeafletOptions = {
