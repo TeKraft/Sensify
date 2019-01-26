@@ -276,7 +276,7 @@ export class SensifyMapPage implements OnChanges {
             this.senseboxMarkersLayerGreen = this.removeLayerGroup(this.senseboxMarkersLayerGreen);
             this.senseboxMarkersLayerYellow = this.removeLayerGroup(this.senseboxMarkersLayerYellow);
             this.senseboxMarkersLayerRed = this.removeLayerGroup(this.senseboxMarkersLayerRed);
-            this.senseboxMarkersLayerBlue = this.removeLayerGroup(this.senseboxMarkersLayerBlue);
+            if(!this.metadata.closestSenseBox) this.senseboxMarkersLayerBlue = this.removeLayerGroup(this.senseboxMarkersLayerBlue);
 
             if (this.senseboxMarkersLayerGreen === undefined &&
                 this.senseboxMarkersLayerYellow === undefined &&
