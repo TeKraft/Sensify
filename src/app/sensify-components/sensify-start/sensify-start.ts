@@ -26,6 +26,7 @@ export class SensifyStartPage implements OnChanges {
     public curUnit: String;
     public curName: String;
     public btns: any;
+    public status:boolean;
 
     @ViewChild('canvas') canvas;
     chart: any;
@@ -49,6 +50,8 @@ export class SensifyStartPage implements OnChanges {
         this.curValue = "...";
         this.curUnit = "";
         this.curName;
+
+        this.status = false;
 
         this.bgImage = "../../../assets/imgs/background.png";
         this.setCurrentDate();
@@ -221,95 +224,94 @@ export class SensifyStartPage implements OnChanges {
 
     
     visualizeCharts(){
+        if(this.status){
+            this.status = false;
+            document.getElementById("sensorInformation").style.display = "inline";
+            document.getElementById("chart").style.display = "none";
+        }else{
+            this.status = true;
+            document.getElementById("sensorInformation").style.display = "none";
+            document.getElementById("chart").style.display = "inline";
 
+        let boxID = this.currBox._id;
+        let sensorID:String;
 
-        console.log(this.currBox);
-
-        //console.log(this.metadata.settings.curSensor.id);
-
-
-
-
-
-//  boxID: String, sensorID:String, fromDate:String, toDate:String
-
-    let boxID = this.currBox._id;
-    let sensorID:String;
-
-    if(this.metadata.settings.curSensor){
-        sensorID = this.metadata.settings.curSensor._id;
-    }else{
-        for (var i: number = 0; i < this.currBox.sensors.length; i++){
-            if(this.currBox.sensors[i].title == "Temperatur"){          
-                sensorID = this.currBox.sensors[i]._id;
-            }else{
-                sensorID = this.currBox.sensors[0]._id;
-            }
-        }
-    }
-
-
-
-
-    let currDate = this.api.getCurrentDate();
-    let todayDate = currDate.today;
-    if(todayDate.substring(6, 7) == "-"){
-        todayDate = todayDate.substring(0, 5) + "0" + todayDate.substring(5);
-    }
-    console.log(currDate);
-
-
-    //2011-08-11T01:23:45.678Z
-
-    let fromDate = "";
-    this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
-
-    });
-
-        document.getElementById("sensorInformation").style.display = "none";
-
-        document.getElementById("chart").style.display = "inline";
-
-
-        this.chart = new Chart(this.canvas.nativeElement, {
-
-            type: 'line',
-            data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
+        if(this.metadata.settings.curSensor){
+            sensorID = this.metadata.settings.curSensor._id;
+        }else{
+            for (var i: number = 0; i < this.currBox.sensors.length; i++){
+                if(this.currBox.sensors[i].title == "Temperatur"){          
+                    sensorID = this.currBox.sensors[i]._id;
+                }else{
+                    sensorID = this.currBox.sensors[0]._id;
                 }
             }
+        }
+        var currentDate = new Date();
+        var day = currentDate.getDate();
+        var month = "" + (currentDate.getMonth()); //January is 0!
+        var year = currentDate.getFullYear();
 
+        if(month.length <= 1){
+            if(month == "0"){
+                month = "12";
+                year = year - 1;
+            }else{
+            month = "0" + month;
+            }
+        }
+
+        let fromDate = "" + year + "-" + month + "-" + day + "T" + "00:00:00.678Z";
+        var lastMonthData = [];
+        var labels = [];
+        var chartOptions: {
+            spanGaps: true,
+            elements: {
+                point:{
+                    radius: 0
+                }
+            }
+        };
+
+        this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
+            for (var i: number = res.length-1; i > 0; i--) {
+                let curDay = res[i].createdAt.slice(8,10);
+
+                let cur;
+
+                if(labels.length>0){                    
+                    cur = (labels[labels.length-1]).slice(3,5);
+                }else{
+                    cur = null;
+                }              
+
+                if(curDay == cur){
+                    labels.push("");
+                    lastMonthData.push(res[i].value);
+                }else{
+                    labels.push(res[i].createdAt.slice(5,10));
+                    lastMonthData.push(res[i].value);
+                }
+            }
+                      
+            this.chart = new Chart(this.canvas.nativeElement, {
+
+                type: 'line',
+                options: chartOptions,
+                data: {
+                    labels: labels,
+                    datasets:[{
+                        data: lastMonthData,
+                        pointRadius:0,
+                        label: this.curName,
+                        borderColor: "#4EAF47",
+                        fill: false
+                    }]
+                }
+
+            });
         });
 
-
+        }
     }
 }

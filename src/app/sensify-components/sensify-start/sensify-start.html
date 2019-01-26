@@ -32,9 +32,7 @@
                 <h5 *ngIf="date" id="sunrise">{{sunset}}</h5>
 
                 
-                <button (click)="visualizeCharts()" id="chartBTN"> TEST
-
-                    </button>
+                <button (click)="visualizeCharts()" id="chartBTN"> TEST </button>
                     
             </ion-col>
         </ion-row>
@@ -85,9 +83,9 @@
 
     </div>
         
-        <div id= "chart" style = "display:none;">
-                <canvas id="canvas" #canvas></canvas>
-        </div>
+        <div id= "chart" class="chart" style = "display:none;">
+                <canvas id="canvas" #canvas height="250"></canvas>
+    </div>
     
 
     </ion-grid>

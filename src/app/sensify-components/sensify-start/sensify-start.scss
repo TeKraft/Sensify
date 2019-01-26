@@ -95,13 +95,6 @@ sensify-page-start {
 
 
 
-
-
-
-
-
-
-
     //Headings Row
     #headingsRow{
         background:rgba(0, 0, 0, 0.5);
@@ -184,5 +177,10 @@ sensify-page-start {
         text-align: left;
         white-space: nowrap; 
         text-overflow: ellipsis;
+    }
+
+    #chart{
+        background:rgba(0, 0, 0, 0.5);
+        height: 100%;
     }
 }

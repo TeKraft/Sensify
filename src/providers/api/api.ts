@@ -193,7 +193,7 @@ export class ApiProvider {
         });
     };
 
-    getSensorMeasurement(boxID: String, sensorID:String, fromDate:String): Promise<SenseBox> {
+    getSensorMeasurement(boxID: String, sensorID:String, fromDate:String): Promise<any> {
         return this.http.get(`${this.API_URL}/boxes/` + boxID +  "/data/" + sensorID + "?from-date=" + fromDate + "&format=json").map(res => {
             let result: any = res;
             return res;
