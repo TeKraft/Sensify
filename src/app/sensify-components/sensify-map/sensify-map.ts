@@ -4,7 +4,6 @@ import * as L from "leaflet";
 import "leaflet.awesome-markers";
 import { Metadata, SenseBox } from "../../../providers/model";
 import { helpers } from "./../../../providers/service/helpers";
-import { map } from 'rxjs/operator/map';
 
 @Component({
     selector: 'sensify-page-map',

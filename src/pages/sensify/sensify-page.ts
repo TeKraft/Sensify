@@ -113,7 +113,7 @@ export class SensifyPage {
                 this.storage.set("metadata", this.metadata);
                 if(this.metadata.settings.firstStart){
                     this.tabSelector = 'welcome';
-                    this.metadata.settings.firstStart = false;
+                    //this.metadata.settings.firstStart = false;
                 }
                 this.initSenseBoxes();
             }
