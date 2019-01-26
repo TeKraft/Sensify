@@ -3,7 +3,9 @@
 
 
         <ion-row id="titleRow" justify-content-center>
-            <h1 *ngIf="currBox" id="senseBoxTitle">{{currBox.name}}</h1>
+            <h1 *ngIf="currBox" id="senseBoxTitle">
+                <button id="btnTitle" ion-button (click)="openSenseBoxIDSelection()">{{currBox.name}}</button>
+            </h1>
             <h5 *ngIf="date" id="date">({{date}})</h5>
         </ion-row>
 

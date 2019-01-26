@@ -1,16 +1,21 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { ActionSheetController, NavController, NavParams, Platform } from 'ionic-angular';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {ActionSheetButton, ActionSheetController, NavController, NavParams, Platform} from 'ionic-angular';
 import { SenseBox, Metadata, Sensor } from '../../../providers/model';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
+import { ApiProvider } from '../../../providers/api/api';
 
 @Component({
     selector: 'sensify-page-start',
     templateUrl: 'sensify-start.html',
 })
+
 export class SensifyStartPage implements OnChanges {
 
     @Input()
     public metadata: Metadata;
+
+    @Output()
+    public onMetadataChange: EventEmitter<Metadata> = new EventEmitter();
 
     public currBox: SenseBox;
     public date: String;
@@ -24,13 +29,15 @@ export class SensifyStartPage implements OnChanges {
     public curUnit: String;
     public curName: String;
     public btns: any;
+    public boxes: (string | ActionSheetButton)[] = [];
 
     constructor(
         public mySensifyPage: SensifyPage,
         public platform: Platform,
         public navCtrl: NavController,
         public navParams: NavParams,
-        public actionSheetCtrl: ActionSheetController) {
+        public actionSheetCtrl: ActionSheetController,
+        public api: ApiProvider,) {
 
         this.sensors = [];
         this.btns = [];
@@ -64,6 +71,7 @@ export class SensifyStartPage implements OnChanges {
             this.init();
             this.setSensors();
         }
+        this.updateBoxes();
     }
 
     public setBackground() {
@@ -153,6 +161,63 @@ export class SensifyStartPage implements OnChanges {
             }
             this.btns.push(newBtn);
         }
+    }
+
+    public async updateBoxes() {
+        try{
+            this.boxes = [];
+
+            if (this.metadata && this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
+                await Promise.all(this.metadata.settings.mySenseBoxIDs.map(async (id) => {
+                    let sb = this.metadata.senseBoxes.find(el => el._id === id);
+                    if(!sb){
+                        await this.api.getSenseBoxByID(id)
+                            .then(box => {
+                                sb = box;
+                            });
+                    }
+                    let txt = id;
+                    // set SenseBox name as selection text
+                    if (sb) {
+                        txt = sb.name;
+                    }
+                    let selected = false;
+                    if (this.metadata.closestSenseBox && this.metadata.closestSenseBox._id === id) {
+                        selected = true;
+                    }
+                    const senseBoxIDSelectBtn: any = {
+                        text: txt,
+                        handler: () => {
+                            this.selectSenseBoxID(id);
+                        }
+                    };
+                    this.boxes.push(senseBoxIDSelectBtn);
+                }));
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    public selectSenseBoxID(id: String) {
+        this.metadata.settings.mySenseBox = id;
+        let sensebox = this.metadata.senseBoxes.find(el => el._id === id);
+        if (sensebox) {
+            this.metadata.closestSenseBox = sensebox;
+            this.currBox = sensebox;
+            this.setSensors();
+            this.setBackground();
+        }
+        this.onMetadataChange.emit(this.metadata);
+    }
+
+    public openSenseBoxIDSelection() {
+        const actionSheet = this.actionSheetCtrl.create({
+            title: 'Select SenseBox to display',
+            buttons: this.boxes,
+        });
+        actionSheet.present();
     }
 
     public async init() {

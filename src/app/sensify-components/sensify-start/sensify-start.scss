@@ -26,7 +26,7 @@ sensify-page-start {
         height:100%;
         font-size:40px;
         color: rgb(255, 255, 255);
-        overflow:auto;
+        overflow:hidden;
         text-align: center;
         white-space: nowrap; 
     }
@@ -64,6 +64,21 @@ sensify-page-start {
         text-overflow: ellipsis;
         
         min-height: 120px;
+    }
+
+    #btnTitle{
+        height: auto;
+        width:auto;
+        font-size:40px;
+        background-color:transparent;
+        text-align: center;
+        color:white;
+        background:rgba(0, 0, 0, 0.2);
+        text-transform: capitalize;
+        overflow-x:auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     #curName{

@@ -391,7 +391,11 @@ export class SensifyPage {
             if (!this.metadata.settings.mySenseBox) {
                 await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
                     this.metadata.closestSenseBox = closestBox;
-                    this.distanceToClosest = this.metadata.settings.location.distanceTo(closestBox.location);
+                    if(this.metadata.closestSenseBox) {
+                        this.distanceToClosest = this.metadata.settings.location.distanceTo(closestBox.location);
+                    } else {
+                        this.distanceToClosest = null;
+                    }
                 });
             }
             await this.updateMetadata();
