@@ -161,12 +161,12 @@ export class SensifyMapPage implements OnChanges {
                                 break;
                             }
                             case 'thisWeek': {
-                                marker = this.createMarker('orange', location, popupDescription, 'customOrange')
+                                marker = this.createMarker('orange', location, popupDescription, 'customOrange');
                                 closestMarkersYellow.push(marker);
                                 break;
                             }
                             case 'tooOld': {
-                                marker = this.createMarker('red', location, popupDescription, 'customRed')
+                                marker = this.createMarker('red', location, popupDescription, 'customRed');
                                 closestMarkersRed.push(marker);
                                 break;
                             }
@@ -176,7 +176,7 @@ export class SensifyMapPage implements OnChanges {
                             }
                         }
                     } else {
-                        marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen')
+                        marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen');
                         closestMarkersBlue.push(marker);
                         // Calculate and style distance distance to ClosestSenseBox
                         let distanceToBox = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
@@ -248,11 +248,35 @@ export class SensifyMapPage implements OnChanges {
             // Draw radius-circle
             this.drawRadiusCircle();
 
-        } else { // Metadata was not set yet => No SenseBoxes found
+        } else {
+            if(this.metadata.settings.location){
+                this.drawRadiusCircle();
+            }
+            if(this.metadata.closestSenseBox){
+                let closestMarkersBlue: L.Marker[] = [];
+                let popupDescription = this.getSenseboxPopupDescription(this.metadata.closestSenseBox);
+                let marker: L.Marker;
+                marker = this.createMarker('blue', this.metadata.closestSenseBox.location, popupDescription, 'customGreen');
+                closestMarkersBlue.push(marker);
+                // Calculate and style distance distance to ClosestSenseBox
+                let distanceToBox = this.metadata.settings.location.distanceTo(this.metadata.closestSenseBox.location);
+                if (distanceToBox > 999) {
+                    distanceToBox = distanceToBox / 1000;
+                    this.distanceToClosestString = this.round(distanceToBox, 2) + " km";
+                } else {
+                    this.distanceToClosestString = this.round(distanceToBox, 2) + " m";
+                }
+                this.senseboxMarkersLayerBlue = this.removeLayerGroup(this.senseboxMarkersLayerBlue);
+                this.senseboxMarkersLayerBlue = this.createLayerGroupsForMarkers(closestMarkersBlue, this.senseboxMarkersLayerBlue, true);
+                if (this.senseboxMarkersLayerBlue) this.layersControl.addOverlay(this.senseboxMarkersLayerBlue, 'Nearest/My SenseBoxes');
+                this.connectUserWithBox();
+            }
+
+            // Metadata was not set yet => No SenseBoxes found
             this.senseboxMarkersLayerGreen = this.removeLayerGroup(this.senseboxMarkersLayerGreen);
             this.senseboxMarkersLayerYellow = this.removeLayerGroup(this.senseboxMarkersLayerYellow);
             this.senseboxMarkersLayerRed = this.removeLayerGroup(this.senseboxMarkersLayerRed);
-            this.senseboxMarkersLayerBlue = this.removeLayerGroup(this.senseboxMarkersLayerBlue);
+            if(!this.metadata.closestSenseBox) this.senseboxMarkersLayerBlue = this.removeLayerGroup(this.senseboxMarkersLayerBlue);
 
             if (this.senseboxMarkersLayerGreen === undefined &&
                 this.senseboxMarkersLayerYellow === undefined &&
@@ -277,6 +301,10 @@ export class SensifyMapPage implements OnChanges {
             container.onclick = () => {
                 if (this.metadata.settings.location) {
                     this.map.panTo(this.metadata.settings.location);
+                    if(this.metadata.settings.mapView){
+                        this.metadata.settings.mapView = null;
+                        this.onMetadataChange.emit(this.metadata);
+                    }
                 }
             };
             return container;

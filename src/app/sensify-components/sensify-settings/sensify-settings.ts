@@ -185,40 +185,51 @@ export class SensifySettingsPage {
     /** 
      * Function to create action sheet for choosing selected SenseBox and remove on of all selected SenseBoxes
      */
-    public updateSenseBoxIDs() {
-        this.senseBoxIDDelete = [];
-        this.senseBoxIDSelect = [];
+    public async updateSenseBoxIDs() {
+        try{
+            this.senseBoxIDDelete = [];
+            this.senseBoxIDSelect = [];
 
-        if (this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
-            this.metadata.settings.mySenseBoxIDs.forEach(id => {
-                let sb = this.metadata.senseBoxes.find(el => el._id === id);
-                let txt = id;
-                // set SenseBox name as selection text
-                if (sb) {
-                    txt = sb.name;
-                }
-                let selected = false;
-                if (this.metadata.closestSenseBox && this.metadata.closestSenseBox._id === id) {
-                    selected = true;
-                }
-                let actionSheetClass = selected ? 'selectedActionSheet' : 'unselectedActionSheet';
-                const senseBoxDeleteBtn: any = {
-                    text: txt,
-                    cssClass: actionSheetClass,
-                    handler: () => {
-                        this.deleteSenseBoxID(id);
+            if (this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
+                await Promise.all(this.metadata.settings.mySenseBoxIDs.map(async (id) => {
+                    let sb = this.metadata.senseBoxes.find(el => el._id === id);
+                    if(!sb){
+                        await this.api.getSenseBoxByID(id)
+                            .then(box => {
+                                sb = box;
+                            });
                     }
-                }
-                this.senseBoxIDDelete.push(senseBoxDeleteBtn);
-                const senseBoxIDSelectBtn: any = {
-                    text: txt,
-                    cssClass: actionSheetClass,
-                    handler: () => {
-                        this.selectSenseBoxID(id);
+                    let txt = id;
+                    // set SenseBox name as selection text
+                    if (sb) {
+                        txt = sb.name;
                     }
-                }
-                this.senseBoxIDSelect.push(senseBoxIDSelectBtn);
-            })
+                    let selected = false;
+                    if (this.metadata.closestSenseBox && this.metadata.closestSenseBox._id === id) {
+                        selected = true;
+                    }
+                    let actionSheetClass = selected ? 'selectedActionSheet' : 'unselectedActionSheet';
+                    const senseBoxDeleteBtn: any = {
+                        text: txt,
+                        cssClass: actionSheetClass,
+                        handler: () => {
+                            this.deleteSenseBoxID(id);
+                        }
+                    };
+                    this.senseBoxIDDelete.push(senseBoxDeleteBtn);
+                    const senseBoxIDSelectBtn: any = {
+                        text: txt,
+                        cssClass: actionSheetClass,
+                        handler: () => {
+                            this.selectSenseBoxID(id);
+                        }
+                    };
+                    this.senseBoxIDSelect.push(senseBoxIDSelectBtn);
+                }));
+            }
+        }
+        catch (err) {
+            console.error(err);
         }
     }
 

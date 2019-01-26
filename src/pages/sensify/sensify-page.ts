@@ -76,7 +76,7 @@ export class SensifyPage {
         private helpers: helpers,
         private verification: verification
     ) {
-        this.helpers.presentToast('Loading user data');
+        this.helpers.presentClosableToast('Loading user data');
         this.storage.get('metadata')
         .then((val) => {
             if (val) {               
@@ -104,12 +104,17 @@ export class SensifyPage {
                         mapView: null,
                         curSensor: null,
                         mySenseBoxIDs: [],
-                        setPositionManual: false
+                        setPositionManual: false,
+                        firstStart: true
                     },
                     notifications: []
                 };
                 this.radius = 5;
                 this.storage.set("metadata", this.metadata);
+                if(this.metadata.settings.firstStart){
+                    this.tabSelector = 'welcome';
+                    this.metadata.settings.firstStart = false;
+                }
                 this.initSenseBoxes();
             }
             this.helpers.toastMSG.dismiss();
@@ -130,7 +135,7 @@ export class SensifyPage {
     }
 
     ionViewDidLoad() {
-        this.tabSelector = 'start'
+        this.tabSelector = 'start';
     }
 
     public LeafletOptions = {
@@ -352,9 +357,9 @@ export class SensifyPage {
         await this.api.getSenseBoxes(this.metadata.settings.location, this.metadata.settings.radius)
         .then(res => {
             this.metadata.senseBoxes = res;
-            if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
-                this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
-            }
+            // if ((this.metadata.closestSenseBox !== null || this.metadata.closestSenseBox !== undefined) && this.metadata.senseBoxes.indexOf(this.metadata.closestSenseBox) < 0) {
+            //     this.metadata.senseBoxes.push(this.metadata.closestSenseBox);
+            // }
             this.verifyBoxes(res)
                 .then(response => {
                     this.metadata.senseBoxes = response;
@@ -384,10 +389,13 @@ export class SensifyPage {
 
             // only executed when no personal sensebox was set
             if (!this.metadata.settings.mySenseBox) {
-                this.metadata
                 await this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(closestBox => {
                     this.metadata.closestSenseBox = closestBox;
-                    this.distanceToClosest = this.metadata.settings.location.distanceTo(closestBox.location);
+                    if(this.metadata.closestSenseBox) {
+                        this.distanceToClosest = this.metadata.settings.location.distanceTo(closestBox.location);
+                    } else {
+                        this.distanceToClosest = null;
+                    }
                 });
             }
             await this.updateMetadata();

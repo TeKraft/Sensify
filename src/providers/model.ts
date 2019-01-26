@@ -41,6 +41,7 @@ export interface Settings {
     mapView: L.LatLng;
     curSensor: Sensor;
     setPositionManual: Boolean;
+    firstStart: Boolean;
 }
 
 export interface Thresholds {

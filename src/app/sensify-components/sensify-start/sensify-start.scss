@@ -13,7 +13,7 @@ sensify-page-start {
 
     //First Row
     #titleRow{
-        height:100px;
+        height:115px;
         overflow:hidden;
         white-space: nowrap; 
         text-overflow: ellipsis;
@@ -26,9 +26,10 @@ sensify-page-start {
         height:100%;
         font-size:40px;
         color: rgb(255, 255, 255);
-        overflow:auto;
+        overflow:hidden;
         text-align: center;
-        white-space: nowrap; 
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     // Date
@@ -54,7 +55,6 @@ sensify-page-start {
     #btn{
         height:50%;
         width:100%;
-        background-color:transparent;
         text-align: left;
         color:white;
         background:rgba(0, 0, 0, 0.2);
@@ -64,6 +64,20 @@ sensify-page-start {
         text-overflow: ellipsis;
         
         min-height: 120px;
+    }
+
+    #btnTitle{
+        height: auto;
+        width: auto;
+        font-size:40px;
+        text-align: center;
+        color:white;
+        background:rgba(0, 0, 0, 0.2);
+        text-transform: capitalize;
+        overflow-x:auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     #curName{
