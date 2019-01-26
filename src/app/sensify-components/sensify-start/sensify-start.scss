@@ -183,4 +183,15 @@ sensify-page-start {
         background:rgba(0, 0, 0, 0.5);
         height: 100%;
     }
+
+    #chartBTN{
+        width: 13vw;
+        height: 13vh;
+        background-color: Transparent;
+        background-repeat:no-repeat;
+        border: none;
+        cursor:pointer;
+        overflow: hidden;
+        outline:none;
+    }
 }
