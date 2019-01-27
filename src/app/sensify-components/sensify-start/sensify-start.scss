@@ -56,7 +56,7 @@ sensify-page-start {
 
     #btn{
         height:calc(50% + 1.5vw);
-        width:100%;
+        width:auto;
         text-align: left;
         color:white;
         background:rgba(0, 0, 0, 0.2);
@@ -87,7 +87,7 @@ sensify-page-start {
     }
 
     #curName{
-        font-size: 20px;
+        font-size: calc(10px + 1.5vw);
         margin: 10px;
     }
 
