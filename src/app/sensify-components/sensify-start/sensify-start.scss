@@ -13,18 +13,16 @@ sensify-page-start {
 
     //First Row
     #titleRow{
-        height:115px;
         overflow:hidden;
         white-space: nowrap; 
         text-overflow: ellipsis;
         min-height: 70px;
         margin-left: 5px;
+        text-align: center;
     }
 
     // Titel
     #senseBoxTitle{
-        width: calc(50% + 4vw);
-        height:100%;
         border-radius: 5px;
         color: rgb(255, 255, 255);
         overflow:hidden;
@@ -33,13 +31,14 @@ sensify-page-start {
         text-overflow: ellipsis;
         padding-bottom: 20px;
         background:rgba(0, 0, 0, 0.2);
+        height: auto;
     }
 
     // Date
     #date{
         font-size:20px;
         color: rgb(255, 255, 255);
-        margin-top:30px;
+        //margin-top:30px;
     }
 
     //Second Row
@@ -47,8 +46,6 @@ sensify-page-start {
         overflow:auto;
         white-space: nowrap; 
         text-overflow: ellipsis;
-        height: 70%;
-        min-height: 200px;
     }
 
     #currentSensorCol{
@@ -65,7 +62,6 @@ sensify-page-start {
         overflow:auto;
         white-space: nowrap; 
         text-overflow: ellipsis;
-        min-height: 120px;
         border-radius: 15px;
     }
 
@@ -94,14 +90,14 @@ sensify-page-start {
     }
 
     #curValue{
-        font-size: 40px;
-        display:inline;
+        font-size: calc(10px + 1.5vw);
+        display: inline;
         font-size: 5.5vw;
         margin: 10px;
     }
 
     #curUnit{
-        font-size: 25px;
+        font-size: calc(10px + 1.5vw);
         display:inline;
     }
 
@@ -110,18 +106,13 @@ sensify-page-start {
         align-content: center;
     }
 
-    #sunIcon{
-        margin-bottom: -10px;
-        height: 45px;
-    }
 
     //Headings Row
     #headingsRow{
         background:rgba(0, 0, 0, 0.5);
         margin-top:-20px;
-        margin-bottom: 0px;
         min-height: 50px;
-        border-bottom: 3px solid #aaa;
+        border-bottom: 3px solid;
         border-bottom-width: 80%;
         border-bottom-left-radius: 10%;
         border-bottom-right-radius: 10%;
@@ -129,7 +120,7 @@ sensify-page-start {
     }
 
     #headingCol{
-        top:-10px;
+        top:-5px;
         text-align: left;
         overflow-y: hidden;
         overflow-x:auto;
@@ -153,7 +144,7 @@ sensify-page-start {
     //Third Row
     #dataRow{
         background:rgba(0, 0, 0, 0.5);
-        height:60%;
+        height: 40vh;
         overflow: auto;
         margin-top: 0px;
         border-radius: 15px;
@@ -201,16 +192,27 @@ sensify-page-start {
     #chart{
         background:rgba(0, 0, 0, 0.5);
         height: 100%;
+        border-radius: 25px;
     }
 
     #chartBTN{
         width: 13vw;
-        height: 13vh;
         background-color: Transparent;
-        background-repeat:no-repeat;
+        background-repeat: no-repeat;
         border: none;
-        cursor:pointer;
+        cursor: pointer;
         overflow: hidden;
-        outline:none;
+        outline: none;
     }
+
+    #sunIcon{
+        margin-bottom: -10px;
+        width: 13vw;
+        margin:auto;
+    }
+
+    #quick-infos{
+        text-align: center;
+    }
+
 }

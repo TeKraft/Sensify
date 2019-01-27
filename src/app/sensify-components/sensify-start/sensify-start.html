@@ -1,52 +1,53 @@
 <ion-content class="start" [style.backgroundImage]="'url(' + bgImage + ')'">
     <ion-grid class="grid">
-
-        <ion-row id="titleRow" >
-                <ion-col id="boxNameCol" col-8>
-                    <h1 *ngIf="currBox" id="senseBoxTitle">
-                       <button id="btnTitle" ion-button (click)="openSenseBoxIDSelection()">
-                        <span>{{currBox.name}}</span>
-                        <span style="padding-left:calc(10px + 1.5vw)">
-                            <ion-icon name="search" float-right small></ion-icon>
-                        </span>
-                    </button>
+        <div style="height: 20vh;">
+            <ion-row id="titleRow">
+                <ion-col>
+                    <h1 *ngIf="currBox" id="senseBoxTitle" style="text-align: center;">
+                        <button id="btnTitle" ion-button (click)="openSenseBoxIDSelection()">
+                            <span style="padding-right: 10px;">
+                                <ion-icon name="search" small></ion-icon>
+                            </span>
+                            <span>{{currBox.name}}</span>
+                            <span *ngIf="date" id="date" style="padding-left:calc(10px + 1.5vw)">({{date}})</span>
+                        </button>
                     </h1>
                 </ion-col>
-                <ion-col justify-content-center>
-                    <h5 *ngIf="date" id="date">({{date}})</h5>
-                </ion-col>
             </ion-row>
-
-        <ion-row id="currentSensorRow">
-            <ion-col id="currentSensorCol" col-6>
-                <ion-col>
-                    <button (click)="openMenu()" id="btn">
+            <ion-row id="currentSensorRow">
+                <ion-col id="currentSensorCol" style="text-align: center;">
+                    <button ion-button (click)="openMenu()" id="btn">
+                        <span style="padding-right: 10px;">
+                            <ion-icon name="search" large></ion-icon>
+                        </span>
                         <div *ngIf="curName" id="curName">{{curName}}
-                            <span style="padding-left:calc(10px + 1.5vw)">
-                                <ion-icon name="search" item-end large></ion-icon>
-                            </span>
                         </div>
-                        <br>
                         <div *ngIf="curValue" id="curValue">{{curValue}}</div>
                         <div *ngIf="curUnit" id="curUnit">{{curUnit}}</div>
                     </button>
                 </ion-col>
-            </ion-col>
-            <ion-col id="sunIndicator" col-6>
-                <img src="../../../assets/imgs/sunrise.png" alt="sunrise" id="sunIcon">
-                <h5 *ngIf="date" id="sunrise">{{sunrise}}</h5>
-                <img src="../../../assets/imgs/sunset.png" alt="sunset" id="sunIcon">
-                <h5 *ngIf="date" id="sunset">{{sunset}}</h5>
-            </ion-col>
-        </ion-row>
-
-        <div>
-            <button (click)="visualizeCharts()" id="chartBTN" float-right>
-                <img src="../../../assets/buttons/chartButton.png" id="chartButton">
-            </button>
+            </ion-row>
         </div>
+        <div style="height: 20vh;">
+            <ion-row justify-content-start>
+                <ion-col id="quick-infos">
+                    <img src="../../../assets/imgs/sunrise.png" alt="sunrise" id="sunIcon">
+                    <h5 *ngIf="date" id="sunrise">{{sunrise}}</h5>
+                </ion-col>
+                <ion-col id="quick-infos">
+                    <img src="../../../assets/imgs/sunset.png" alt="sunset" id="sunIcon">
+                    <h5 *ngIf="date" id="sunset">{{sunset}}</h5>
+                </ion-col>
+                <ion-col id="quick-infos">
+                    <button (click)="visualizeCharts()" id="chartBTN" style="position:absolute; bottom:15px; right:10px;">
+                        <img src="../../../assets/buttons/chartButton.png" id="chartButton">
+                    </button>
+                </ion-col>
+            </ion-row>
+        </div>
+        <br>
 
-        <div id="sensorInformation">
+        <div id="sensorInformation" style="position:fixed; bottom:5px; left: 5px; right: 5px; height: -70vh;">
             <ion-row id="headingsRow">
                 <ion-col id="headingCol" col-5>
                     <h3 id="headingSensor">Sensors</h3>
@@ -84,7 +85,7 @@
         </div>
 
         <div id="chart" class="chart" style="display:none;">
-            <canvas id="canvas" #canvas height="250"></canvas>
+            <canvas id="canvas" #canvas height="200"></canvas>
         </div>
 
     </ion-grid>
