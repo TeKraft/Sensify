@@ -13,30 +13,32 @@ sensify-page-start {
 
     //First Row
     #titleRow{
-        height:115px;
         overflow:hidden;
         white-space: nowrap; 
         text-overflow: ellipsis;
         min-height: 70px;
+        margin-left: 5px;
+        text-align: center;
     }
 
     // Titel
     #senseBoxTitle{
-        width: 70%;
-        height:100%;
-        font-size:40px;
+        border-radius: 5px;
         color: rgb(255, 255, 255);
         overflow:hidden;
         text-align: center;
         white-space: nowrap;
         text-overflow: ellipsis;
+        padding-bottom: 20px;
+        background:rgba(0, 0, 0, 0.2);
+        height: auto;
     }
 
     // Date
     #date{
         font-size:20px;
         color: rgb(255, 255, 255);
-        margin-top:30px;
+        //margin-top:30px;
     }
 
     //Second Row
@@ -44,8 +46,6 @@ sensify-page-start {
         overflow:auto;
         white-space: nowrap; 
         text-overflow: ellipsis;
-        height: 70%;
-        min-height: 200px;
     }
 
     #currentSensorCol{
@@ -53,8 +53,8 @@ sensify-page-start {
     }
 
     #btn{
-        height:50%;
-        width:100%;
+        height:calc(50% + 1.5vw);
+        width:auto;
         text-align: left;
         color:white;
         background:rgba(0, 0, 0, 0.2);
@@ -62,38 +62,42 @@ sensify-page-start {
         overflow:auto;
         white-space: nowrap; 
         text-overflow: ellipsis;
-        
-        min-height: 120px;
+        border-radius: 15px;
     }
 
     #btnTitle{
         height: auto;
         width: auto;
-        font-size:40px;
+        font-size:calc(15px + 1.5vw);;
         text-align: center;
         color:white;
-        background:rgba(0, 0, 0, 0.2);
+        background-color: transparent;
+        border: none;
+        -webkit-box-shadow: none;
+        box-shadow: none;
         text-transform: capitalize;
         overflow-x:auto;
         overflow-y: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+        border-radius: 25px;
+        padding-left: 10px
     }
 
     #curName{
-        font-size: 20px;
+        font-size: calc(10px + 1.5vw);
         margin: 10px;
     }
 
     #curValue{
-        font-size: 40px;
-        display:inline;
+        font-size: calc(10px + 1.5vw);
+        display: inline;
         font-size: 5.5vw;
         margin: 10px;
     }
 
     #curUnit{
-        font-size: 25px;
+        font-size: calc(10px + 1.5vw);
         display:inline;
     }
 
@@ -102,35 +106,21 @@ sensify-page-start {
         align-content: center;
     }
 
-    #sunIcon{
-        margin-bottom: -10px;
-        height: 45px;
-    }
-
-
-
-
-
-
-
-
-
 
     //Headings Row
     #headingsRow{
         background:rgba(0, 0, 0, 0.5);
         margin-top:-20px;
-        margin-bottom: 0px;
         min-height: 50px;
-        
-        border-bottom: 3px solid #aaa;
+        border-bottom: 3px solid;
         border-bottom-width: 80%;
         border-bottom-left-radius: 10%;
         border-bottom-right-radius: 10%;
+        border-radius: 15px;
     }
 
     #headingCol{
-        top:-10px;
+        top:-5px;
         text-align: left;
         overflow-y: hidden;
         overflow-x:auto;
@@ -151,13 +141,13 @@ sensify-page-start {
         white-space: nowrap; 
     }
 
-
     //Third Row
     #dataRow{
         background:rgba(0, 0, 0, 0.5);
-        height:60%;
+        height: 40vh;
         overflow: auto;
         margin-top: 0px;
+        border-radius: 15px;
     }
 
     #sensorCol{
@@ -192,11 +182,37 @@ sensify-page-start {
         margin-left:-30px;
     }
 
-
     #element{
         overflow:auto;
         text-align: left;
         white-space: nowrap; 
         text-overflow: ellipsis;
     }
+
+    #chart{
+        background:rgba(0, 0, 0, 0.5);
+        height: 100%;
+        border-radius: 25px;
+    }
+
+    #chartBTN{
+        width: 13vw;
+        background-color: Transparent;
+        background-repeat: no-repeat;
+        border: none;
+        cursor: pointer;
+        overflow: hidden;
+        outline: none;
+    }
+
+    #sunIcon{
+        margin-bottom: -10px;
+        width: 13vw;
+        margin:auto;
+    }
+
+    #quick-infos{
+        text-align: center;
+    }
+
 }
