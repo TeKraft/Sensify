@@ -281,4 +281,11 @@ export class SensifySettingsPage {
             this.helpers.showAlert('Error', 'First, you need to enable manually position.');
         }
     }
+
+    public selectClosestSenseBox() {
+        this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
+            this.metadata.closestSenseBox = res;
+        });
+        this.helpers.showAlert('Selected Closest SenseBox!', 'You are now connected to the closest SenseBox.');
+    }
 }
