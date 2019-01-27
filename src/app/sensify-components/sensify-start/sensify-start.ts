@@ -64,6 +64,9 @@ export class SensifyStartPage implements OnChanges {
     }
 
     openMenu() {
+        if(this.status){
+            this.visualizeCharts();
+        }
         const actionSheet = this.actionSheetCtrl.create({
             title: 'Select Sensor',
             buttons: this.btns,
@@ -297,84 +300,112 @@ export class SensifyStartPage implements OnChanges {
             document.getElementById("sensorInformation").style.display = "none";
             document.getElementById("chart").style.display = "inline";
 
-        let boxID = this.currBox._id;
-        let sensorID:String;
+            let boxID = this.currBox._id;
+            let sensorID:String;
 
-        if(this.metadata.settings.curSensor){
-            sensorID = this.metadata.settings.curSensor._id;
-        }else{
-            for (var i: number = 0; i < this.currBox.sensors.length; i++){
-                if(this.currBox.sensors[i].title == "Temperatur"){          
-                    sensorID = this.currBox.sensors[i]._id;
-                }else{
-                    sensorID = this.currBox.sensors[0]._id;
-                }
-            }
-        }
-        var currentDate = new Date();
-        var day = currentDate.getDate();
-        var month = "" + (currentDate.getMonth()); //January is 0!
-        var year = currentDate.getFullYear();
-
-        if(month.length <= 1){
-            if(month == "0"){
-                month = "12";
-                year = year - 1;
+            if(this.metadata.settings.curSensor){
+                sensorID = this.metadata.settings.curSensor._id;
             }else{
-            month = "0" + month;
-            }
-        }
-
-        let fromDate = "" + year + "-" + month + "-" + day + "T" + "00:00:00.678Z";
-        var lastMonthData = [];
-        var labels = [];
-        var chartOptions: {
-            spanGaps: true,
-            elements: {
-                point:{
-                    radius: 0
+                for (var i: number = 0; i < this.currBox.sensors.length; i++){
+                    if(this.currBox.sensors[i].title == "Temperatur"){          
+                        sensorID = this.currBox.sensors[i]._id;
+                    }else{
+                        sensorID = this.currBox.sensors[0]._id;
+                    }
                 }
             }
-        };
+            var currentDate = new Date();
+            var day = currentDate.getDate();
+            var month = "" + (currentDate.getMonth()); //January is 0!
+            var year = currentDate.getFullYear();
 
-        this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
-            for (var i: number = res.length-1; i > 0; i--) {
-                let curDay = res[i].createdAt.slice(8,10);
-
-                let cur;
-
-                if(labels.length>0){                    
-                    cur = (labels[labels.length-1]).slice(3,5);
+            if(month.length <= 1){
+                if(month == "0"){
+                    month = "12";
+                    year = year - 1;
                 }else{
-                    cur = null;
-                }              
-
-                if(curDay == cur){
-                    labels.push("");
-                    lastMonthData.push(res[i].value);
-                }else{
-                    labels.push(res[i].createdAt.slice(5,10));
-                    lastMonthData.push(res[i].value);
+                month = "0" + month;
                 }
             }
-                      
-            this.chart = new Chart(this.canvas.nativeElement, {
 
-                type: 'line',
-                options: chartOptions,
-                data: {
-                    labels: labels,
-                    datasets:[{
-                        data: lastMonthData,
-                        pointRadius:0,
-                        label: this.curName,
-                        borderColor: "#4EAF47",
-                        fill: false
+            let fromDate = "" + year + "-" + month + "-" + day + "T" + "00:00:00.678Z";
+            var lastMonthData = [];
+            var labels = [];
+
+            var chartOptions = {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            fontColor: "white",
+                            fontSize: 14,
+                            beginAtZero: true
+                        },
+                        gridLines: {
+                            color: 'rgba(171,171,171,0.5)',
+                            lineWidth: 1
+                          }
+                        
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            fontColor: "white",
+                            fontSize: 14,
+                            beginAtZero: true
+                        },
+                        gridLines: {
+                            display: "none",
+                            color: "rgba(0, 0, 0, 0)",
+                            lineWidth: 1
+                          }
                     }]
+                   
+                },
+                spanGaps: true,
+                elements: {
+                    point:{
+                        radius: 0
+                    }
                 }
+            };
 
+            this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
+                for (var i: number = res.length-1; i > 0; i--) {
+                    let curDay = res[i].createdAt.slice(8,10);
+
+                    let cur;
+
+                    if(labels.length>0){                    
+                        cur = (labels[labels.length-1]).slice(3,5);
+                    }else{
+                        cur = null;
+                    }              
+
+                    if(curDay == cur){
+                        labels.push("");
+                        lastMonthData.push(res[i].value);
+                    }else{
+                        labels.push(res[i].createdAt.slice(5,10));
+                        lastMonthData.push(res[i].value);
+                    }
+                }
+                        
+                this.chart = new Chart(this.canvas.nativeElement, {
+                    type: 'line',                    
+                    data: {
+                        labels: labels,                        
+                        datasets:[{
+                            data: lastMonthData,                            
+                            pointRadius:0,
+                            label: this.curName,
+                            borderColor: "#4EAF47",
+                            fill: false
+                        }]
+                    },
+                    options: chartOptions
+                    
+                });
+                Chart.defaults.global.defaultFontColor = 'white';
             });
-        });
 
         }
     }
