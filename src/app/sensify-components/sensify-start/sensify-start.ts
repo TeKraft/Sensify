@@ -294,7 +294,7 @@ export class SensifyStartPage implements OnChanges {
         var currentDate = new Date()
         var day = currentDate.getDate()
         var month = currentDate.getMonth() + 1 //January is 0!
-        this.date = day + "." + month;// + "." + year;
+        this.date = day + "." + month;
     }
 
     
@@ -324,7 +324,7 @@ export class SensifyStartPage implements OnChanges {
             }
             var currentDate = new Date();
             var day = currentDate.getDate();
-            var month = "" + (currentDate.getMonth()); //January is 0!
+            var month = "" + (currentDate.getMonth());
             var year = currentDate.getFullYear();
 
             if(month.length <= 1){
@@ -361,7 +361,6 @@ export class SensifyStartPage implements OnChanges {
                             beginAtZero: true
                         },
                         gridLines: {
-                            //display: "none",
                             color: 'rgba(171,171,171,0.5)',
                             lineWidth: 1
                           }
@@ -377,36 +376,10 @@ export class SensifyStartPage implements OnChanges {
             };
 
             this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
-
-
-
-
-                // create data and label array
-
                 for (var i: number = res.length-1; i > 0; i--) {
 
                     lastMonthData.push(res[i].value);
                     labels.push(res[i].createdAt.slice(0,10));
-
-                    //labels.push(res[i].createdAt.slice(0,10));
-
-
-                    // let curDay = res[i].createdAt.slice(8,10);
-                    // let cur;
-
-                    // if(labels.length > 0){                    
-                    //     cur = (labels[labels.length-1]).slice(3,5);
-                    // }else{
-                    //     cur = null;
-                    // }              
-
-                    // if(curDay == cur){
-                        
-                    // }else{
-                        
-                    // }
-
-
 
                 }
 
