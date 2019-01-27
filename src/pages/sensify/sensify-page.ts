@@ -76,9 +76,9 @@ export class SensifyPage {
         private helpers: helpers,
         private verification: verification
     ) {
-        this.helpers.presentClosableToast('Loading user data');
         this.storage.get('metadata')
         .then((val) => {
+            this.helpers.presentClosableToast('Loading user data');
             if (val) {               
                 this.metadata = val;
                 this.radius = val.settings.radius;
