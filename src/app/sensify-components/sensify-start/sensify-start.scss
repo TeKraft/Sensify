@@ -18,6 +18,7 @@ sensify-page-start {
         white-space: nowrap; 
         text-overflow: ellipsis;
         min-height: 70px;
+        margin-left: 5px;
     }
 
     // Titel
@@ -84,6 +85,7 @@ sensify-page-start {
         white-space: nowrap;
         text-overflow: ellipsis;
         border-radius: 25px;
+        padding-left: 10px
     }
 
     #curName{
@@ -113,20 +115,16 @@ sensify-page-start {
         height: 45px;
     }
 
-
-
     //Headings Row
     #headingsRow{
         background:rgba(0, 0, 0, 0.5);
         margin-top:-20px;
         margin-bottom: 0px;
         min-height: 50px;
-        
         border-bottom: 3px solid #aaa;
         border-bottom-width: 80%;
         border-bottom-left-radius: 10%;
         border-bottom-right-radius: 10%;
-
         border-radius: 15px;
     }
 
@@ -151,7 +149,6 @@ sensify-page-start {
         margin-left: 10px;
         white-space: nowrap; 
     }
-
 
     //Third Row
     #dataRow{
@@ -193,7 +190,6 @@ sensify-page-start {
         border-right: 1px solid #aaa;
         margin-left:-30px;
     }
-
 
     #element{
         overflow:auto;

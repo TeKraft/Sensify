@@ -1,19 +1,21 @@
 <ion-content class="start" [style.backgroundImage]="'url(' + bgImage + ')'">
     <ion-grid class="grid">
 
-        <ion-row id="titleRow" justify-content-center>
-            <h1 *ngIf="currBox" id="senseBoxTitle">
-                <div>
-                    <button id="btnTitle" ion-button (click)="openSenseBoxIDSelection()" style="padding-right: 10px;">
+        <ion-row id="titleRow" >
+                <ion-col id="boxNameCol" col-8>
+                    <h1 *ngIf="currBox" id="senseBoxTitle">
+                       <button id="btnTitle" ion-button (click)="openSenseBoxIDSelection()">
                         <span>{{currBox.name}}</span>
                         <span style="padding-left:calc(10px + 1.5vw)">
                             <ion-icon name="search" float-right small></ion-icon>
                         </span>
                     </button>
-                </div>
-            </h1>
-            <h5 *ngIf="date" id="date" style="padding-left: 15px;">({{date}})</h5>
-        </ion-row>
+                    </h1>
+                </ion-col>
+                <ion-col justify-content-center>
+                    <h5 *ngIf="date" id="date">({{date}})</h5>
+                </ion-col>
+            </ion-row>
 
         <ion-row id="currentSensorRow">
             <ion-col id="currentSensorCol" col-6>
