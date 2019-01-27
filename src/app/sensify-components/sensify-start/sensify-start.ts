@@ -44,8 +44,8 @@ export class SensifyStartPage implements OnChanges {
         public platform: Platform,
         public navCtrl: NavController,
         public navParams: NavParams,
-        public actionSheetCtrl: ActionSheetController,
-        public api: ApiProvider,) {
+        public actionSheetCtrl: ActionSheetController
+        ) {
 
         this.sensors = [];
         this.btns = [];

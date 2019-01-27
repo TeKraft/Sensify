@@ -22,14 +22,16 @@ sensify-page-start {
 
     // Titel
     #senseBoxTitle{
-        width: 70%;
+        width: calc(50% + 4vw);
         height:100%;
-        font-size:40px;
+        border-radius: 5px;
         color: rgb(255, 255, 255);
         overflow:hidden;
         text-align: center;
         white-space: nowrap;
         text-overflow: ellipsis;
+        padding-bottom: 20px;
+        background:rgba(0, 0, 0, 0.2);
     }
 
     // Date
@@ -53,7 +55,7 @@ sensify-page-start {
     }
 
     #btn{
-        height:50%;
+        height:calc(50% + 1.5vw);
         width:100%;
         text-align: left;
         color:white;
@@ -62,22 +64,26 @@ sensify-page-start {
         overflow:auto;
         white-space: nowrap; 
         text-overflow: ellipsis;
-        
         min-height: 120px;
+        border-radius: 15px;
     }
 
     #btnTitle{
         height: auto;
         width: auto;
-        font-size:40px;
+        font-size:calc(20px + 1.5vw);;
         text-align: center;
         color:white;
-        background:rgba(0, 0, 0, 0.2);
+        background-color: transparent;
+        border: none;
+        -webkit-box-shadow: none;
+        box-shadow: none;
         text-transform: capitalize;
         overflow-x:auto;
         overflow-y: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+        border-radius: 25px;
     }
 
     #curName{
@@ -120,6 +126,8 @@ sensify-page-start {
         border-bottom-width: 80%;
         border-bottom-left-radius: 10%;
         border-bottom-right-radius: 10%;
+
+        border-radius: 15px;
     }
 
     #headingCol{
@@ -151,6 +159,7 @@ sensify-page-start {
         height:60%;
         overflow: auto;
         margin-top: 0px;
+        border-radius: 15px;
     }
 
     #sensorCol{
