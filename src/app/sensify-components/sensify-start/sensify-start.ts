@@ -126,7 +126,6 @@ export class SensifyStartPage implements OnChanges {
     }
 
     public setSensors() {
-        console.log("set");
         this.sensors = [];
         this.btns = [];
         // check if the current title (sensebox sensor title) exists in the selected sensebox.
