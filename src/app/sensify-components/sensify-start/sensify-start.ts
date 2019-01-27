@@ -361,8 +361,8 @@ export class SensifyStartPage implements OnChanges {
                             beginAtZero: true
                         },
                         gridLines: {
-                            display: "none",
-                            color: "rgba(0, 0, 0, 0)",
+                            //display: "none",
+                            color: 'rgba(171,171,171,0.5)',
                             lineWidth: 1
                           }
                     }]
@@ -377,24 +377,41 @@ export class SensifyStartPage implements OnChanges {
             };
 
             this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
+
+
+
+
+                // create data and label array
+
                 for (var i: number = res.length-1; i > 0; i--) {
-                    let curDay = res[i].createdAt.slice(8,10);
 
-                    let cur;
+                    lastMonthData.push(res[i].value);
+                    labels.push(res[i].createdAt.slice(0,10));
 
-                    if(labels.length>0){                    
-                        cur = (labels[labels.length-1]).slice(3,5);
-                    }else{
-                        cur = null;
-                    }              
+                    //labels.push(res[i].createdAt.slice(0,10));
 
-                    if(curDay == cur){
-                        labels.push("");
-                        lastMonthData.push(res[i].value);
-                    }else{
-                        labels.push(res[i].createdAt.slice(5,10));
-                        lastMonthData.push(res[i].value);
-                    }
+
+                    // let curDay = res[i].createdAt.slice(8,10);
+                    // let cur;
+
+                    // if(labels.length > 0){                    
+                    //     cur = (labels[labels.length-1]).slice(3,5);
+                    // }else{
+                    //     cur = null;
+                    // }              
+
+                    // if(curDay == cur){
+                        
+                    // }else{
+                        
+                    // }
+
+
+
+                }
+
+                if (this.chart != undefined || this.chart != null) {
+                    this.chart.destroy();
                 }
                         
                 this.chart = new Chart(this.canvas.nativeElement, {
