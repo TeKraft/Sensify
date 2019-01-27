@@ -1,9 +1,9 @@
 <ion-grid>
     <ion-row>
+        <ion-item>
+            <strong>Settings</strong>
+        </ion-item>
         <ion-col width-100>
-            <ion-item>
-                <strong>Settings</strong>
-            </ion-item>
             <ion-item>
                 <ion-label color="primary" stacked>Radius (in km)</ion-label>
                 <!-- TODO: add placeholders ( e.g. in the ion-input: placeholder="{{settings.radius}}" ) -->
@@ -29,27 +29,61 @@
                 <ion-label color="primary" stacked>Max UV Intensity Notification Threshold</ion-label>
                 <ion-input type="number" min="-70" [(ngModel)]="newNotificationThresholduvIntensityMax" placeholder={{metadata.settings.thresholds.uvIntensity.max}}></ion-input>
             </ion-item>
-            <ion-item>
-                <ion-label color="primary" stacked>SenseBox ID</ion-label>
-                <ion-input [(ngModel)]="newSenseboxID" placeholder="{{metadata.settings.mySenseBox}}"></ion-input>
-            </ion-item>
-
         </ion-col>
     </ion-row>
     <button ion-button round outline (click)="changeSettings()">Confirm Changes</button>
 
     <ion-row>
+        <ion-item>
+            <strong>Personal SenseBox</strong>
+        </ion-item>
         <ion-col>
             <ion-item>
-                <button ion-button (click)="openSenseBoxIDSelection()">
-                    select SenseBox ID
-                </button>
-                <button ion-button (click)="openSenseBoxIDDelete()">
-                    <ion-icon size="large" name="trash" style="zoom:1.5;"></ion-icon>
-                </button>
+                <ion-label color="primary" stacked>SenseBox ID</ion-label>
+                <ion-input [(ngModel)]="newSenseboxID" placeholder="{{metadata.settings.mySenseBox}}"></ion-input>
             </ion-item>
         </ion-col>
+        <ion-col>
+            <button ion-button round outline (click)="changeSettings()">
+                <ion-icon size="large" name="checkmark-circle-outline" style="zoom:1.5;"></ion-icon>
+            </button>
+        </ion-col>
     </ion-row>
-    <button ion-button round outline (click)="deleteSenseBoxIDs()">Remove SenseBox IDs</button>
+    <ion-row>
+        <button ion-button (click)="openSenseBoxIDSelection()">
+            select SenseBox ID
+        </button>
+        <button ion-button (click)="openSenseBoxIDDelete()">
+            <ion-icon size="large" name="trash" style="zoom:1.5;"></ion-icon>
+        </button>
+        <button ion-button (click)="deleteSenseBoxIDs()">Delete all</button>
+    </ion-row>
+
+    <ion-row>
+        <ion-item>
+            <strong>Privacy</strong>
+        </ion-item>
+        <ion-item>
+            <ion-label>Manually set user position</ion-label>
+            <ion-toggle [(ngModel)]="metadata.settings.setPositionManual"></ion-toggle>
+            <!--  (ngModelChange)="togglePositionManual()" -->
+        </ion-item>
+        <ion-col>
+            <ion-item>
+                <ion-label color="primary" stacked>Latitude</ion-label>
+                <ion-input [(ngModel)]="manualLat" placeholder="{{metadata.settings.location.lat}}"></ion-input>
+            </ion-item>
+        </ion-col>
+        <ion-col>
+            <ion-item>
+                <!-- class="padding-left-2px" -->
+                <ion-label color="primary" stacked>Longitude</ion-label>
+                <ion-input [(ngModel)]="manualLng" placeholder="{{metadata.settings.location.lng}}"></ion-input>
+            </ion-item>
+        </ion-col>
+        <button ion-button round outline (click)="changeLocation()">
+            <ion-icon size="large" name="checkmark-circle-outline" style="zoom:1.5;"></ion-icon>
+        </button>
+    </ion-row>
 
 </ion-grid>

@@ -4,6 +4,7 @@ import { Metadata } from '../../../providers/model';
 import { ApiProvider } from '../../../providers/api/api';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
 import { helpers } from "../../../providers/service/helpers";
+import * as L from 'leaflet';
 
 @Component({
     selector: 'sensify-page-settings',
@@ -30,6 +31,9 @@ export class SensifySettingsPage {
 
     public senseBoxIDDelete: (string | ActionSheetButton)[] = [];
     public senseBoxIDSelect: (string | ActionSheetButton)[] = [];
+    public setPositionManual: boolean;
+    public manualLat;
+    public manualLng;
 
     constructor(
         public mySensifyPage: SensifyPage,
@@ -48,7 +52,7 @@ export class SensifySettingsPage {
         if (this.newRadius) {
             this.metadata.settings.radius = this.newRadius;
         }
-        if(this.newGpsDistance){
+        if (this.newGpsDistance) {
             this.metadata.settings.gpsDistance = this.newGpsDistance;
         }
         if (this.newVerificationRange) {
@@ -186,14 +190,14 @@ export class SensifySettingsPage {
      * Function to create action sheet for choosing selected SenseBox and remove on of all selected SenseBoxes
      */
     public async updateSenseBoxIDs() {
-        try{
+        try {
             this.senseBoxIDDelete = [];
             this.senseBoxIDSelect = [];
 
             if (this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
                 await Promise.all(this.metadata.settings.mySenseBoxIDs.map(async (id) => {
                     let sb = this.metadata.senseBoxes.find(el => el._id === id);
-                    if(!sb){
+                    if (!sb) {
                         await this.api.getSenseBoxByID(id)
                             .then(box => {
                                 sb = box;
@@ -253,5 +257,21 @@ export class SensifySettingsPage {
             buttons: this.senseBoxIDDelete,
         });
         actionSheet.present();
+    }
+
+    public changeLocation() {
+        let position: L.LatLng = this.metadata.settings.location;
+        if (this.manualLat) {
+            position.lat = this.manualLat;
+        }
+        if (this.manualLng) {
+            position.lng = this.manualLng;
+        }
+        if (this.metadata.settings.setPositionManual) {
+            this.metadata.settings.location = position;
+            this.onMetadataChange.emit(this.metadata);
+        } else {
+            this.helpers.showAlert('Error', 'First, you need to enable manually position.');
+        }
     }
 }
