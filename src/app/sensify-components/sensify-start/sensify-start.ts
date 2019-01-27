@@ -67,9 +67,17 @@ export class SensifyStartPage implements OnChanges {
         if(this.status){
             this.visualizeCharts();
         }
+
+        let filteredBtns = [];
+        
+        for(var i: number = 0; i < this.btns.length; i++){
+            if(this.btns[i]){
+                filteredBtns.push(this.btns[i]);
+            }
+        }
         const actionSheet = this.actionSheetCtrl.create({
             title: 'Select Sensor',
-            buttons: this.btns,
+            buttons: filteredBtns,
         });
         actionSheet.present();
     }
@@ -118,6 +126,7 @@ export class SensifyStartPage implements OnChanges {
     }
 
     public setSensors() {
+        console.log("set");
         this.sensors = [];
         this.btns = [];
         // check if the current title (sensebox sensor title) exists in the selected sensebox.
