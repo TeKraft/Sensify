@@ -65,23 +65,22 @@
         </ion-item>
         <ion-item>
             <ion-label>Manually set user position</ion-label>
-            <ion-toggle [(ngModel)]="metadata.settings.setPositionManual"></ion-toggle>
-            <!--  (ngModelChange)="togglePositionManual()" -->
+            <ion-toggle [(ngModel)]="metadata.settings.setPositionManual" (ngModelChange)="togglePositionManual()"></ion-toggle>
         </ion-item>
-        <ion-col>
+        <ion-col *ngIf="metadata.settings.setPositionManual">
             <ion-item>
                 <ion-label color="primary" stacked>Latitude</ion-label>
                 <ion-input [(ngModel)]="manualLat" placeholder="{{metadata.settings.location.lat}}"></ion-input>
             </ion-item>
         </ion-col>
-        <ion-col>
+        <ion-col *ngIf="metadata.settings.setPositionManual">
             <ion-item>
                 <!-- class="padding-left-2px" -->
                 <ion-label color="primary" stacked>Longitude</ion-label>
                 <ion-input [(ngModel)]="manualLng" placeholder="{{metadata.settings.location.lng}}"></ion-input>
             </ion-item>
         </ion-col>
-        <button ion-button round outline (click)="changeLocation()">
+        <button ion-button round outline (click)="changeLocation()" *ngIf="metadata.settings.setPositionManual">
             <ion-icon size="large" name="checkmark-circle-outline" style="zoom:1.5;"></ion-icon>
         </button>
     </ion-row>

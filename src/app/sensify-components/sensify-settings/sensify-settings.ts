@@ -259,6 +259,13 @@ export class SensifySettingsPage {
         actionSheet.present();
     }
 
+    public togglePositionManual() {
+        console.log(this.metadata.settings.setPositionManual);
+        if (this.metadata.settings.setPositionManual) {
+            // activate auto GPS positioning
+        }
+    }
+
     public changeLocation() {
         let position: L.LatLng = this.metadata.settings.location;
         if (this.manualLat) {
