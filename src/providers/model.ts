@@ -8,7 +8,7 @@ export interface Sensor {
         createdAt: String;
     };
     sensorType: String;
-    id: String;
+    _id: String;
 }
 
 export interface SenseBox {
@@ -40,7 +40,7 @@ export interface Settings {
     zoomLevel: number;
     mapView: L.LatLng;
     curSensor: Sensor;
-    setPositionManual: Boolean;
+    setPositionManual: Boolean; // manual vs auto GPS positioning
     firstStart: Boolean;
 }
 

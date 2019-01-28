@@ -29,6 +29,7 @@
     "@ionic-native/status-bar": "~4.15.0",
     "@ionic/storage": "2.2.0",
     "@types/leaflet.awesome-markers": "^2.0.23",
+    "chart.js": "^2.7.3",
     "cordova-android": "7.1.1",
     "cordova-browser": "5.0.4",
     "cordova-ios": "4.5.5",

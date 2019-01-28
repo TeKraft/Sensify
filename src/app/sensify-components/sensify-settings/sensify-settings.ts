@@ -4,6 +4,7 @@ import { Metadata } from '../../../providers/model';
 import { ApiProvider } from '../../../providers/api/api';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
 import { helpers } from "../../../providers/service/helpers";
+import * as L from 'leaflet';
 
 @Component({
     selector: 'sensify-page-settings',
@@ -19,6 +20,9 @@ export class SensifySettingsPage {
 
     @Output()
     public onMessageChange: EventEmitter<string> = new EventEmitter();
+    
+    @Output()
+    public onManualPositioningChange: EventEmitter<Boolean> = new EventEmitter();
 
     newRadius: number;
     newGpsDistance: number;
@@ -30,6 +34,9 @@ export class SensifySettingsPage {
 
     public senseBoxIDDelete: (string | ActionSheetButton)[] = [];
     public senseBoxIDSelect: (string | ActionSheetButton)[] = [];
+    public setPositionManual: boolean;
+    public manualLat;
+    public manualLng;
 
     constructor(
         public mySensifyPage: SensifyPage,
@@ -48,7 +55,7 @@ export class SensifySettingsPage {
         if (this.newRadius) {
             this.metadata.settings.radius = this.newRadius;
         }
-        if(this.newGpsDistance){
+        if (this.newGpsDistance) {
             this.metadata.settings.gpsDistance = this.newGpsDistance;
         }
         if (this.newVerificationRange) {
@@ -64,6 +71,18 @@ export class SensifySettingsPage {
             this.metadata.settings.thresholds.uvIntensity.max = this.newNotificationThresholduvIntensityMax;
         }
 
+        if (this.newRadius || this.newVerificationRange || this.newGpsDistance) {
+            this.helpers.showAlert('Saved successfully', 'Settings are saved successfully');
+            this.resetInputForms();
+        }
+
+        if (this.newNotificationThresholdTemperatureMin || this.newNotificationThresholdTemperatureMax || this.newNotificationThresholduvIntensityMax) {
+            this.helpers.showAlert('Saved successfully', 'Thresholds saved successfully');
+            this.resetInputForms();
+        }
+    }
+
+    public changeSenseBoxIdManually() {
         if (this.newSenseboxID) {
             this.api.getSenseBoxByID(this.newSenseboxID).then(res => {
                 if (res) {
@@ -80,20 +99,12 @@ export class SensifySettingsPage {
                     }
                     this.helpers.showAlert('ID saved successfully', 'New ID saved successfully');
                 }
-                this.resetInputForms();
+                this.resetInputFormsSenseBox();
             }).catch(err => {
-                this.helpers.showAlert('ID not saved', '<br><b>The ID you have is not valid. Please try again</b><br><br>' + err.error.message);
+                this.helpers.showAlert('ID not saved', '<br><b>The ID you have entered is not valid. Please try again</b><br><br>' + err.error.message);
             })
-        }
-
-        if (this.newRadius || this.newVerificationRange || this.newGpsDistance) {
-            this.helpers.showAlert('Saved successfully', 'Settings are saved successfully');
-            this.resetInputForms();
-        }
-
-        if (this.newNotificationThresholdTemperatureMin || this.newNotificationThresholdTemperatureMax || this.newNotificationThresholduvIntensityMax) {
-            this.helpers.showAlert('Saved successfully', 'Thresholds saved successfully');
-            this.resetInputForms();
+        } else {
+            this.helpers.showAlert('No ID', 'Please enter a SenseBox ID to change home SenseBox manually.');
         }
     }
 
@@ -108,6 +119,13 @@ export class SensifySettingsPage {
         this.newNotificationThresholdTemperatureMin = null;
         this.newNotificationThresholdTemperatureMax = null;
         this.newNotificationThresholduvIntensityMax = null;
+        this.onMetadataChange.emit(this.metadata);
+    }
+
+    /**
+     * Function to reset input forms for sensebox id after setting changes
+     */
+    resetInputFormsSenseBox() {
         this.newSenseboxID = null;
         this.onMetadataChange.emit(this.metadata);
     }
@@ -186,14 +204,14 @@ export class SensifySettingsPage {
      * Function to create action sheet for choosing selected SenseBox and remove on of all selected SenseBoxes
      */
     public async updateSenseBoxIDs() {
-        try{
+        try {
             this.senseBoxIDDelete = [];
             this.senseBoxIDSelect = [];
 
             if (this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
                 await Promise.all(this.metadata.settings.mySenseBoxIDs.map(async (id) => {
                     let sb = this.metadata.senseBoxes.find(el => el._id === id);
-                    if(!sb){
+                    if (!sb) {
                         await this.api.getSenseBoxByID(id)
                             .then(box => {
                                 sb = box;
@@ -253,5 +271,34 @@ export class SensifySettingsPage {
             buttons: this.senseBoxIDDelete,
         });
         actionSheet.present();
+    }
+
+    public togglePositionManual() {
+        console.log(this.metadata.settings.setPositionManual);
+        // deactivate and activate auto GPS positioning
+        this.onManualPositioningChange.emit(this.metadata.settings.setPositionManual);
+    }
+
+    public changeLocation() {
+        let position: L.LatLng = this.metadata.settings.location;
+        if (this.manualLat) {
+            position.lat = this.manualLat;
+        }
+        if (this.manualLng) {
+            position.lng = this.manualLng;
+        }
+        if (this.metadata.settings.setPositionManual) {
+            this.metadata.settings.location = position;
+            this.onMetadataChange.emit(this.metadata);
+        } else {
+            this.helpers.showAlert('Error', 'First, you need to enable manually position.');
+        }
+    }
+
+    public selectClosestSenseBox() {
+        this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
+            this.metadata.closestSenseBox = res;
+        });
+        this.helpers.showAlert('Selected Closest SenseBox!', 'You are now connected to the closest SenseBox.');
     }
 }

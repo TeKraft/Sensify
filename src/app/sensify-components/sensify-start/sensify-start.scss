@@ -13,190 +13,123 @@ sensify-page-start {
 
     //First Row
     #titleRow{
-        height:115px;
         overflow:hidden;
         white-space: nowrap; 
         text-overflow: ellipsis;
         min-height: 70px;
+        margin-left: 5px;
+        text-align: center;
+        font-size:calc(20px + 1.5vw);
     }
 
     // Titel
     #senseBoxTitle{
-        width: 70%;
-        height:100%;
-        font-size:40px;
-        color: rgb(255, 255, 255);
         overflow:hidden;
         text-align: center;
         white-space: nowrap;
         text-overflow: ellipsis;
+        height: auto;
     }
 
-    // Date
-    #date{
-        font-size:20px;
-        color: rgb(255, 255, 255);
-        margin-top:30px;
-    }
-
-    //Second Row
     #currentSensorRow{
-        overflow:auto;
-        white-space: nowrap; 
-        text-overflow: ellipsis;
-        height: 70%;
-        min-height: 200px;
+        font-size:calc(15px + 1.5vw);
     }
 
-    #currentSensorCol{
-        text-align:left;
-    }
-
-    #btn{
-        height:50%;
-        width:100%;
-        text-align: left;
-        color:white;
-        background:rgba(0, 0, 0, 0.2);
-        text-transform: capitalize;
-        overflow:auto;
-        white-space: nowrap; 
-        text-overflow: ellipsis;
-        
-        min-height: 120px;
-    }
 
     #btnTitle{
         height: auto;
         width: auto;
-        font-size:40px;
+        font-size:calc(25px + 1.5vw);
         text-align: center;
         color:white;
-        background:rgba(0, 0, 0, 0.2);
+        background-color: transparent;
+        border: none;
+        -webkit-box-shadow: none;
+        box-shadow: none;
         text-transform: capitalize;
         overflow-x:auto;
         overflow-y: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+        padding-left: 10px
     }
 
-    #curName{
-        font-size: 20px;
-        margin: 10px;
-    }
-
-    #curValue{
-        font-size: 40px;
-        display:inline;
-        font-size: 5.5vw;
-        margin: 10px;
-    }
-
-    #curUnit{
-        font-size: 25px;
-        display:inline;
-    }
-
-    #sunIndicator{
+    #btn{
+        height:auto;
         text-align: center;
-        align-content: center;
+        color:white;
+        background:transparent;
+        text-transform: capitalize;
+        overflow:auto;
+        white-space: nowrap; 
+        text-overflow: ellipsis;
+        -webkit-box-shadow: none;
+        box-shadow: none;
     }
 
-    #sunIcon{
-        margin-bottom: -10px;
-        height: 45px;
+    #currSensor{
+        font-size:calc(15px + 1.5vw);
+        margin: 10px;
     }
 
-
-
-
-
-
-
-
-
-
-    //Headings Row
-    #headingsRow{
-        background:rgba(0, 0, 0, 0.5);
-        margin-top:-20px;
-        margin-bottom: 0px;
-        min-height: 50px;
-        
-        border-bottom: 3px solid #aaa;
+    #dataRow{
+        //overflow: auto;
+        margin-top: -20px;
         border-bottom-width: 80%;
         border-bottom-left-radius: 10%;
         border-bottom-right-radius: 10%;
     }
 
-    #headingCol{
-        top:-10px;
-        text-align: left;
-        overflow-y: hidden;
-        overflow-x:auto;
+    ion-row.outline, ion-col.outline, button.outline {
+        text-shadow:
+            0.05em 0 black,
+            0 0.05em black,
+            -0.05em 0 black,
+            0 -0.05em black,
+            -0.05em -0.05em black,
+            -0.05em 0.05em black,
+            0.05em -0.05em black,
+            0.05em 0.05em black;
     }
 
-    #headingSensor{
-        margin-left: 10px;        
-        white-space: nowrap; 
-    }
-
-    #headingValue{
-        margin-left: 10px;
-        white-space: nowrap; 
-    }
-
-    #headingUnit{
-        margin-left: 10px;
-        white-space: nowrap; 
-    }
-
-
-    //Third Row
-    #dataRow{
+    #chart{
         background:rgba(0, 0, 0, 0.5);
-        height:60%;
-        overflow: auto;
-        margin-top: 0px;
+        height: 100%;
+        border-radius:25px;
     }
 
-    #sensorCol{
-        top:-10px;
-        font-size: 20px;
-        line-height: 2;
+    #chartBTN{
+        width: 13vw;
+        background-color: Transparent;
+        background-repeat: no-repeat;
+        border: none;
+        cursor: pointer;
+        overflow: hidden;
+        outline: none;
     }
 
-    #valueCol{
-        top:-10px;
-        font-size: 20px;
-        line-height: 2;
+    #sunIcon{
+        margin-bottom: -10px;
+        width: 13vw;
     }
 
-    #values{
-        margin-left:-30px;
+    #quick-infos{
+        text-align: center;
     }
-
-    #unitCol{
-        top:-10px;
-        font-size: 20px;
-        line-height: 2;
-        text-align: left;
+   
+    span.header{
+        font-size: calc(15px + 1.5vw);
+        font-weight:bold;
+        text-align: center;
+        white-space: nowrap; 
     }
-
-    #units{
-        margin-left:-30px;
-    }
-
-    #sensors{
-        border-right: 1px solid #aaa;
-        margin-left:-30px;
-    }
-
-
-    #element{
+    
+    #sensorStyling{
         overflow:auto;
         text-align: left;
         white-space: nowrap; 
-        text-overflow: ellipsis;
+        margin-left:calc(-30px + 1.5vw);
+        font-size: calc(15px + 1.5vw);
+        line-height: 2
     }
 }

@@ -32,14 +32,13 @@
             <sensify-page-map [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-map>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'start')">
-            <sensify-page-start [metadata]="metadata"></sensify-page-start>
+            <sensify-page-start [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-start>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'notifications')">
             <sensify-page-notifications [metadata]="metadata"></sensify-page-notifications>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'settings')">
-            <sensify-page-settings [metadata]="metadata"
-                                   (onMetadataChange)="setMetadata($event)"></sensify-page-settings>
+            <sensify-page-settings [metadata]="metadata" (onMetadataChange)="setMetadata($event)" (onManualPositioningChange)="watchUserGPS($event)"></sensify-page-settings>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'about')">
             <sensify-page-about></sensify-page-about>

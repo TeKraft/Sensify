@@ -192,4 +192,14 @@ export class ApiProvider {
             }
         });
     };
+
+    getSensorMeasurement(boxID: String, sensorID:String, fromDate:String): Promise<any> {
+        return this.http.get(`${this.API_URL}/boxes/` + boxID +  "/data/" + sensorID + "?from-date=" + fromDate + "&format=json").map(res => {
+            return res;
+        }).toPromise().then((res: any) => {
+            return res;
+        })
+    };
+
+    
 }
