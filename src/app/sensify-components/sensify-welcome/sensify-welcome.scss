@@ -2,4 +2,30 @@ senify-welcome {
     .sensifyWelcome{
         background-color:white
     }
+
+    .slide {
+        position:absolute;
+        z-index:1;
+        width:100%;
+        top: 0;
+        height: 86%;
+      }
+
+    .slide-heading {
+        margin-top:80% !important;
+        font-weight:bold;
+        font-size:1.6em;
+      }
+      
+    .slide-paragaph{
+        width:80%;
+        display:block;
+        margin: 0 auto;
+        font-size:1.5em;
+    }
+
+    #toHomePage{
+        background-color: transparent;
+        font-size: calc(10px + 1.5vw);
+    }
 }

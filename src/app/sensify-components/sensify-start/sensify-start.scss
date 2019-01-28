@@ -72,6 +72,10 @@ sensify-page-start {
         margin: 10px;
     }
 
+    #currUnit{
+        font-size:calc(15px + 1.5vw);
+    }
+
     #dataRow{
         //overflow: auto;
         margin-top: -20px;

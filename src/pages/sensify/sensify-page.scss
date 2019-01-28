@@ -13,4 +13,8 @@ sensify-page {
         height: 100%;
         width: 100%;
     }
+
+    ion-menu .scroll-content{
+        overflow-y: auto; // or "overflow: auto;"
+    }
 }

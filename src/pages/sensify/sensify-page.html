@@ -44,7 +44,7 @@
             <sensify-page-about></sensify-page-about>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'welcome')">
-            <sensify-page-welcome></sensify-page-welcome>
+            <sensify-page-welcome (onTabSelectorChange)="changeTab($event)"></sensify-page-welcome>
         </div>
     </ion-row>
     <div style="width:0px; height:0px; z-index: 5; position: absolute; visibility: hidden" leaflet [leafletOptions]="LeafletOptions"
