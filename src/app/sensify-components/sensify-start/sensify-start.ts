@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnChanges, Output, ViewChild} from '@angular/core';
-import {ActionSheetButton, ActionSheetController, NavController, NavParams, Platform} from 'ionic-angular';
+import { Component, EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+import { ActionSheetButton, ActionSheetController, NavController, NavParams, Platform } from 'ionic-angular';
 import { SenseBox, Metadata, Sensor } from '../../../providers/model';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
 import { Chart } from 'chart.js';
@@ -30,8 +30,8 @@ export class SensifyStartPage implements OnChanges {
     public curUnit: String;
     public curName: String;
     public btns: any;
-  
-    public status:boolean;
+
+    public status: boolean;
 
     @ViewChild('canvas') canvas;
     chart: any;
@@ -45,7 +45,7 @@ export class SensifyStartPage implements OnChanges {
         public navCtrl: NavController,
         public navParams: NavParams,
         public actionSheetCtrl: ActionSheetController
-        ) {
+    ) {
 
         this.sensors = [];
         this.btns = [];
@@ -64,14 +64,14 @@ export class SensifyStartPage implements OnChanges {
     }
 
     openMenu() {
-        if(this.status){
+        if (this.status) {
             this.visualizeCharts();
         }
 
         let filteredBtns = [];
-        
-        for(var i: number = 0; i < this.btns.length; i++){
-            if(this.btns[i]){
+
+        for (var i: number = 0; i < this.btns.length; i++) {
+            if (this.btns[i]) {
                 filteredBtns.push(this.btns[i]);
             }
         }
@@ -82,7 +82,7 @@ export class SensifyStartPage implements OnChanges {
         actionSheet.present();
     }
 
-    ngOnChanges(changes) : void {
+    ngOnChanges(changes): void {
         if (changes && changes.metadata.currentValue && changes.metadata.currentValue.closestSenseBox) {
             if (this.metadata.settings.curSensor) {
                 // this.curName is undefined in setSensors(). It needs to be set, when changes occur.
@@ -106,7 +106,7 @@ export class SensifyStartPage implements OnChanges {
         if (this.temperature) {
             if (Number(sunrise) > Number(currTime) || Number(currTime) > Number(sunset)) {    //Nacht
                 this.bgImage = "../../../assets/imgs/nightBackground.jpg";
-                if(Number(this.temperature.slice(0, -3)) <= 0){
+                if (Number(this.temperature.slice(0, -3)) <= 0) {
                     this.bgImage = "../../../assets/imgs/nightCold_Background.jpg";
                 }
             } else {                                          //Tag
@@ -143,6 +143,7 @@ export class SensifyStartPage implements OnChanges {
                         this.curUnit = sensor.unit;
                         this.curName = sensor.title;
                         this.metadata.settings.curSensor = sensor;
+                        this.onMetadataChange.emit(this.metadata);
                     }
                 };
                 this.sensors.push(sensor);
@@ -185,13 +186,13 @@ export class SensifyStartPage implements OnChanges {
     }
 
     public async updateBoxes() {
-        try{
+        try {
             this.boxes = [];
 
             if (this.metadata && this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
                 await Promise.all(this.metadata.settings.mySenseBoxIDs.map(async (id) => {
                     let sb = this.metadata.senseBoxes.find(el => el._id === id);
-                    if(!sb){
+                    if (!sb) {
                         await this.api.getSenseBoxByID(id)
                             .then(box => {
                                 sb = box;
@@ -201,10 +202,6 @@ export class SensifyStartPage implements OnChanges {
                     // set SenseBox name as selection text
                     if (sb) {
                         txt = sb.name;
-                    }
-                    let selected = false;
-                    if (this.metadata.closestSenseBox && this.metadata.closestSenseBox._id === id) {
-                        selected = true;
                     }
                     const senseBoxIDSelectBtn: any = {
                         text: txt,
@@ -297,27 +294,27 @@ export class SensifyStartPage implements OnChanges {
         this.date = day + "." + month;
     }
 
-    
-    visualizeCharts(){
-        if(this.status){
+
+    visualizeCharts() {
+        if (this.status) {
             this.status = false;
             document.getElementById("sensorInformation").style.display = "inline";
             document.getElementById("chart").style.display = "none";
-        }else{
+        } else {
             this.status = true;
             document.getElementById("sensorInformation").style.display = "none";
             document.getElementById("chart").style.display = "inline";
 
             let boxID = this.currBox._id;
-            let sensorID:String;
+            let sensorID: String;
 
-            if(this.metadata.settings.curSensor){
+            if (this.metadata.settings.curSensor) {
                 sensorID = this.metadata.settings.curSensor._id;
-            }else{
-                for (var i: number = 0; i < this.currBox.sensors.length; i++){
-                    if(this.currBox.sensors[i].title == "Temperatur"){          
+            } else {
+                for (var i: number = 0; i < this.currBox.sensors.length; i++) {
+                    if (this.currBox.sensors[i].title == "Temperatur") {
                         sensorID = this.currBox.sensors[i]._id;
-                    }else{
+                    } else {
                         sensorID = this.currBox.sensors[0]._id;
                     }
                 }
@@ -327,12 +324,12 @@ export class SensifyStartPage implements OnChanges {
             var month = "" + (currentDate.getMonth());
             var year = currentDate.getFullYear();
 
-            if(month.length <= 1){
-                if(month == "0"){
+            if (month.length <= 1) {
+                if (month == "0") {
                     month = "12";
                     year = year - 1;
-                }else{
-                month = "0" + month;
+                } else {
+                    month = "0" + month;
                 }
             }
 
@@ -351,8 +348,8 @@ export class SensifyStartPage implements OnChanges {
                         gridLines: {
                             color: 'rgba(171,171,171,0.5)',
                             lineWidth: 1
-                          }
-                        
+                        }
+
                     }],
                     xAxes: [{
                         ticks: {
@@ -363,44 +360,44 @@ export class SensifyStartPage implements OnChanges {
                         gridLines: {
                             color: 'rgba(171,171,171,0.5)',
                             lineWidth: 1
-                          }
+                        }
                     }]
-                   
+
                 },
                 spanGaps: true,
                 elements: {
-                    point:{
+                    point: {
                         radius: 0
                     }
                 }
             };
 
             this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
-                for (var i: number = res.length-1; i > 0; i--) {
+                for (var i: number = res.length - 1; i > 0; i--) {
 
                     lastMonthData.push(res[i].value);
-                    labels.push(res[i].createdAt.slice(0,10));
+                    labels.push(res[i].createdAt.slice(0, 10));
 
                 }
 
                 if (this.chart != undefined || this.chart != null) {
                     this.chart.destroy();
                 }
-                        
+
                 this.chart = new Chart(this.canvas.nativeElement, {
-                    type: 'line',                    
+                    type: 'line',
                     data: {
-                        labels: labels,                        
-                        datasets:[{
-                            data: lastMonthData,                            
-                            pointRadius:0,
+                        labels: labels,
+                        datasets: [{
+                            data: lastMonthData,
+                            pointRadius: 0,
                             label: this.curName,
                             borderColor: "#4EAF47",
                             fill: false
                         }]
                     },
                     options: chartOptions
-                    
+
                 });
                 Chart.defaults.global.defaultFontColor = 'white';
             });

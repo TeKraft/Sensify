@@ -20,6 +20,9 @@ export class SensifySettingsPage {
 
     @Output()
     public onMessageChange: EventEmitter<string> = new EventEmitter();
+    
+    @Output()
+    public onManualPositioningChange: EventEmitter<Boolean> = new EventEmitter();
 
     newRadius: number;
     newGpsDistance: number;
@@ -68,6 +71,18 @@ export class SensifySettingsPage {
             this.metadata.settings.thresholds.uvIntensity.max = this.newNotificationThresholduvIntensityMax;
         }
 
+        if (this.newRadius || this.newVerificationRange || this.newGpsDistance) {
+            this.helpers.showAlert('Saved successfully', 'Settings are saved successfully');
+            this.resetInputForms();
+        }
+
+        if (this.newNotificationThresholdTemperatureMin || this.newNotificationThresholdTemperatureMax || this.newNotificationThresholduvIntensityMax) {
+            this.helpers.showAlert('Saved successfully', 'Thresholds saved successfully');
+            this.resetInputForms();
+        }
+    }
+
+    public changeSenseBoxIdManually() {
         if (this.newSenseboxID) {
             this.api.getSenseBoxByID(this.newSenseboxID).then(res => {
                 if (res) {
@@ -84,20 +99,12 @@ export class SensifySettingsPage {
                     }
                     this.helpers.showAlert('ID saved successfully', 'New ID saved successfully');
                 }
-                this.resetInputForms();
+                this.resetInputFormsSenseBox();
             }).catch(err => {
-                this.helpers.showAlert('ID not saved', '<br><b>The ID you have is not valid. Please try again</b><br><br>' + err.error.message);
+                this.helpers.showAlert('ID not saved', '<br><b>The ID you have entered is not valid. Please try again</b><br><br>' + err.error.message);
             })
-        }
-
-        if (this.newRadius || this.newVerificationRange || this.newGpsDistance) {
-            this.helpers.showAlert('Saved successfully', 'Settings are saved successfully');
-            this.resetInputForms();
-        }
-
-        if (this.newNotificationThresholdTemperatureMin || this.newNotificationThresholdTemperatureMax || this.newNotificationThresholduvIntensityMax) {
-            this.helpers.showAlert('Saved successfully', 'Thresholds saved successfully');
-            this.resetInputForms();
+        } else {
+            this.helpers.showAlert('No ID', 'Please enter a SenseBox ID to change home SenseBox manually.');
         }
     }
 
@@ -112,6 +119,13 @@ export class SensifySettingsPage {
         this.newNotificationThresholdTemperatureMin = null;
         this.newNotificationThresholdTemperatureMax = null;
         this.newNotificationThresholduvIntensityMax = null;
+        this.onMetadataChange.emit(this.metadata);
+    }
+
+    /**
+     * Function to reset input forms for sensebox id after setting changes
+     */
+    resetInputFormsSenseBox() {
         this.newSenseboxID = null;
         this.onMetadataChange.emit(this.metadata);
     }
@@ -261,9 +275,8 @@ export class SensifySettingsPage {
 
     public togglePositionManual() {
         console.log(this.metadata.settings.setPositionManual);
-        if (this.metadata.settings.setPositionManual) {
-            // activate auto GPS positioning
-        }
+        // deactivate and activate auto GPS positioning
+        this.onManualPositioningChange.emit(this.metadata.settings.setPositionManual);
     }
 
     public changeLocation() {

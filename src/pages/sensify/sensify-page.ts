@@ -79,7 +79,7 @@ export class SensifyPage {
         this.storage.get('metadata')
         .then((val) => {
             this.helpers.presentClosableToast('Loading user data');
-            if (val) {               
+            if (val) {
                 this.metadata = val;
                 this.radius = val.settings.radius;
                 this.initSenseBoxes();
@@ -184,7 +184,8 @@ export class SensifyPage {
                     await this.api.getSenseBoxByID(this.metadata.settings.mySenseBox)
                         .then((box: SenseBox) => {
                             this.metadata.closestSenseBox = box;
-                            if (this.metadata.senseBoxes.indexOf(box) < 0) {
+                            // check for id and not for box / no box without updatedCategory in array
+                            if (this.metadata.senseBoxes.findIndex(el => el._id === box._id) < 0) {
                                 this.metadata.senseBoxes.push(box);
                             }
                             if (this.metadata.settings.location && this.metadata.closestSenseBox) {
@@ -205,19 +206,7 @@ export class SensifyPage {
             this.helpers.toastMSG.dismiss();
             this.helpers.toastMSG = null;
 
-            // Watch the user position
-            this.map.locate({watch: true, enableHighAccuracy: true}).on("locationfound", (e: any) => {
-                if(e.latlng){
-                    let location = new L.LatLng(e.latlng.lat, e.latlng.lng);
-                    let distance = location.distanceTo(this.metadata.settings.location);
-                    if(distance >= this.metadata.settings.gpsDistance) {
-                        this.metadata.settings.location = location;
-                        this.updateBoxes();
-                    }
-                }
-            }).on("locationerror", error => {
-                console.error(error);
-            });
+            this.watchUserGPS(this.metadata.settings.setPositionManual);
 
             // TEST: verify TEMPERATURE VALUE OF CLOSEST SENSEBOX          
             // console.log("SenseBox Sensor Value for Temperature Valid? : "+this.api.sensorIsValid("Temperatur", this.metadata.closestSenseBox, this.metadata.senseBoxes, this.metadata.settings.ranges.temperature));
@@ -232,6 +221,26 @@ export class SensifyPage {
         }
         catch (err) {
             console.error(err);
+        }
+    }
+
+    public watchUserGPS(manually: Boolean) {
+        if (manually) {
+            this.map.stopLocate();
+        } else {
+            // Watch the user position
+            this.map.locate({watch: true, enableHighAccuracy: true}).on("locationfound", (e: any) => {
+                if(e.latlng){
+                    let location = new L.LatLng(e.latlng.lat, e.latlng.lng);
+                    let distance = location.distanceTo(this.metadata.settings.location);
+                    if(distance >= this.metadata.settings.gpsDistance) {
+                        this.metadata.settings.location = location;
+                        this.updateBoxes();
+                    }
+                }
+            }).on("locationerror", error => {
+                console.error(error);
+            });
         }
     }
 

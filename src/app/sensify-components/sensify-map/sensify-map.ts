@@ -4,7 +4,6 @@ import * as L from "leaflet";
 import "leaflet.awesome-markers";
 import { Metadata, SenseBox } from "../../../providers/model";
 import { helpers } from "./../../../providers/service/helpers";
-import { map } from 'rxjs/operator/map';
 
 @Component({
     selector: 'sensify-page-map',
@@ -17,6 +16,7 @@ export class SensifyMapPage implements OnChanges {
 
     @Output()
     public onMessageChange: EventEmitter<string> = new EventEmitter();
+
     @Output()
     public onMetadataChange: EventEmitter<Metadata> = new EventEmitter();
 
@@ -222,7 +222,8 @@ export class SensifyMapPage implements OnChanges {
                             if (idx < 0) {
                                 this.metadata.settings.mySenseBoxIDs.push(this.metadata.settings.mySenseBox);
                             }
-                            this.updateMap();
+                            // this.updateMap();
+                            this.onMetadataChange.emit(this.metadata);
                             this.helpers.showAlert('Success', 'New home SenseBox was set');
                         })
                     })
