@@ -3,7 +3,6 @@ senify-welcome {
         background-color:white
     }
 
-
     .slide {
         position:absolute;
         z-index:1;
@@ -24,5 +23,9 @@ senify-welcome {
         margin: 0 auto;
         font-size:1.5em;
     }
-      
+
+    #toHomePage{
+        background-color: transparent;
+        font-size: calc(10px + 1.5vw);
+    }
 }

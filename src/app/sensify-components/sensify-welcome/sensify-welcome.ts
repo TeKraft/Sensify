@@ -23,9 +23,11 @@ export class SensifyWelcomePage {
     }
 
     slideMoved() {
-        if (this.welcomeSlides.getActiveIndex() >= this.welcomeSlides.getPreviousIndex())
+        if (this.welcomeSlides.getActiveIndex() >= this.welcomeSlides.getPreviousIndex()) {
             this.state = 'rightSwipe';
-        else
+        } else {
             this.state = 'leftSwipe';
+        }
     }
 }
+
