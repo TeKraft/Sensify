@@ -298,12 +298,12 @@ export class SensifyStartPage implements OnChanges {
     visualizeCharts() {
         if (this.status) {
             this.status = false;
-            document.getElementById("sensorInformation").style.display = "inline";
+            document.getElementById("dataRow").style.display = "block";
             document.getElementById("chart").style.display = "none";
         } else {
             this.status = true;
-            document.getElementById("sensorInformation").style.display = "none";
-            document.getElementById("chart").style.display = "inline";
+            document.getElementById("dataRow").style.display = "none";
+            document.getElementById("chart").style.display = "block";
 
             let boxID = this.currBox._id;
             let sensorID: String;

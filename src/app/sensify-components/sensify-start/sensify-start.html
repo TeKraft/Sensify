@@ -1,92 +1,80 @@
 <ion-content class="start" [style.backgroundImage]="'url(' + bgImage + ')'">
     <ion-grid class="grid">
-        <div style="height: 20vh;">
+        <div>
             <ion-row id="titleRow">
                 <ion-col>
                     <h1 *ngIf="currBox" id="senseBoxTitle" style="text-align: center;">
-                        <button id="btnTitle" ion-button (click)="openSenseBoxIDSelection()">
+                        <button id="btnTitle" ion-button (click)="openSenseBoxIDSelection()" class="outline">
                             <span style="padding-right: 10px;">
                                 <ion-icon name="search" small></ion-icon>
                             </span>
                             <span>{{currBox.name}}</span>
-                            <span *ngIf="date" id="date" style="padding-left:calc(10px + 1.5vw)">({{date}})</span>
+                            <span *ngIf="date" style="padding-left:calc(10px + 1.5vw)">({{date}})</span>
                         </button>
                     </h1>
                 </ion-col>
             </ion-row>
             <ion-row id="currentSensorRow">
-                <ion-col id="currentSensorCol" style="text-align: center;">
-                    <button ion-button (click)="openMenu()" id="btn">
-                        <span style="padding-right: 10px;">
+                <ion-col style="text-align: center;">
+                    <button ion-button (click)="openMenu()" id="btn" class="outline">
+                        <span>
                             <ion-icon name="search" large></ion-icon>
                         </span>
-                        <div *ngIf="curName" id="curName">{{curName}}
-                        </div>
-                        <div *ngIf="curValue" id="curValue">{{curValue}}</div>
-                        <div *ngIf="curUnit" id="curUnit">{{curUnit}}</div>
+                        <span *ngIf="curName" id="currSensor">{{curName}}</span>
+                        <span *ngIf="curValue" id="currSensor">{{curValue}}</span>
+                        <span *ngIf="curUnit" id="currSensor">{{curUnit}}</span>
                     </button>
                 </ion-col>
             </ion-row>
         </div>
-        <div style="height: 20vh;">
-            <ion-row justify-content-start>
+        <div>
+            <ion-row justify-content-start class="outline">
                 <ion-col id="quick-infos">
                     <img src="../../../assets/imgs/sunrise.png" alt="sunrise" id="sunIcon">
                     <h5 *ngIf="date" id="sunrise">{{sunrise}}</h5>
                 </ion-col>
-                <ion-col id="quick-infos">
+                <ion-col id="quick-infos" class="outline" style="text-align: center;">
                     <img src="../../../assets/imgs/sunset.png" alt="sunset" id="sunIcon">
                     <h5 *ngIf="date" id="sunset">{{sunset}}</h5>
                 </ion-col>
-                <ion-col id="quick-infos">
+            </ion-row>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <ion-row justify-content-start>
+                <ion-col id="quick-infos" class="outline">
                     <button (click)="visualizeCharts()" id="chartBTN" style="position:absolute; bottom:15px; right:10px;">
                         <img src="../../../assets/buttons/chartButton.png" id="chartButton">
                     </button>
                 </ion-col>
             </ion-row>
         </div>
-        <br>
-
-        <div id="sensorInformation" style="position:fixed; bottom:5px; left: 5px; right: 5px; height: -70vh;">
-            <ion-row id="headingsRow">
-                <ion-col id="headingCol" col-5>
-                    <h3 id="headingSensor">Sensors</h3>
-                </ion-col>
-                <ion-col id="headingCol" col-4>
-                    <h3 id="headingValue">Values</h3>
-                </ion-col>
-                <ion-col id="headingCol" col-3>
-                    <h3 id="headingUnit">Unit</h3>
-                </ion-col>
-            </ion-row>
-            <ion-row id="dataRow">
-                <ion-col id="sensorCol" col-5>
-                    <ul id="sensors">
-                        <li *ngFor="let sensor of sensors" id="element">
+        <div id="dataRow">
+            <ion-row class="outline">
+                <ion-col col-7>
+                    <span class="header" style="padding: 35px">Sensor</span>
+                    <ul>
+                        <li *ngFor="let sensor of sensors" id="sensorStyling">
                             <div>{{sensor.title}}</div>
                         </li>
                     </ul>
                 </ion-col>
-                <ion-col id="valueCol" col-4>
-                    <ul id="values">
-                        <li *ngFor="let sensor of sensors" id="element">
-                            <div *ngIf="sensor.lastMeasurement != null">{{sensor.lastMeasurement.value}}</div>
-                        </li>
-                    </ul>
-                </ion-col>
-                <ion-col id="unitCol" col-3>
-                    <ul id="units">
-                        <li *ngFor="let sensor of sensors" id="element">
-                            <div>{{sensor.unit}}</div>
+                <ion-col col-5>
+                    <span class="header">Measurement</span>
+                    <ul>
+                        <li *ngFor="let sensor of sensors" id="sensorStyling">
+                            <span *ngIf="sensor.lastMeasurement != null">
+                                {{sensor.lastMeasurement.value}} {{sensor.unit}}
+                            </span>
                         </li>
                     </ul>
                 </ion-col>
             </ion-row>
         </div>
-
         <div id="chart" class="chart" style="display:none;">
             <canvas id="canvas" #canvas height="200"></canvas>
         </div>
-
     </ion-grid>
 </ion-content>
