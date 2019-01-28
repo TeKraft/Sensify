@@ -1,13 +1,13 @@
 {
-  "name": "openSenseApp",
-  "short_name": "openSenseApp",
+  "name": "Sensify",
+  "short_name": "Sensify",
   "start_url": "index.html",
   "display": "standalone",
   "icons": [{
-    "src": "assets/imgs/logo.png",
-    "sizes": "377x376",
+    "src": "assets/logos/sensify_big.png",
+    "sizes": "323x323",
     "type": "image/png"
   }],
-  "background_color": "#4e8ef7",
-  "theme_color": "#4e8ef7"
+  "background_color": "#949698",
+  "theme_color": "#949698"
 }

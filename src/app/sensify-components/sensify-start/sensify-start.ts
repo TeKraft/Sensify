@@ -1,16 +1,23 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { ActionSheetController, NavController, NavParams, Platform } from 'ionic-angular';
+import { Component, EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+import { ActionSheetButton, ActionSheetController, NavController, NavParams, Platform } from 'ionic-angular';
 import { SenseBox, Metadata, Sensor } from '../../../providers/model';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
+import { Chart } from 'chart.js';
+import { ApiProvider } from '../../../providers/api/api';
 
 @Component({
     selector: 'sensify-page-start',
     templateUrl: 'sensify-start.html',
 })
+
 export class SensifyStartPage implements OnChanges {
 
     @Input()
     public metadata: Metadata;
+
+    @Output()
+    public onMetadataChange: EventEmitter<Metadata> = new EventEmitter();
+
     public currBox: SenseBox;
     public date: String;
     public sunrise: String;
@@ -24,7 +31,22 @@ export class SensifyStartPage implements OnChanges {
     public curName: String;
     public btns: any;
 
-    constructor(public mySensifyPage: SensifyPage, public platform: Platform, public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController) {
+    public status: boolean;
+
+    @ViewChild('canvas') canvas;
+    chart: any;
+
+    public boxes: (string | ActionSheetButton)[] = [];
+
+    constructor(
+        public api: ApiProvider,
+        public mySensifyPage: SensifyPage,
+        public platform: Platform,
+        public navCtrl: NavController,
+        public navParams: NavParams,
+        public actionSheetCtrl: ActionSheetController
+    ) {
+
         this.sensors = [];
         this.btns = [];
 
@@ -33,26 +55,44 @@ export class SensifyStartPage implements OnChanges {
 
         this.curValue = "...";
         this.curUnit = "";
-        this.curName = "";
+        this.curName;
 
-        this.bgImage = "../../../assets/imgs/TestBckgrd.png";
+        this.status = false;
+
+        this.bgImage = "../../../assets/imgs/background.png";
         this.setCurrentDate();
     }
 
     openMenu() {
+        if (this.status) {
+            this.visualizeCharts();
+        }
+
+        let filteredBtns = [];
+
+        for (var i: number = 0; i < this.btns.length; i++) {
+            if (this.btns[i]) {
+                filteredBtns.push(this.btns[i]);
+            }
+        }
         const actionSheet = this.actionSheetCtrl.create({
             title: 'Select Sensor',
-            buttons: this.btns,
+            buttons: filteredBtns,
         });
         actionSheet.present();
     }
 
-    ngOnChanges(changes) {
-        if (changes.metadata.currentValue.closestSenseBox) {
+    ngOnChanges(changes): void {
+        if (changes && changes.metadata.currentValue && changes.metadata.currentValue.closestSenseBox) {
+            if (this.metadata.settings.curSensor) {
+                // this.curName is undefined in setSensors(). It needs to be set, when changes occur.
+                this.curName = this.metadata.settings.curSensor.title;
+            }
             this.currBox = this.metadata.closestSenseBox;
             this.init();
             this.setSensors();
         }
+        this.updateBoxes();
     }
 
     public setBackground() {
@@ -63,16 +103,18 @@ export class SensifyStartPage implements OnChanges {
         var sunrise = this.sunrise.replace(":", ".");
         var sunset = this.sunset.replace(":", ".");
 
-
         if (this.temperature) {
             if (Number(sunrise) > Number(currTime) || Number(currTime) > Number(sunset)) {    //Nacht
                 this.bgImage = "../../../assets/imgs/nightBackground.jpg";
+                if (Number(this.temperature.slice(0, -3)) <= 0) {
+                    this.bgImage = "../../../assets/imgs/nightCold_Background.jpg";
+                }
             } else {                                          //Tag
-                if (Number(this.temperature.slice(0, -3)) < 0) {
+                if (Number(this.temperature.slice(0, -3)) <= 0) {
                     this.bgImage = "../../../assets/imgs/snowBackground.jpg";
                 } else {
 
-                    if (Number(this.uv) < 100) {
+                    if (Number(this.uv) < 700) {
                         this.bgImage = "../../../assets/imgs/cloudBackground.jpg";
 
                     } else {
@@ -86,6 +128,8 @@ export class SensifyStartPage implements OnChanges {
     public setSensors() {
         this.sensors = [];
         this.btns = [];
+        // check if the current title (sensebox sensor title) exists in the selected sensebox.
+        let idx = this.currBox.sensors.findIndex(el => el.title === this.curName);
 
         for (var i: number = 0; i < this.currBox.sensors.length; i++) {
             let newBtn: any;
@@ -98,35 +142,100 @@ export class SensifyStartPage implements OnChanges {
                         this.curValue = sensor.lastMeasurement.value;
                         this.curUnit = sensor.unit;
                         this.curName = sensor.title;
-
                         this.metadata.settings.curSensor = sensor;
-
+                        this.onMetadataChange.emit(this.metadata);
                     }
                 };
-
                 this.sensors.push(sensor);
 
-                if (this.metadata.settings.curSensor) {
+                // always set temperature and uv intensity as globals
+                if (sensor.title == "Temperatur") {
+                    this.temperature = sensor.lastMeasurement.value;
+                }
+                if (sensor.title == "UV-Intensität") {
+                    this.uv = sensor.lastMeasurement.value;
+                }
 
-                    this.curValue = this.metadata.settings.curSensor.lastMeasurement.value;
-                    this.curUnit = this.metadata.settings.curSensor.unit;
-                    this.curName = this.metadata.settings.curSensor.title;
-
+                // if the selected sensebox has the current selected sensor it is used. otherwise "Temperatur" will be set.
+                if (idx >= 0) {
+                    if (sensor.title === this.curName) {
+                        this.metadata.settings.curSensor = sensor;
+                    }
+                    if (this.metadata.settings.curSensor) {
+                        this.curValue = this.metadata.settings.curSensor.lastMeasurement.value;
+                        this.curUnit = this.metadata.settings.curSensor.unit;
+                        this.curName = this.metadata.settings.curSensor.title;
+                    } else {
+                        if (sensor.title == "Temperatur") {
+                            this.curValue = sensor.lastMeasurement.value;
+                            this.curUnit = sensor.unit;
+                            this.curName = sensor.title;
+                        }
+                    }
                 } else {
                     if (sensor.title == "Temperatur") {
-                        this.temperature = sensor.lastMeasurement.value;
                         this.curValue = sensor.lastMeasurement.value;
                         this.curUnit = sensor.unit;
                         this.curName = sensor.title;
                     }
-                    if (sensor.title == "UV-Intensität") {
-                        this.uv = sensor.lastMeasurement.value;
-                    }
                 }
-            }
 
+            }
             this.btns.push(newBtn);
         }
+    }
+
+    public async updateBoxes() {
+        try {
+            this.boxes = [];
+
+            if (this.metadata && this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
+                await Promise.all(this.metadata.settings.mySenseBoxIDs.map(async (id) => {
+                    let sb = this.metadata.senseBoxes.find(el => el._id === id);
+                    if (!sb) {
+                        await this.api.getSenseBoxByID(id)
+                            .then(box => {
+                                sb = box;
+                            });
+                    }
+                    let txt = id;
+                    // set SenseBox name as selection text
+                    if (sb) {
+                        txt = sb.name;
+                    }
+                    const senseBoxIDSelectBtn: any = {
+                        text: txt,
+                        handler: () => {
+                            this.selectSenseBoxID(id);
+                        }
+                    };
+                    this.boxes.push(senseBoxIDSelectBtn);
+                }));
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    public selectSenseBoxID(id: String) {
+        this.metadata.settings.mySenseBox = id;
+        let sensebox = this.metadata.senseBoxes.find(el => el._id === id);
+        if (sensebox) {
+            this.metadata.closestSenseBox = sensebox;
+            this.currBox = sensebox;
+            this.setSensors();
+            this.setBackground();
+        }
+        this.onMetadataChange.emit(this.metadata);
+    }
+
+    public openSenseBoxIDSelection() {
+        const actionSheet = this.actionSheetCtrl.create({
+            title: 'Select SenseBox to display',
+            buttons: this.boxes,
+        });
+        actionSheet.present();
     }
 
     public async init() {
@@ -155,9 +264,7 @@ export class SensifyStartPage implements OnChanges {
             hour = hour + 13;
         }
 
-        time = hour + ":" + minutes;
-
-        return time;
+        return hour + ":" + minutes;
     }
 
     getSunrise(url: string): Promise<any> {
@@ -180,14 +287,121 @@ export class SensifyStartPage implements OnChanges {
             });
     }
 
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad SensifyStartPage');
-    }
-
     setCurrentDate() {
         var currentDate = new Date()
         var day = currentDate.getDate()
         var month = currentDate.getMonth() + 1 //January is 0!
-        this.date = day + "." + month;// + "." + year;
+        this.date = day + "." + month;
+    }
+
+
+    visualizeCharts() {
+        if (this.status) {
+            this.status = false;
+            document.getElementById("dataRow").style.display = "block";
+            document.getElementById("chart").style.display = "none";
+        } else {
+            this.status = true;
+            document.getElementById("dataRow").style.display = "none";
+            document.getElementById("chart").style.display = "block";
+
+            let boxID = this.currBox._id;
+            let sensorID: String;
+
+            if (this.metadata.settings.curSensor) {
+                sensorID = this.metadata.settings.curSensor._id;
+            } else {
+                for (var i: number = 0; i < this.currBox.sensors.length; i++) {
+                    if (this.currBox.sensors[i].title == "Temperatur") {
+                        sensorID = this.currBox.sensors[i]._id;
+                    } else {
+                        sensorID = this.currBox.sensors[0]._id;
+                    }
+                }
+            }
+            var currentDate = new Date();
+            var day = currentDate.getDate();
+            var month = "" + (currentDate.getMonth());
+            var year = currentDate.getFullYear();
+
+            if (month.length <= 1) {
+                if (month == "0") {
+                    month = "12";
+                    year = year - 1;
+                } else {
+                    month = "0" + month;
+                }
+            }
+
+            let fromDate = "" + year + "-" + month + "-" + day + "T" + "00:00:00.678Z";
+            var lastMonthData = [];
+            var labels = [];
+
+            var chartOptions = {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            fontColor: "white",
+                            fontSize: 14,
+                            beginAtZero: true
+                        },
+                        gridLines: {
+                            color: 'rgba(171,171,171,0.5)',
+                            lineWidth: 1
+                        }
+
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            fontColor: "white",
+                            fontSize: 14,
+                            beginAtZero: true
+                        },
+                        gridLines: {
+                            color: 'rgba(171,171,171,0.5)',
+                            lineWidth: 1
+                        }
+                    }]
+
+                },
+                spanGaps: true,
+                elements: {
+                    point: {
+                        radius: 0
+                    }
+                }
+            };
+
+            this.api.getSensorMeasurement(boxID, sensorID, fromDate).then(res => {
+                for (var i: number = res.length - 1; i > 0; i--) {
+
+                    lastMonthData.push(res[i].value);
+                    labels.push(res[i].createdAt.slice(0, 10));
+
+                }
+
+                if (this.chart != undefined || this.chart != null) {
+                    this.chart.destroy();
+                }
+
+                this.chart = new Chart(this.canvas.nativeElement, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: lastMonthData,
+                            pointRadius: 0,
+                            label: this.curName,
+                            borderColor: "#4EAF47",
+                            fill: false
+                        }]
+                    },
+                    options: chartOptions
+
+                });
+                Chart.defaults.global.defaultFontColor = 'white';
+            });
+
+        }
     }
 }

@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Metadata } from '../../../providers/model';
 import { ActionSheetController, AlertController, ActionSheetButton } from 'ionic-angular';
+import { Metadata } from '../../../providers/model';
 import { ApiProvider } from '../../../providers/api/api';
 import { SensifyPage } from '../../../pages/sensify/sensify-page';
-
+import { helpers } from "../../../providers/service/helpers";
+import * as L from 'leaflet';
 
 @Component({
     selector: 'sensify-page-settings',
@@ -19,25 +20,31 @@ export class SensifySettingsPage {
 
     @Output()
     public onMessageChange: EventEmitter<string> = new EventEmitter();
+    
+    @Output()
+    public onManualPositioningChange: EventEmitter<Boolean> = new EventEmitter();
 
-    newRadius: any;
-    newValidationRange: any;
+    newRadius: number;
+    newGpsDistance: number;
+    newVerificationRange: number;
+    newNotificationThresholdTemperatureMin: number;
+    newNotificationThresholdTemperatureMax: number;
+    newNotificationThresholduvIntensityMax: number;
     newSenseboxID: any;
 
     public senseBoxIDDelete: (string | ActionSheetButton)[] = [];
     public senseBoxIDSelect: (string | ActionSheetButton)[] = [];
+    public setPositionManual: boolean;
+    public manualLat;
+    public manualLng;
 
     constructor(
         public mySensifyPage: SensifyPage,
-        public alertCrtl: AlertController,
+        public alertCtrl: AlertController,
         public api: ApiProvider,
-        private alertCtrl: AlertController,
-        public actionSheetCtrl: ActionSheetController
+        public actionSheetCtrl: ActionSheetController,
+        private helpers: helpers
     ) { }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad SensifySettingsPage');
-    }
 
     ngOnChanges(changes) {
         this.updateSenseBoxIDs();
@@ -48,56 +55,85 @@ export class SensifySettingsPage {
         if (this.newRadius) {
             this.metadata.settings.radius = this.newRadius;
         }
-        if (this.newValidationRange) {
-            this.metadata.settings.ranges.temperature = this.newValidationRange;
+        if (this.newGpsDistance) {
+            this.metadata.settings.gpsDistance = this.newGpsDistance;
         }
+        if (this.newVerificationRange) {
+            this.metadata.settings.ranges.temperature = this.newVerificationRange;
+        }
+        if (this.newNotificationThresholdTemperatureMin) {
+            this.metadata.settings.thresholds.temperature.min = this.newNotificationThresholdTemperatureMin;
+        }
+        if (this.newNotificationThresholdTemperatureMax) {
+            this.metadata.settings.thresholds.temperature.max = this.newNotificationThresholdTemperatureMax;
+        }
+        if (this.newNotificationThresholduvIntensityMax) {
+            this.metadata.settings.thresholds.uvIntensity.max = this.newNotificationThresholduvIntensityMax;
+        }
+
+        if (this.newRadius || this.newVerificationRange || this.newGpsDistance) {
+            this.helpers.showAlert('Saved successfully', 'Settings are saved successfully');
+            this.resetInputForms();
+        }
+
+        if (this.newNotificationThresholdTemperatureMin || this.newNotificationThresholdTemperatureMax || this.newNotificationThresholduvIntensityMax) {
+            this.helpers.showAlert('Saved successfully', 'Thresholds saved successfully');
+            this.resetInputForms();
+        }
+    }
+
+    public changeSenseBoxIdManually() {
         if (this.newSenseboxID) {
-            //Validate if senseBoxID is a sensebox
             this.api.getSenseBoxByID(this.newSenseboxID).then(res => {
                 if (res) {
                     this.metadata.closestSenseBox = res;
                     this.metadata.settings.mySenseBox = res._id;
-                    let idx = this.metadata.settings.mySenseBoxIDs.findIndex(el => el === res._id);
+                    let idx = -1;
+                    if (this.metadata.settings.mySenseBoxIDs) {
+                        idx = this.metadata.settings.mySenseBoxIDs.findIndex(el => el === res._id);
+                    } else {
+                        this.metadata.settings.mySenseBoxIDs = [];
+                    }
                     if (idx < 0) {
                         this.metadata.settings.mySenseBoxIDs.push(res._id);
                     }
-
-                } else {
-                    console.error("SENSEBOX ID IS NOT VALID: Please check it again!")
+                    this.helpers.showAlert('ID saved successfully', 'New ID saved successfully');
                 }
+                this.resetInputFormsSenseBox();
+            }).catch(err => {
+                this.helpers.showAlert('ID not saved', '<br><b>The ID you have entered is not valid. Please try again</b><br><br>' + err.error.message);
             })
-        }
-        // this.mySensifyPage.setMetadata(this.metadata);
-        this.onMetadataChange.emit(this.metadata);
-
-        if (this.newRadius || this.newValidationRange || this.newSenseboxID) {
-            let alert = this.alertCtrl.create({
-                title: 'Saved successfully',
-                subTitle: 'Settings are saved successfully',
-                buttons: ['OK']
-            });
-            alert.present();
         } else {
-            let alert = this.alertCtrl.create({
-                title: 'Nothing changed',
-                subTitle: 'There were no settings changed',
-                buttons: ['OK']
-            });
-            alert.present();
+            this.helpers.showAlert('No ID', 'Please enter a SenseBox ID to change home SenseBox manually.');
         }
+    }
 
-        // Reset Input forms after setting change
+    /**
+     * Function to reset input forms after setting changes
+     */
+    resetInputForms() {
+        //Reset Input forms after setting change
         this.newRadius = null;
-        this.newValidationRange = null;
+        this.newGpsDistance = null;
+        this.newVerificationRange = null;
+        this.newNotificationThresholdTemperatureMin = null;
+        this.newNotificationThresholdTemperatureMax = null;
+        this.newNotificationThresholduvIntensityMax = null;
+        this.onMetadataChange.emit(this.metadata);
+    }
+
+    /**
+     * Function to reset input forms for sensebox id after setting changes
+     */
+    resetInputFormsSenseBox() {
         this.newSenseboxID = null;
-        // this.onMetadataChange.emit(this.metadata);    
+        this.onMetadataChange.emit(this.metadata);
     }
 
     /**
      * Function to remove all selected SenseBox IDs.
      */
     deleteSenseBoxIDs() {
-        this.mySensifyPage.presentToast('Waiting for Closest SenseBox');
         this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
             this.metadata.closestSenseBox = res;
             this.newSenseboxID = null;
@@ -106,15 +142,8 @@ export class SensifySettingsPage {
             this.senseBoxIDDelete = [];
             this.senseBoxIDSelect = [];
         });
-        this.mySensifyPage.toastMSG.dismiss();
-        this.mySensifyPage.toastMSG = null;
-        
-        let alert = this.alertCtrl.create({
-            title: 'IDs deleted',
-            subTitle: 'The SenseBox IDs have been deleted.',
-            buttons: ['OK']
-        });
-        alert.present();
+
+        this.helpers.showAlert('All IDs deleted successfully', 'The SenseBox IDs have been deleted');
     }
 
     /**
@@ -122,8 +151,8 @@ export class SensifySettingsPage {
      * @param id {String} id of the SenseBox that should be removed
      */
     deleteSenseBoxID(id: String) {
-        this.mySensifyPage.presentToast('Waiting for Closest SenseBox');
         this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
+            this.helpers.presentClosableToast('Deleting Sensebox');
             let idx = this.metadata.settings.mySenseBoxIDs.findIndex(el => el === id);
             // splice deleted id from sensebox array
             if (idx >= 0) {
@@ -149,17 +178,12 @@ export class SensifySettingsPage {
                     delete this.metadata.settings.mySenseBox;
                 }
             }
-
             this.onMetadataChange.emit(this.metadata);
-            let alert = this.alertCtrl.create({
-                title: 'ID Removed',
-                subTitle: 'The SenseBox ID has been removed.',
-                buttons: ['OK']
-            });
-            alert.present();
+            this.helpers.showAlert('ID removed successfully', 'The SenseBox ID has been removed');
+
+            this.helpers.toastMSG.dismiss();
+            this.helpers.toastMSG = null;
         })
-        this.mySensifyPage.toastMSG.dismiss();
-        this.mySensifyPage.toastMSG = null;
     }
 
     /**
@@ -172,39 +196,58 @@ export class SensifySettingsPage {
         if (sensebox) {
             this.metadata.closestSenseBox = sensebox;
         }
-        let alert = this.alertCtrl.create({
-            title: 'ID set',
-            subTitle: 'The SenseBox ID has been set.',
-            buttons: ['OK']
-        });
-        alert.present();
+        this.helpers.showAlert('ID set', 'The SenseBox ID has been set');
         this.onMetadataChange.emit(this.metadata);
     }
 
     /** 
      * Function to create action sheet for choosing selected SenseBox and remove on of all selected SenseBoxes
      */
-    public updateSenseBoxIDs() {
-        this.senseBoxIDDelete = [];
-        this.senseBoxIDSelect = [];
+    public async updateSenseBoxIDs() {
+        try {
+            this.senseBoxIDDelete = [];
+            this.senseBoxIDSelect = [];
 
-        if (this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
-            this.metadata.settings.mySenseBoxIDs.forEach(id => {
-                const senseBoxDeleteBtn: any = {
-                    text: id,
-                    handler: () => {
-                        this.deleteSenseBoxID(id);
+            if (this.metadata.settings.mySenseBoxIDs && this.metadata.settings.mySenseBoxIDs.length > 0) {
+                await Promise.all(this.metadata.settings.mySenseBoxIDs.map(async (id) => {
+                    let sb = this.metadata.senseBoxes.find(el => el._id === id);
+                    if (!sb) {
+                        await this.api.getSenseBoxByID(id)
+                            .then(box => {
+                                sb = box;
+                            });
                     }
-                }
-                this.senseBoxIDDelete.push(senseBoxDeleteBtn);
-                const senseBoxIDSelectBtn: any = {
-                    text: id,
-                    handler: () => {
-                        this.selectSenseBoxID(id);
+                    let txt = id;
+                    // set SenseBox name as selection text
+                    if (sb) {
+                        txt = sb.name;
                     }
-                }
-                this.senseBoxIDSelect.push(senseBoxIDSelectBtn);
-            })
+                    let selected = false;
+                    if (this.metadata.closestSenseBox && this.metadata.closestSenseBox._id === id) {
+                        selected = true;
+                    }
+                    let actionSheetClass = selected ? 'selectedActionSheet' : 'unselectedActionSheet';
+                    const senseBoxDeleteBtn: any = {
+                        text: txt,
+                        cssClass: actionSheetClass,
+                        handler: () => {
+                            this.deleteSenseBoxID(id);
+                        }
+                    };
+                    this.senseBoxIDDelete.push(senseBoxDeleteBtn);
+                    const senseBoxIDSelectBtn: any = {
+                        text: txt,
+                        cssClass: actionSheetClass,
+                        handler: () => {
+                            this.selectSenseBoxID(id);
+                        }
+                    };
+                    this.senseBoxIDSelect.push(senseBoxIDSelectBtn);
+                }));
+            }
+        }
+        catch (err) {
+            console.error(err);
         }
     }
 
@@ -228,5 +271,34 @@ export class SensifySettingsPage {
             buttons: this.senseBoxIDDelete,
         });
         actionSheet.present();
+    }
+
+    public togglePositionManual() {
+        console.log(this.metadata.settings.setPositionManual);
+        // deactivate and activate auto GPS positioning
+        this.onManualPositioningChange.emit(this.metadata.settings.setPositionManual);
+    }
+
+    public changeLocation() {
+        let position: L.LatLng = this.metadata.settings.location;
+        if (this.manualLat) {
+            position.lat = this.manualLat;
+        }
+        if (this.manualLng) {
+            position.lng = this.manualLng;
+        }
+        if (this.metadata.settings.setPositionManual) {
+            this.metadata.settings.location = position;
+            this.onMetadataChange.emit(this.metadata);
+        } else {
+            this.helpers.showAlert('Error', 'First, you need to enable manually position.');
+        }
+    }
+
+    public selectClosestSenseBox() {
+        this.api.getclosestSenseBox(this.metadata.senseBoxes, this.metadata.settings.location).then(res => {
+            this.metadata.closestSenseBox = res;
+        });
+        this.helpers.showAlert('Selected Closest SenseBox!', 'You are now connected to the closest SenseBox.');
     }
 }

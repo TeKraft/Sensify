@@ -8,7 +8,7 @@ export interface Sensor {
         createdAt: String;
     };
     sensorType: String;
-    id: String;
+    _id: String;
 }
 
 export interface SenseBox {
@@ -22,22 +22,36 @@ export interface SenseBox {
     sensors: Sensor[];
     _id: String;
     updatedCategory: String;
-    isValid: Boolean;
+    isVerified: Boolean;
 }
 
 export interface Settings {
     gps: boolean;
     location?: L.LatLng;
     radius: number;
+    gpsDistance: number;
     mySenseBox?: String;
     mySenseBoxIDs?: String[];
     timestamp: Date;
     ranges: {
         temperature: number;
     };
+    thresholds: Thresholds;
     zoomLevel: number;
     mapView: L.LatLng;
     curSensor: Sensor;
+    setPositionManual: Boolean; // manual vs auto GPS positioning
+    firstStart: Boolean;
+}
+
+export interface Thresholds {
+    temperature: {
+        min: number;
+        max: number;
+    };
+    uvIntensity: {
+        max: number;
+    }
 }
 
 export interface Metadata {

@@ -1,5 +1,7 @@
 <ion-header>
     <ion-navbar>
+        <ion-title>Sensify</ion-title>
+
         <button ion-button menuToggle>
             <ion-icon name="menu"></ion-icon>
         </button>
@@ -12,7 +14,6 @@
                 <ion-icon size="large" name="settings" style="zoom:1.5;"></ion-icon>
             </button>
         </ion-buttons>
-        <ion-title>Sensify</ion-title>
     </ion-navbar>
 </ion-header>
 
@@ -21,7 +22,6 @@
 <ion-select [(ngModel)]="tabSelector" interface="action-sheet" #mySelect>
     <ion-option value="settings">Settings</ion-option>
     <ion-option value="about">About</ion-option>
-    <!--<ion-option value="mute_inf">Exit App</ion-option>-->
 </ion-select>
 
 
@@ -29,22 +29,27 @@
     <!-- components -->
     <ion-row id="pageContent">
         <div class="selectedPage" *ngIf="(tabSelector === 'map')">
-            <sensify-page-map [metadata]="metadata"></sensify-page-map>
+            <sensify-page-map [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-map>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'start')">
-            <sensify-page-start [metadata]="metadata"></sensify-page-start>
+            <sensify-page-start [metadata]="metadata" (onMetadataChange)="setMetadata($event)"></sensify-page-start>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'notifications')">
             <sensify-page-notifications [metadata]="metadata"></sensify-page-notifications>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'settings')">
-            <sensify-page-settings [metadata]="metadata"
-                                   (onMetadataChange)="setMetadata($event)"></sensify-page-settings>
+            <sensify-page-settings [metadata]="metadata" (onMetadataChange)="setMetadata($event)" (onManualPositioningChange)="watchUserGPS($event)"></sensify-page-settings>
         </div>
         <div class="selectedPage" *ngIf="(tabSelector === 'about')">
             <sensify-page-about></sensify-page-about>
         </div>
+        <div class="selectedPage" *ngIf="(tabSelector === 'welcome')">
+            <sensify-page-welcome (onTabSelectorChange)="changeTab($event)"></sensify-page-welcome>
+        </div>
     </ion-row>
+    <div style="width:0px; height:0px; z-index: 5; position: absolute; visibility: hidden" leaflet [leafletOptions]="LeafletOptions"
+         (leafletMapReady)="onMapReady($event)">
+    </div>
 </ion-content>
 
 <ion-footer class="footer-sensify-page">
@@ -56,7 +61,7 @@
         </ion-segment-button>
         <!--Home-->
         <ion-segment-button style="color:black" value="start">
-            <img src="../../assets/icon/favicon_sensify_black_white.png" width="30px">
+            <img src="../../assets/logos/favicon_black_white.png" width="30px">
         </ion-segment-button>
         <!--Notifications-->
         <ion-segment-button style="color:black" value="notifications">

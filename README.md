@@ -1,4 +1,4 @@
-### openSenseApp starter
+### Sensify starter
 
 - This IONIC 3 project was generated with IONIC CLI
     - https://ionicframework.com/docs/cli/
@@ -30,3 +30,7 @@
 
 - senseBox page has an example how to talk to the openSenseMap Api
     - please use https://api.testing.opensensemap.org for testing
+
+
+- build apps with
+    - -ionic cordova build --debug android

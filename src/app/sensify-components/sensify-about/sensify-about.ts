@@ -7,10 +7,6 @@ import { Component } from '@angular/core';
 export class SensifyAboutPage {
 
     constructor() {}
-    
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad SensifyAboutPage');
-    }
 
     openUrl(){
         window.open('https://github.com/vgorte/openSenseApp', '_system');

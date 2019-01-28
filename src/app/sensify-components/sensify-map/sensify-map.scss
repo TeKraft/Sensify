@@ -22,6 +22,27 @@ page-map {
     fill: #c53debbb;
 }
 
+.buttons {
+    width: 30px;
+    height: 30px;
+    border: 5px;
+    border-color: black;
+    background-color: white;
+    background-size: 30px;
+    background-position: center;
+}
+
+.alert .alert-wrapper{
+    background:white;
+}
+
+/* css to customize Leaflet default styles  */
+.customBlue .leaflet-popup-tip,
+.customBlue .leaflet-popup-content-wrapper {
+    background: #2f95bd;
+    color: color($colors, light);
+}
+
 /* css to customize Leaflet default styles  */
 .customRed .leaflet-popup-tip,
 .customRed .leaflet-popup-content-wrapper {
@@ -37,7 +58,7 @@ page-map {
 }
 
 /* css to customize Leaflet default styles  */
-.customYellow .leaflet-popup-tip,
-.customYellow .leaflet-popup-content-wrapper {
+.customOrange .leaflet-popup-tip,
+.customOrange .leaflet-popup-content-wrapper {
     background: #F1993C;
 }
