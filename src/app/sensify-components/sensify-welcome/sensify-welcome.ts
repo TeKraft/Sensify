@@ -1,6 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { NavController, NavParams, Slides } from 'ionic-angular';
-import { SensifyPage } from '../../../pages/sensify/sensify-page';
 
 @Component({
     selector: 'sensify-page-welcome',
@@ -8,6 +7,9 @@ import { SensifyPage } from '../../../pages/sensify/sensify-page';
 })
 export class SensifyWelcomePage {
     @ViewChild(Slides) welcomeSlides: Slides;
+
+    @Output()
+    public onTabSelectorChange: EventEmitter<String> = new EventEmitter();
 
     public state: String;
 
@@ -19,7 +21,7 @@ export class SensifyWelcomePage {
     }
 
     toHomePage() {
-        this.navCtrl.setRoot(SensifyPage);
+        this.onTabSelectorChange.emit('start');
     }
 
     slideMoved() {
