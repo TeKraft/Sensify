@@ -9,6 +9,6 @@ export class SensifyAboutPage {
     constructor() {}
 
     openUrl(){
-        window.open('https://github.com/vgorte/openSenseApp', '_system');
+        window.open('https://github.com/vgorte/sensify', '_system');
     }
 }
